@@ -75,13 +75,12 @@ export class Background extends SheetExtension {
 
                 ctx.fillStyle = rgb || getColor([255, 255, 255])!;
 
-                const backgroundPaths = new Path2D(); // 使用 Path 对象代替原有的 ctx.moveTo ctx.lineTo, Path 性能更好
+                const backgroundPaths = new Path2D();
                 backgroundCache.forValue((rowIndex, columnIndex) => {
                     if (!checkOutOfViewBound && !inViewRanges(viewRanges, rowIndex, columnIndex)) {
                         return true;
                     }
 
-                    // 合并单元格可能从视野外很远的位置开始, 因此需要全局遍历
                     const cellInfo = backgroundPositions?.getValue(rowIndex, columnIndex);
                     if (cellInfo == null) {
                         return true;
@@ -91,16 +90,18 @@ export class Background extends SheetExtension {
                     const mergeTo = diffRanges && diffRanges.length > 0 ? diffRanges : viewRanges;
                     const combineWithMergeRanges = mergeRangeIfIntersects(mergeTo, [mergeInfo]);
 
-                    // 不在范围(视野 + 合并单元格)内, 提前退出
+                    // If curr cell is not in the viewrange (viewport + merged cells), exit early.
                     if (!inViewRanges(combineWithMergeRanges!, rowIndex, columnIndex)) {
                         return true;
                     }
 
-                    // 合并后的单元格 && 非左上角单元格  // 此刻需要使用左上角单元格的背景色
+                    // For merged cells && cells that are not top-left,
+                    // we need to use the background color of the top-left cell.
                     if (isMerged) {
                         return true;
                     }
-                    // 合并单元格, 但是区域是合并的左上角
+
+                    // For merged cells, and the current cell is the top-left cell in the merged region.
                     if (isMergedMainCell) {
                         startY = mergeInfo.startY;
                         endY = mergeInfo.endY;

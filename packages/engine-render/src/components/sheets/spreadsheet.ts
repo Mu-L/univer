@@ -112,9 +112,9 @@ export class Spreadsheet extends SheetComponent {
     }
 
     /**
-     * 根据 viewport 绘制
-     * viewRange 根据 cacheBound 计算得到
-     * diffRange 根据 diffCacheBounds 得到
+     * draw by viewport
+     * cacheBound ---> viewBound
+     * diffCacheBounds ---> diffRange
      * @param ctx
      * @param viewportInfo
      */
@@ -136,15 +136,13 @@ export class Spreadsheet extends SheetComponent {
         const viewRanges = [spreadsheetSkeleton.getRowColumnSegmentByViewBound(viewportInfo?.cacheBound)];
         const extensions = this.getExtensionsByOrder();
 
-        // 此刻 ctx.transform is at topLeft of sheet content, cell(0, 0)
+        // At this moment, ctx.transform is at topLeft of sheet content, cell(0, 0)
         for (const extension of extensions) {
             // const timeKey = `extension ${viewportInfo.viewPortKey}:${extension.constructor.name}`;
-            // console.time(timeKey);
             extension.draw(ctx, parentScale, spreadsheetSkeleton, diffRanges, {
                 viewRanges,
                 checkOutOfViewBound: true,
             });
-            // console.timeEnd(timeKey);
         }
     }
 
@@ -263,7 +261,7 @@ export class Spreadsheet extends SheetComponent {
             }
         } else if (diffBounds.length !== 0 || diffX !== 0 || diffY !== 0) {
             // scrolling && no dirty
-            this.paintNewAreaOfCacheCanvas(viewportInfo, {
+            this.paintNewAreaForScrolling(viewportInfo, {
                 cacheCanvas, cacheCtx, mainCtx, topOrigin, leftOrigin, bufferEdgeX, bufferEdgeY, scaleX, scaleY, columnHeaderHeight, rowHeaderWidth,
             });
         }
@@ -274,7 +272,7 @@ export class Spreadsheet extends SheetComponent {
         cacheCtx.restore();
     }
 
-    paintNewAreaOfCacheCanvas(viewportInfo: IViewportInfo, param: {
+    paintNewAreaForScrolling(viewportInfo: IViewportInfo, param: {
         cacheCanvas: Canvas; cacheCtx: UniverRenderingContext; mainCtx: UniverRenderingContext;
         topOrigin: number;
         leftOrigin: number;
@@ -294,7 +292,8 @@ export class Spreadsheet extends SheetComponent {
         cacheCtx.restore();
 
         this._refreshIncrementalState = true;
-        // 绘制之前重设画笔位置到 spreadsheet 原点, 当没有滚动时, 这个值是 (rowHeaderWidth, colHeaderHeight)
+        // Reset the ctx position to the spreadsheet content origin before drawing.
+        // trasnlation should be (rowHeaderWidth, colHeaderHeight) at start.
         const m = mainCtx.getTransform();
         cacheCtx.setTransform(m.a, m.b, m.c, m.d, 0, 0);
 
@@ -319,7 +318,8 @@ export class Spreadsheet extends SheetComponent {
                 cacheCtx.save();
                 cacheCtx.beginPath();
                 cacheCtx.rectByPrecision(x, y, w, h);
-                // 这里需要 clip 的原因是避免重复绘制 (否则文字有毛刺, especially on Windows)
+                cacheCtx.closePath();
+                // The reason for clipping here is to avoid duplicate drawing (otherwise the text would be jagged, especially on Windows)
                 cacheCtx.clip();
                 this.draw(cacheCtx, {
                     ...viewportInfo,
@@ -332,7 +332,7 @@ export class Spreadsheet extends SheetComponent {
     }
 
     /**
-     * 整个 viewport 重绘
+     * Redraw the entire viewport.
      */
     refreshCacheCanvas(viewportInfo: IViewportInfo, param: {
         cacheCanvas: Canvas; cacheCtx: UniverRenderingContext; mainCtx: UniverRenderingContext;
@@ -353,8 +353,8 @@ export class Spreadsheet extends SheetComponent {
         // cacheCtx.setTransform(m.a, m.b, m.c, m.d, m.e, m.f);
         cacheCtx.setTransform(m.a, m.b, m.c, m.d, 0, 0);
 
-        // // leftOrigin 是 viewport 相对 sheetcorner 的偏移(不考虑缩放)
-        // // - (leftOrigin - bufferEdgeX)  ----> 简化
+        // The 'leftOrigin' is the offset of the viewport relative to the sheet corner, which is the position of cell(0, 0), and it does not consider scaling.
+        // - (leftOrigin - bufferEdgeX)  ----> - leftOrigin + bufferEdgeX
         cacheCtx.translateWithPrecision(m.e / m.a - leftOrigin + bufferEdgeX, m.f / m.d - topOrigin + bufferEdgeY);
 
         // extension 绘制时按照内容的左上角计算, 不考虑 rowHeaderWidth
@@ -394,7 +394,7 @@ export class Spreadsheet extends SheetComponent {
             // zIndex 2 rowHeader & colHeader & freezeBorder this.getObjectsByOrder() ---> [SpreadsheetRowHeader, SpreadsheetColumnHeader, _Rect]
             // zIndex 3 selection  this.getObjectsByOrder() ---> [group]
 
-            // SpreadsheetRowHeader SpreadsheetColumnHeader 并不在 spreadsheet 中处理
+            // SpreadsheetRowHeader SpreadsheetColumnHeader is not render by spreadsheet
         if (this.sheetContentViewport().includes(viewPortKey)) {
             if (viewportInfo && viewportInfo.cacheCanvas) {
                 this.renderByViewport(mainCtx, viewportInfo, spreadsheetSkeleton);
@@ -413,9 +413,9 @@ export class Spreadsheet extends SheetComponent {
     }
 
     /**
-     *
-     * @param mainCtx
+     * applyCache from cache canvas
      * @param cacheCanvas Source Image
+     * @param ctx MainCtx
      * @param sx
      * @param sy
      * @param sw
@@ -518,7 +518,6 @@ export class Spreadsheet extends SheetComponent {
     /**
      * draw gridlines
      * @param ctx
-     * @param bounds
      */
     // eslint-disable-next-line max-lines-per-function
     private _drawAuxiliary(ctx: UniverRenderingContext) {
@@ -708,23 +707,5 @@ export class Spreadsheet extends SheetComponent {
 
             ctx.clearRectForTexture(startX, startY, endX - startX + 0.5, endY - startY + 0.5);
         });
-    }
-
-    getRandomLightColor(): string {
-        const letters = 'ABCDEF';
-        let color = '#';
-        for (let i = 0; i < 6; i++) {
-            color += letters[Math.floor(Math.random() * 6)];
-        }
-
-        // 确保生成的颜色足够亮
-        const r = Number.parseInt(color.substring(1, 3), 16);
-        const g = Number.parseInt(color.substring(3, 5), 16);
-        const b = Number.parseInt(color.substring(5, 7), 16);
-        if (r + g + b < 610) {
-            return this.getRandomLightColor(); // 递归调用直到生成足够亮的颜色
-        }
-
-        return color;
     }
 }
