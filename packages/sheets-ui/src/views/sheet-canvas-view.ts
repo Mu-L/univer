@@ -117,6 +117,9 @@ export class SheetCanvasView extends RxDisposable implements IRenderController {
 
     // eslint-disable-next-line max-lines-per-function
     private _initViewports(scene: Scene, rowHeader: { width: number }, columnHeader: { height: number }) {
+        const bufferEdgeX = 100;
+        const bufferEdgeY = 100;
+        // window.sc = scene;
         const viewMain = new Viewport(VIEWPORT_KEY.VIEW_MAIN, scene, {
             left: rowHeader.width,
             top: columnHeader.height,
@@ -126,8 +129,8 @@ export class SheetCanvasView extends RxDisposable implements IRenderController {
             isRelativeX: true,
             isRelativeY: true,
             allowCache: true,
-            bufferEdgeX: 100,
-            bufferEdgeY: 100,
+            bufferEdgeX,
+            bufferEdgeY,
         });
 
         const viewRowTop = new Viewport(VIEWPORT_KEY.VIEW_ROW_TOP, scene, {
@@ -191,7 +194,7 @@ export class SheetCanvasView extends RxDisposable implements IRenderController {
             isRelativeY: true,
             allowCache: true,
             bufferEdgeX: 0,
-            bufferEdgeY: 50,
+            bufferEdgeY,
         });
 
         const viewMainTop = new Viewport(VIEWPORT_KEY.VIEW_MAIN_TOP, scene, {
@@ -200,7 +203,7 @@ export class SheetCanvasView extends RxDisposable implements IRenderController {
             isRelativeX: true,
             isRelativeY: false,
             allowCache: true,
-            bufferEdgeX: 100,
+            bufferEdgeX,
             bufferEdgeY: 0,
         });
         return {

@@ -132,7 +132,6 @@ export class Spreadsheet extends SheetComponent {
         const diffRanges = this._refreshIncrementalState && viewportInfo?.diffBounds
             ? viewportInfo?.diffBounds?.map((bound) => spreadsheetSkeleton.getRowColumnSegmentByViewBound(bound))
             : undefined;
-
         const viewRanges = [spreadsheetSkeleton.getRowColumnSegmentByViewBound(viewportInfo?.cacheBound)];
         const extensions = this.getExtensionsByOrder();
 
@@ -312,7 +311,7 @@ export class Spreadsheet extends SheetComponent {
                 const h = diffBottom - diffTop; // w h 必须精确和 diffarea 大小匹配, 否则会造成往回滚时, clear 的区域过大, 导致上一帧有效内容被擦除
 
                 cacheCtx.clearRectByPrecision(x, y, w, h);
-                // cacheCtx.fillStyle = this.getRandomLightColor();
+                // cacheCtx.fillStyle = this.testGetRandomLightColor();
                 // cacheCtx.fillRectByPrecision(x, y, w, h); // x, y is diffBounds, means it's relative to scrolling distance.
 
                 cacheCtx.save();
@@ -707,5 +706,23 @@ export class Spreadsheet extends SheetComponent {
 
             ctx.clearRectForTexture(startX, startY, endX - startX + 0.5, endY - startY + 0.5);
         });
+    }
+
+    testGetRandomLightColor(): string {
+        const letters = 'ABCDEF';
+        let color = '#';
+        for (let i = 0; i < 6; i++) {
+            color += letters[Math.floor(Math.random() * 6)];
+        }
+
+        // 确保生成的颜色足够亮
+        const r = Number.parseInt(color.substring(1, 3), 16);
+        const g = Number.parseInt(color.substring(3, 5), 16);
+        const b = Number.parseInt(color.substring(5, 7), 16);
+        if (r + g + b < 610) {
+            return this.testGetRandomLightColor(); // 递归调用直到生成足够亮的颜色
+        }
+
+        return color;
     }
 }

@@ -1274,8 +1274,10 @@ export class Viewport {
         const onePixelFix = FIX_ONE_PIXEL_BLUR_OFFSET * 2;
         return {
             right: value.right + this.bufferEdgeX + onePixelFix,
-            left: Math.max(this.leftOrigin, value.left - this.bufferEdgeX) - onePixelFix,
-            top: Math.max(this.topOrigin, value.top - this.bufferEdgeY) - onePixelFix,
+            // left: Math.max(this.leftOrigin, value.left - this.bufferEdgeX) - onePixelFix,
+            // top: Math.max(this.topOrigin, value.top - this.bufferEdgeY) - onePixelFix,
+            left: value.left - this.bufferEdgeX - onePixelFix,
+            top: value.top - this.bufferEdgeY - onePixelFix,
             bottom: value.bottom + this.bufferEdgeY + onePixelFix,
         } as IBoundRectNoAngle;
     }
@@ -1292,14 +1294,20 @@ export class Viewport {
         IBoundRectNoAngle | null, diffX: number, diffY: number): number {
         if (!this._cacheCanvas) return 0b00;
         if (!cacheBounds) return 0b01;
-        const viewBoundOutCacheArea = !(viewBound.right <= cacheBounds.right && viewBound.top >= cacheBounds.top
-            && viewBound.left >= cacheBounds.left && viewBound.bottom <= cacheBounds.bottom)
+
+        const onePixelFix = FIX_ONE_PIXEL_BLUR_OFFSET * 2;
+        const viewBoundOutCacheArea = !(
+            viewBound.right + onePixelFix <= cacheBounds.right &&
+            viewBound.top - onePixelFix >= cacheBounds.top &&
+            viewBound.left - onePixelFix >= cacheBounds.left &&
+            viewBound.bottom + onePixelFix <= cacheBounds.bottom)
             ? 0b01
             : 0b00;
 
         const edgeX = this.bufferEdgeX / 4;
         const edgeY = this.bufferEdgeY / 4;
         const nearEdge = ((diffX < 0 && Math.abs(viewBound.right - cacheBounds.right) < edgeX) ||
+            // Scrollbar goes left, scrolling back left.
             (diffX > 0 && Math.abs(viewBound.left - cacheBounds.left) < edgeX) ||
             // Scrollbar goes up, scrolling back up.
             (diffY > 0 && Math.abs(viewBound.top - cacheBounds.top) < edgeY) ||
