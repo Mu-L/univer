@@ -119,7 +119,7 @@ export class SheetCanvasView extends RxDisposable implements IRenderController {
     private _initViewports(scene: Scene, rowHeader: { width: number }, columnHeader: { height: number }) {
         const bufferEdgeX = 100;
         const bufferEdgeY = 100;
-        // window.sc = scene;
+        window.sc = scene;
         const viewMain = new Viewport(VIEWPORT_KEY.VIEW_MAIN, scene, {
             left: rowHeader.width,
             top: columnHeader.height,

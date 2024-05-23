@@ -354,6 +354,10 @@ export class SpreadsheetSkeleton extends Skeleton {
         this._columnTotalWidth = 0;
         this._rowHeaderWidth = 0;
         this._columnHeaderHeight = 0;
+
+        /**
+         * column & row range in visible area (cacheBound)
+         */
         this._rowColumnSegment = null as any;
         this._dataMergeCache = [];
         this._stylesCache = null as any;

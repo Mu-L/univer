@@ -371,7 +371,7 @@ export const InsertColBeforeCommand: ICommand = {
 export const InsertColAfterCommand: ICommand = {
     type: CommandType.COMMAND,
     id: 'sheet.command.insert-col-after',
-    handler: async (accessor: IAccessor) => {
+    handler: async (accessor: IAccessor, params: Record<any, any>) => {
         const selectionManagerService = accessor.get(SelectionManagerService);
         const selections = selectionManagerService.getSelections();
         let range: IRange;
@@ -407,6 +407,7 @@ export const InsertColAfterCommand: ICommand = {
                 startRow: 0,
                 endRow: worksheet.getLastRowWithContent(),
             },
+            ...params,
         };
 
         return accessor.get(ICommandService).executeCommand(InsertColCommand.id, insertColParams);
