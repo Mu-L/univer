@@ -63,7 +63,7 @@ export const SheetPermissionPanelDetailFooter = () => {
                         if (activeRule.unitType === oldRule?.unitType && activeRule.name === oldRule.name && activeRule.description === oldRule.description && activeRule.ranges === oldRule.ranges) {
                             isSetCollaborators = true;
                         }
-                        if (!isSetCollaborators) {
+                        if (isSetCollaborators) {
                             await authzIoService.putCollaborators({
                                 objectID: activeRule.permissionId,
                                 unitID: activeRule.unitId,

@@ -107,15 +107,18 @@ export function getCurrentRangeDisable$(accessor: IAccessor, permissionTypes: IP
     );
 }
 
-export function getCurrentRangeDisable2$(accessor: IAccessor, permissionTypes: IPermissionTypes = {}) {
+export function getCommentDisable$(accessor: IAccessor, permissionTypes: IPermissionTypes = {}) {
     const univerInstanceService = accessor.get(IUniverInstanceService);
     const selectionManagerService = accessor.get(SelectionManagerService);
     const selectionRuleModal = accessor.get(SelectionProtectionRuleModel);
     const worksheetRuleModel = accessor.get(WorksheetProtectionRuleModel);
-    const workbook = univerInstanceService.getCurrentUnitForType<Workbook>(UniverInstanceType.UNIVER_SHEET)!;
     const userManagerService = accessor.get(UserManagerService);
-    return combineLatest([userManagerService.currentUser$, workbook.activeSheet$, selectionManagerService.selectionMoveEnd$]).pipe(
+    return combineLatest([userManagerService.currentUser$, selectionManagerService.selectionMoveEnd$]).pipe(
         switchMap(() => {
+            const workbook = univerInstanceService.getCurrentUnitForType<Workbook>(UniverInstanceType.UNIVER_SHEET);
+            if (!workbook) {
+                return of(true);
+            }
             const worksheet = workbook.getActiveSheet();
             const unitId = workbook.getUnitId();
             const subUnitId = worksheet.getSheetId();
