@@ -39,7 +39,6 @@ import { AddSheetDataValidationCommand, DataValidationController, UpdateSheetDat
 import type { IAddCfCommandParams } from '@univerjs/sheets-conditional-formatting-ui';
 import { AddCfCommand, ConditionalFormattingClearController } from '@univerjs/sheets-conditional-formatting-ui';
 import type { IConditionalFormattingRuleConfig, IConditionFormattingRule } from '@univerjs/sheets-conditional-formatting';
-import { serializeRange } from '@univerjs/engine-formula';
 import { HeaderFreezeRenderController } from '@univerjs/sheets-ui/controllers/render-controllers/freeze.render-controller.js';
 import { UNIVER_SHEET_PERMISSION_ALERT_DIALOG, UNIVER_SHEET_PERMISSION_ALERT_DIALOG_ID } from '../views/error-msg-dialog/interface';
 
@@ -344,20 +343,9 @@ export class SheetPermissionInterceptorController extends RxDisposable {
                     const worksheetRule = this._worksheetProtectionRuleModel.getRule(unitId, subUnitId);
                     const selectionRuleList = this._selectionProtectionRuleModel.getSubunitRuleList(unitId, subUnitId);
                     if (worksheetRule) {
-                        worksheetRule.name = params.name;
                         this._worksheetProtectionRuleModel.ruleRefresh(worksheetRule.permissionId);
                     }
                     if (selectionRuleList.length) {
-                        selectionRuleList.forEach((rule) => {
-                            const ranges = rule.ranges;
-                            const rangeStr = ranges?.length
-                                ? ranges.map((range) => {
-                                    const v = serializeRange(range);
-                                    return v === 'NaN' ? '' : v;
-                                }).filter((r) => !!r).join(',')
-                                : '';
-                            rule.name = `${params.name}(${rangeStr})`;
-                        });
                         this._selectionProtectionRuleModel.ruleRefresh(subUnitId);
                     }
                 }
@@ -416,7 +404,8 @@ export class SheetPermissionInterceptorController extends RxDisposable {
         const worksheet = workbook?.getActiveSheet();
         const subUnitId = worksheet.getSheetId();
         const worksheetRule = this._worksheetProtectionRuleModel.getRule(unitId, subUnitId);
-        if (worksheetRule) {
+        const selectionRule = this._selectionProtectionRuleModel.getSubunitRuleList(unitId, subUnitId).length > 0;
+        if (worksheetRule || selectionRule) {
             return this._workbookPermissionService.getManageCollaboratorPermission(unitId);
         } else {
             return this._workbookPermissionService.getEditPermission(unitId);

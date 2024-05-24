@@ -30,6 +30,7 @@ import type { IPermissionPoint } from '@univerjs/protocol';
 import { UnitAction, UnitObject } from '@univerjs/protocol';
 import { DeleteSingle, WriteSingle } from '@univerjs/icons';
 import { useHighlightRange } from '@univerjs/sheets-ui';
+import { serializeRange } from '@univerjs/engine-formula';
 import { UNIVER_SHEET_PERMISSION_PANEL, UNIVER_SHEET_PERMISSION_PANEL_FOOTER } from '../../const';
 import type { IPermissionPanelRule } from '../../service/sheet-permission-panel.model';
 import { SheetPermissionPanelModel } from '../../service/sheet-permission-panel.model';
@@ -215,6 +216,23 @@ export const SheetPermissionPanelList = () => {
 
                             const hasManagerPermission = manageCollaboratorAction || currentUser.userID === item.creator?.userID;
 
+                            const worksheet = workbook.getActiveSheet();
+
+                            let ruleName = '';
+
+                            if (rule.unitType === UnitObject.SelectRange) {
+                                const ranges = (rule as ISelectionProtectionRule).ranges;
+                                const rangeStr = ranges?.length
+                                    ? ranges.map((range) => {
+                                        const v = serializeRange(range);
+                                        return v === 'NaN' ? '' : v;
+                                    }).filter((r) => !!r).join(',')
+                                    : '';
+                                ruleName = `${worksheet.getName()}(${rangeStr})`;
+                            } else if (rule.unitType === UnitObject.Worksheet) {
+                                ruleName = worksheet.getName();
+                            }
+
                             return (
                                 <div
                                     key={item.objectID}
@@ -237,8 +255,8 @@ export const SheetPermissionPanelList = () => {
                                     onMouseLeave={() => currentRuleRangesSet([])}
                                 >
                                     <div className={styles.sheetPermissionListItemHeader}>
-                                        <Tooltip title={rule.name}>
-                                            <div className={styles.sheetPermissionListItemHeaderName}>{rule.name}</div>
+                                        <Tooltip title={ruleName}>
+                                            <div className={styles.sheetPermissionListItemHeaderName}>{ruleName}</div>
                                         </Tooltip>
 
                                         {hasManagerPermission && (

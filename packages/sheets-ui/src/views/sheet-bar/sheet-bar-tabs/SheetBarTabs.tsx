@@ -27,6 +27,7 @@ import {
     SetWorksheetNameMutation,
     SetWorksheetOrderCommand,
     SetWorksheetOrderMutation,
+    WorkbookPermissionService,
     WorksheetProtectionRuleModel,
 } from '@univerjs/sheets';
 import { IConfirmService, Menu, useObservable } from '@univerjs/ui';
@@ -69,6 +70,7 @@ export function SheetBarTabs() {
     const resetOrder = useObservable(worksheetProtectionRuleModel.resetOrder$);
 
     const workbook = univerInstanceService.getCurrentUnitForType<Workbook>(UniverInstanceType.UNIVER_SHEET)!;
+    const workbookPermissionService = useDependency(WorkbookPermissionService);
 
     const statusInit = useCallback(() => {
         const currentSubUnitId = workbook.getActiveSheet().getSheetId();
@@ -175,6 +177,18 @@ export function SheetBarTabs() {
             },
             onNameCheckAlert: (text: string) => {
                 return nameEmptyCheck(text) || nameRepeatCheck(text);
+            },
+            onNameChangeCheck: () => {
+                const unitId = workbook.getUnitId();
+                const worksheet = workbook?.getActiveSheet();
+                const subUnitId = worksheet.getSheetId();
+                const worksheetRule = worksheetProtectionRuleModel.getRule(unitId, subUnitId);
+                const selectionRule = selectionProtectionRuleModel.getSubunitRuleList(unitId, subUnitId).length > 0;
+                if (worksheetRule || selectionRule) {
+                    return workbookPermissionService.getManageCollaboratorPermission(unitId);
+                } else {
+                    return workbookPermissionService.getEditPermission(unitId);
+                }
             },
         });
 
