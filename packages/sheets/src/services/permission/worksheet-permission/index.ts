@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
-export type { GetWorkbookPermissionFunc, GetWorksheetPermission } from './type';
-export { defaultWorksheetPermissionPoint, getAllWorksheetPermissionPoint, getAllWorksheetPermissionPointByPointPanel } from './worksheet-permission/utils';
-export { getWorkbookPointId, getWorksheetPointId, getRangePointId } from './tool';
+export { WorksheetPermissionService } from './worksheet-permission.service';
+export { WorksheetProtectionRuleModel } from './worksheet-permission-rule.model';
+export { WorksheetProtectionPointModel } from './worksheet-permission-point.model';
+export { WorksheetProtectionRenderService } from './worksheet-permission-render.service';
+

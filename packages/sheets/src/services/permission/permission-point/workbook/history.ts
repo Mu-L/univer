@@ -14,6 +14,18 @@
  * limitations under the License.
  */
 
-export type { GetWorkbookPermissionFunc, GetWorksheetPermission } from './type';
-export { defaultWorksheetPermissionPoint, getAllWorksheetPermissionPoint, getAllWorksheetPermissionPointByPointPanel } from './worksheet-permission/utils';
-export { getWorkbookPointId, getWorksheetPointId, getRangePointId } from './tool';
+import type { IPermissionPoint, IUnitPermissionId } from '@univerjs/core';
+import { PermissionStatus, PermissionType, UnitPermissionType } from '@univerjs/core';
+
+export class WorkbookHistoryPermission implements IPermissionPoint {
+    id: IUnitPermissionId;
+    value = true;
+    type = PermissionType.WORK_BOOK;
+    status = PermissionStatus.INIT;
+    subType = UnitPermissionType.History;
+
+    constructor(public unitId: string) {
+        this.unitId = unitId;
+        this.id = `${this.type}.${UnitPermissionType.History}_${unitId}` as IUnitPermissionId;
+    }
+}

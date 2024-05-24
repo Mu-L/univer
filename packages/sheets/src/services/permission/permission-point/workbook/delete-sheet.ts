@@ -14,21 +14,18 @@
  * limitations under the License.
  */
 
-import { PermissionPoint } from '@univerjs/core';
+import type { IPermissionPoint, IUnitPermissionId } from '@univerjs/core';
+import { PermissionStatus, PermissionType, UnitPermissionType } from '@univerjs/core';
 
-const SheetEditablePermissionPoint = 'univer.sheet.editable';
-
-export class SheetEditablePermission extends PermissionPoint<boolean> {
-    id = SheetEditablePermissionPoint;
+export class WorkbookDeleteSheetPermission implements IPermissionPoint {
+    id: IUnitPermissionId;
     value = true;
-    unitID: string;
+    type = PermissionType.WORK_BOOK;
+    status = PermissionStatus.INIT;
+    subType = UnitPermissionType.DeleteSheet;
 
-    constructor(
-        private _unitId: string,
-        private _subUnitId: string
-    ) {
-        super();
-        this.unitID = _unitId;
-        this.id = `${SheetEditablePermissionPoint}_${_unitId}_${_subUnitId}`;
+    constructor(public unitId: string) {
+        this.unitId = unitId;
+        this.id = `${this.type}.${UnitPermissionType.DeleteSheet}_${unitId}` as IUnitPermissionId;
     }
 }
