@@ -130,7 +130,7 @@ export function InsertRangeMoveRightMenuItemFactory(accessor: IAccessor): IMenuB
         title: 'rightClick.moveRight',
         icon: 'InsertCellShiftRight',
         positions: [CELL_INSERT_MENU_ID],
-        disabled$: getCurrentRangeDisable$(accessor, { workbookTypes: [UnitPermissionType.Edit], worksheetTypes: [SubUnitPermissionType.InsertColumn, SubUnitPermissionType.Edit], rangeTypes: [RangeUnitPermissionType.Edit] }),
+        disabled$: getCurrentRangeDisable$(accessor, { workbookTypes: [UnitPermissionType.Edit], worksheetTypes: [SubUnitPermissionType.Edit], rangeTypes: [RangeUnitPermissionType.Edit] }),
         hidden$: getCellMenuHidden$(accessor, 'col'),
     };
 }
@@ -142,7 +142,7 @@ export function InsertRangeMoveDownMenuItemFactory(accessor: IAccessor): IMenuBu
         title: 'rightClick.moveDown',
         icon: 'InsertCellDown',
         positions: [CELL_INSERT_MENU_ID],
-        disabled$: getCurrentRangeDisable$(accessor, { workbookTypes: [UnitPermissionType.Edit], worksheetTypes: [SubUnitPermissionType.InsertRow, SubUnitPermissionType.Edit], rangeTypes: [RangeUnitPermissionType.Edit] }),
+        disabled$: getCurrentRangeDisable$(accessor, { workbookTypes: [UnitPermissionType.Edit], worksheetTypes: [SubUnitPermissionType.Edit], rangeTypes: [RangeUnitPermissionType.Edit] }),
 
         hidden$: getCellMenuHidden$(accessor, 'row'),
     };

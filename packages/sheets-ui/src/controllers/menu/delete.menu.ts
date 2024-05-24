@@ -18,7 +18,7 @@ import type { IMenuButtonItem, IMenuSelectorItem } from '@univerjs/ui';
 import { MenuGroup, MenuItemType, MenuPosition } from '@univerjs/ui';
 
 import type { IAccessor } from '@wendellhu/redi';
-import { SubUnitPermissionType, UnitPermissionType } from '@univerjs/core';
+import { RangeUnitPermissionType, SubUnitPermissionType, UnitPermissionType } from '@univerjs/core';
 import { DeleteRangeMoveLeftConfirmCommand } from '../../commands/commands/delete-range-move-left-confirm.command ';
 import { DeleteRangeMoveUpConfirmCommand } from '../../commands/commands/delete-range-move-up-confirm.command';
 import {
@@ -38,7 +38,7 @@ export function DeleteRangeMenuItemFactory(accessor: IAccessor): IMenuSelectorIt
         icon: 'Reduce',
         positions: [MenuPosition.CONTEXT_MENU],
         hidden$: getBaseRangeMenuHidden$(accessor),
-        disabled$: getCurrentRangeDisable$(accessor, { workbookTypes: [UnitPermissionType.Edit], worksheetTypes: [SubUnitPermissionType.Edit, SubUnitPermissionType.SetCellValue, SubUnitPermissionType.SetCellStyle] }),
+        disabled$: getCurrentRangeDisable$(accessor, { workbookTypes: [UnitPermissionType.Edit], worksheetTypes: [SubUnitPermissionType.Edit] }),
     };
 }
 
@@ -76,7 +76,7 @@ export function DeleteRangeMoveLeftMenuItemFactory(accessor: IAccessor): IMenuBu
         title: 'rightClick.moveLeft',
         icon: 'DeleteCellShiftLeft',
         positions: [DELETE_RANGE_MENU_ID],
-        disabled$: getCurrentRangeDisable$(accessor, { workbookTypes: [UnitPermissionType.Edit], worksheetTypes: [SubUnitPermissionType.Edit, SubUnitPermissionType.SetCellValue, SubUnitPermissionType.SetCellStyle] }),
+        disabled$: getCurrentRangeDisable$(accessor, { workbookTypes: [UnitPermissionType.Edit], worksheetTypes: [SubUnitPermissionType.Edit], rangeTypes: [RangeUnitPermissionType.Edit] }),
         hidden$: getCellMenuHidden$(accessor, 'col'),
     };
 }
@@ -89,7 +89,7 @@ export function DeleteRangeMoveUpMenuItemFactory(accessor: IAccessor): IMenuButt
         title: 'rightClick.moveUp',
         icon: 'DeleteCellShiftUp',
         positions: [DELETE_RANGE_MENU_ID],
-        disabled$: getCurrentRangeDisable$(accessor, { workbookTypes: [UnitPermissionType.Edit], worksheetTypes: [SubUnitPermissionType.Edit, SubUnitPermissionType.SetCellValue, SubUnitPermissionType.SetCellStyle] }),
+        disabled$: getCurrentRangeDisable$(accessor, { workbookTypes: [UnitPermissionType.Edit], worksheetTypes: [SubUnitPermissionType.Edit], rangeTypes: [RangeUnitPermissionType.Edit] }),
         hidden$: getCellMenuHidden$(accessor, 'row'),
     };
 }
