@@ -17,10 +17,10 @@
 import { Button } from '@univerjs/design';
 import { useDependency } from '@wendellhu/redi/react-bindings';
 import React from 'react';
-import { ISidebarService } from '@univerjs/ui';
+import { ISidebarService, useObservable } from '@univerjs/ui';
 import type { Workbook } from '@univerjs/core';
-import { IUniverInstanceService, LocaleService, UniverInstanceType } from '@univerjs/core';
-import { WorkbookPermissionService } from '@univerjs/sheets';
+import { IUniverInstanceService, LocaleService, UniverInstanceType, Worksheet } from '@univerjs/core';
+import { WorkbookPermissionService, WorksheetProtectionRuleModel } from '@univerjs/sheets';
 import { UNIVER_SHEET_PERMISSION_PANEL, UNIVER_SHEET_PERMISSION_PANEL_FOOTER } from '../../const';
 import { SheetPermissionPanelModel } from '../../service/sheet-permission-panel.model';
 import styles from './index.module.less';
@@ -33,14 +33,24 @@ export const SheetPermissionPanelAddFooter = () => {
     const workbookPermissionService = useDependency(WorkbookPermissionService);
     const workbook = univerInstanceService.getCurrentUnitForType<Workbook>(UniverInstanceType.UNIVER_SHEET)!;
     const unitId = workbook.getUnitId();
+    const activeSheet$ = useObservable(workbook.activeSheet$);
 
     const workbookEditPermission = workbookPermissionService.getEditPermission(unitId);
     const workbookManagePermission = workbookPermissionService.getManageCollaboratorPermission(unitId);
 
     const hasSetProtectPermission = workbookEditPermission && workbookManagePermission;
     const sheetPermissionPanelModel = useDependency(SheetPermissionPanelModel);
+    const worksheetProtectionRuleModel = useDependency(WorksheetProtectionRuleModel);
 
-    if (!hasSetProtectPermission) {
+    const subUnitId = activeSheet$?.getSheetId();
+    if(!subUnitId) {
+        return null;
+    }
+
+    const worksheetRule = worksheetProtectionRuleModel.getRule(unitId, subUnitId);
+
+
+    if (!hasSetProtectPermission || worksheetRule) {
         return null;
     }
     return (

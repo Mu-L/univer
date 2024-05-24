@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import { ICommandService } from '@univerjs/core';
+import { ICommandService, IUniverInstanceService, UniverInstanceType, Workbook } from '@univerjs/core';
 import { IncreaseSingle, MoreSingle } from '@univerjs/icons';
-import { InsertSheetCommand } from '@univerjs/sheets';
-import { useDependency } from '@wendellhu/redi/react-bindings';
+import { InsertSheetCommand, WorkbookPermissionService } from '@univerjs/sheets';
+import { useDependency, useObservable } from '@wendellhu/redi/react-bindings';
 import React, { useEffect, useState } from 'react';
 
 import { ISheetBarService } from '../../services/sheet-bar/sheet-bar.service';
@@ -32,9 +32,16 @@ const SCROLL_WIDTH = 100;
 export const SheetBar = () => {
     const [leftScrollState, setLeftScrollState] = useState(true);
     const [rightScrollState, setRightScrollState] = useState(true);
+    const [editPermission, setEditPermission] = useState(false);
 
     const commandService = useDependency(ICommandService);
     const sheetBarService = useDependency(ISheetBarService);
+
+    const workbookPermissionService = useDependency(WorkbookPermissionService);
+    const univerInstanceService = useDependency(IUniverInstanceService);
+
+    const workbook = univerInstanceService.getCurrentUnitForType<Workbook>(UniverInstanceType.UNIVER_SHEET)!;
+    const unitId = workbook.getUnitId();
 
     useEffect(() => {
         const subscription = sheetBarService.scroll$.subscribe((state: IScrollState) => {
@@ -45,6 +52,16 @@ export const SheetBar = () => {
             subscription.unsubscribe();
         };
     }, []);
+
+    useEffect(() => {
+        const subscription = workbookPermissionService.getEditPermission$(unitId).subscribe((permission) => {
+            setEditPermission(permission);
+        })
+
+        return () => {
+            subscription.unsubscribe();
+        }
+    }, [])
 
     const updateScrollButtonState = (state: IScrollState) => {
         const { leftEnd, rightEnd } = state;
@@ -72,7 +89,7 @@ export const SheetBar = () => {
         <div className={styles.sheetBar}>
             <div className={styles.sheetBarOptions}>
                 {/* Add sheet button */}
-                <SheetBarButton onClick={addSheet}>
+                <SheetBarButton onClick={addSheet} disabled={!editPermission}>
                     <IncreaseSingle />
                 </SheetBarButton>
                 {/* All sheets button */}
