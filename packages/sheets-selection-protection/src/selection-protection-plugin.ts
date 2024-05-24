@@ -28,12 +28,13 @@ import { PLUGIN_NAME } from './base/const';
 import { AddRangeProtectionCommand } from './commands/commands/add-selection-protection.command';
 import { SetRangeProtectionCommand } from './commands/commands/set-selection-protection.command';
 import { DeleteRangeProtectionCommand } from './commands/commands/delete-selection-protection.command';
+import { SelectionProtectionRefRangeService } from './service/selection-protection/selection-protection.ref-range';
 
 export class UniverSheetsSelectionProtectionPlugin extends Plugin {
     static override type = UniverInstanceType.UNIVER_SHEET;
     static override pluginName = PLUGIN_NAME;
 
-    static readonly dependencyList: Dependency[] = [[SelectionProtectionRenderModel], [SelectionProtectionRuleModel], [SelectionProtectionService]];
+    static readonly dependencyList: Dependency[] = [[SelectionProtectionRenderModel], [SelectionProtectionRuleModel], [SelectionProtectionService], [SelectionProtectionRefRangeService]];
     static readonly mutationList = [AddSelectionProtection, DeleteSelectionProtection, SetSelectionProtection];
     static readonly commandList = [AddRangeProtectionCommand, DeleteRangeProtectionCommand, SetRangeProtectionCommand];
 

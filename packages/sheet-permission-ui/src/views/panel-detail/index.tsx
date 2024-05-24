@@ -304,17 +304,14 @@ export const SheetPermissionPanelDetail = ({ fromSheetBar }: { fromSheetBar: boo
                             unitType: UnitObject.SelectRange,
                             name: `${sheetName}(${rangeStr})`,
                         };
-                        let ruleRangeHasWholeSheet = false;
                         if (rule.ranges.length === 1) {
-                            const { startRow, endRow, rangeType } = rule.ranges[0];
-                            if (startRow === 0 && endRow === worksheet.getRowCount() - 1 && rangeType === RANGE_TYPE.ROW) {
-                                ruleRangeHasWholeSheet = true;
+                            const { startRow, endRow, startColumn, endColumn } = rule.ranges[0];
+                            if (startRow === 0 && endRow === worksheet.getRowCount() - 1 && startColumn === 0 && worksheet.getColumnCount() - 1 === endColumn) {
+                                rule.unitType = UnitObject.Worksheet;
+                                rule.name = `${sheetName}`;
                             }
                         }
-                        if (ruleRangeHasWholeSheet) {
-                            rule.unitType = UnitObject.Worksheet;
-                            rule.name = `${sheetName}`;
-                        }
+
                         sheetPermissionPanelModel.setRule(rule);
                     }}
                 />
