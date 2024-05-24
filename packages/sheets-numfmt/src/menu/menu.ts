@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-import { ICommandService, IUniverInstanceService, LocaleService, UniverInstanceType } from '@univerjs/core';
+import { ICommandService, IUniverInstanceService, LocaleService, RangeUnitPermissionType, SubUnitPermissionType, UnitPermissionType, UniverInstanceType } from '@univerjs/core';
 import {
-    getCurrentSheetDisabled$,
     INumfmtService,
     RemoveNumfmtMutation,
     SelectionManagerService,
@@ -28,6 +27,7 @@ import type { IAccessor } from '@wendellhu/redi';
 import { merge, Observable } from 'rxjs';
 
 import { deriveStateFromActiveSheet$ } from '@univerjs/sheets-ui';
+import { getCurrentRangeDisable$ } from '@univerjs/sheets-ui/controllers/menu/menu-util.js';
 import { MENU_OPTIONS } from '../base/const/MENU-OPTIONS';
 import { AddDecimalCommand } from '../commands/commands/add-decimal.command';
 import { SetCurrencyCommand } from '../commands/commands/set-currency.command';
@@ -47,7 +47,8 @@ export const CurrencyMenuItem = (accessor: IAccessor) => {
         group: MenuGroup.TOOLBAR_FORMULAS_INSERT,
         positions: [MenuPosition.TOOLBAR_START],
         hidden$: getMenuHiddenObservable(accessor, UniverInstanceType.UNIVER_SHEET),
-        disabled$: getCurrentSheetDisabled$(accessor),
+        disabled$: getCurrentRangeDisable$(accessor, { workbookTypes: [UnitPermissionType.Edit], worksheetTypes: [SubUnitPermissionType.Edit, SubUnitPermissionType.SetCellStyle], rangeTypes: [RangeUnitPermissionType.Edit] }),
+
     };
 };
 
@@ -61,7 +62,7 @@ export const AddDecimalMenuItem = (accessor: IAccessor) => {
         positions: [MenuPosition.TOOLBAR_START],
         group: MenuGroup.TOOLBAR_FORMULAS_INSERT,
         hidden$: getMenuHiddenObservable(accessor, UniverInstanceType.UNIVER_SHEET),
-        disabled$: getCurrentSheetDisabled$(accessor),
+        disabled$: getCurrentRangeDisable$(accessor, { workbookTypes: [UnitPermissionType.Edit], worksheetTypes: [SubUnitPermissionType.Edit, SubUnitPermissionType.SetCellStyle], rangeTypes: [RangeUnitPermissionType.Edit] }),
     };
 };
 
@@ -75,7 +76,7 @@ export const SubtractDecimalMenuItem = (accessor: IAccessor) => {
         group: MenuGroup.TOOLBAR_FORMULAS_INSERT,
         positions: [MenuPosition.TOOLBAR_START],
         hidden$: getMenuHiddenObservable(accessor, UniverInstanceType.UNIVER_SHEET),
-        disabled$: getCurrentSheetDisabled$(accessor),
+        disabled$: getCurrentRangeDisable$(accessor, { workbookTypes: [UnitPermissionType.Edit], worksheetTypes: [SubUnitPermissionType.Edit, SubUnitPermissionType.SetCellStyle], rangeTypes: [RangeUnitPermissionType.Edit] }),
     };
 };
 
@@ -89,7 +90,8 @@ export const PercentMenuItem = (accessor: IAccessor) => {
         group: MenuGroup.TOOLBAR_FORMULAS_INSERT,
         positions: [MenuPosition.TOOLBAR_START],
         hidden$: getMenuHiddenObservable(accessor, UniverInstanceType.UNIVER_SHEET),
-        disabled$: getCurrentSheetDisabled$(accessor),
+        disabled$: getCurrentRangeDisable$(accessor, { workbookTypes: [UnitPermissionType.Edit], worksheetTypes: [SubUnitPermissionType.Edit, SubUnitPermissionType.SetCellStyle], rangeTypes: [RangeUnitPermissionType.Edit] }),
+
     };
 };
 
@@ -157,6 +159,6 @@ export const FactoryOtherMenuItem = (accessor: IAccessor): IMenuSelectorItem => 
         ],
         value$,
         hidden$: getMenuHiddenObservable(accessor, UniverInstanceType.UNIVER_SHEET),
-        disabled$: getCurrentSheetDisabled$(accessor),
+        disabled$: getCurrentRangeDisable$(accessor, { workbookTypes: [UnitPermissionType.Edit], worksheetTypes: [SubUnitPermissionType.SetCellStyle, SubUnitPermissionType.Edit], rangeTypes: [RangeUnitPermissionType.Edit] }),
     };
 };

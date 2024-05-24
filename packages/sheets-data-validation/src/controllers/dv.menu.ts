@@ -16,7 +16,8 @@
 
 import { getMenuHiddenObservable, type IMenuItem, MenuGroup, MenuItemType, MenuPosition } from '@univerjs/ui';
 import type { IAccessor } from '@wendellhu/redi';
-import { UniverInstanceType } from '@univerjs/core';
+import { RangeUnitPermissionType, SubUnitPermissionType, UnitPermissionType, UniverInstanceType } from '@univerjs/core';
+import { getCurrentRangeDisable$ } from '@univerjs/sheets-ui';
 import { AddSheetDataValidationAndOpenCommand } from '../commands/commands/data-validation.command';
 import { OpenValidationPanelOperation } from '../commands/operations/data-validation.operation';
 
@@ -32,6 +33,7 @@ export function dataValidationMenuFactory(accessor: IAccessor): IMenuItem {
         icon: DataValidationIcon,
         tooltip: 'dataValidation.title',
         hidden$: getMenuHiddenObservable(accessor, UniverInstanceType.UNIVER_SHEET),
+        disabled$: getCurrentRangeDisable$(accessor, { workbookTypes: [UnitPermissionType.Edit], worksheetTypes: [SubUnitPermissionType.SetCellStyle, SubUnitPermissionType.Edit], rangeTypes: [RangeUnitPermissionType.Edit] }),
     };
 }
 

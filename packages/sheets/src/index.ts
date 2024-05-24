@@ -46,7 +46,9 @@ export { getSheetCommandTarget, getSheetCommandTargetWorkbook, getSheetMutationT
 export { alignToMergedCellsBorders, getCellAtRowCol, setEndForRange, isSingleCellSelection } from './commands/commands/utils/selection-utils';
 export { MAX_CELL_PER_SHEET_KEY } from './controllers/config/config';
 export { BorderStyleManagerService, type IBorderInfo } from './services/border-style-manager.service';
-export { getCurrentSheetDisabled$, SheetEditablePermission, SheetPermissionService } from './services/permission';
+export * from './services/permission/permission-point';
+export { WorksheetPermissionService } from './services/permission/worksheet-permission/worksheet-permission.service';
+export { WorkbookPermissionService } from './services/permission/workbook-permission/workbook-permission.service';
 export {
     NORMAL_SELECTION_PLUGIN_NAME,
     SelectionManagerService,
@@ -265,6 +267,7 @@ export type { EffectRefRangeParams, IOperator } from './services/ref-range/type'
 export { EffectRefRangId, OperatorType } from './services/ref-range/type';
 export { type ISetWorkbookNameCommandParams, SetWorkbookNameCommand } from './commands/commands/set-workbook-name.command';
 export { type ISetWorkbookNameMutationParams, SetWorkbookNameMutation } from './commands/mutations/set-workbook-name.mutation';
+export { DefinedNameDataController } from './controllers/defined-name-data.controller';
 export {
     handleBaseInsertRange,
     handleBaseMoveRowsCols,
@@ -297,3 +300,14 @@ export { SetDefinedNameCommand, type ISetDefinedNameCommandParams } from './comm
 export { ScrollToCellOperation } from './commands/operations/scroll-to-cell.operation';
 export type { FormatType } from './services/numfmt/type';
 export { getMoveRangeUndoRedoMutations } from './commands/commands/move-range.command';
+export type { GetWorkbookPermissionFunc, GetWorksheetPermission } from './services/permission';
+export { defaultWorksheetPermissionPoint, getAllWorksheetPermissionPoint, getAllWorksheetPermissionPointByPointPanel } from './services/permission';
+export type { IWorksheetProtectionRule } from './services/permission/type';
+export { WorksheetProtectionRuleModel, WorksheetProtectionPointModel, WorksheetProtectionRenderService } from './services/permission/worksheet-permission';
+export { getWorkbookPointId, getWorksheetPointId, getRangePointId } from './services/permission';
+export { AddWorksheetProtectionMutation } from './commands/mutations/add-worksheet-protection.mutation';
+export { SetWorksheetProtectionMutation } from './commands/mutations/set-worksheet-protection.mutation';
+export { DeleteWorksheetProtectionMutation } from './commands/mutations/delete-worksheet-protection.mutation';
+export { SetWorksheetPermissionPointsCommand } from './commands/commands/set-worksheet-permission-points.command';
+export { getAllWorkbookPermissionPoint, defaultWorkbookPermissionPoints } from './services/permission/workbook-permission';
+

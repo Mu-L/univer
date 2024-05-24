@@ -21,12 +21,16 @@ import { getMenuHiddenObservable, MenuGroup, MenuItemType, MenuPosition } from '
 import { SelectionManagerService, SetWorksheetActiveOperation } from '@univerjs/sheets';
 
 import { debounceTime } from 'rxjs/operators';
-import type { Workbook } from '@univerjs/core';
-import { ICommandService, IUniverInstanceService, Rectangle, UniverInstanceType } from '@univerjs/core';
+import type { ICellDataForSheetInterceptor, IRange, Workbook } from '@univerjs/core';
+import { ICommandService, IUniverInstanceService, RangeUnitPermissionType, Rectangle, SubUnitPermissionType, UnitPermissionType, UniverInstanceType } from '@univerjs/core';
 import { AddConditionalRuleMutation, ConditionalFormattingRuleModel, DeleteConditionalRuleMutation, MoveConditionalRuleMutation, SetConditionalRuleMutation } from '@univerjs/sheets-conditional-formatting';
+
+import { getCurrentRangeDisable$ } from '@univerjs/sheets-ui/controllers/menu/menu-util.js';
 import { CF_MENU_OPERATION, OpenConditionalFormattingOperator } from '../commands/operations/open-conditional-formatting-panel';
 
 const commandList = [SetWorksheetActiveOperation.id, AddConditionalRuleMutation.id, SetConditionalRuleMutation.id, DeleteConditionalRuleMutation.id, MoveConditionalRuleMutation.id];
+
+type ICellPermission = Record<RangeUnitPermissionType, boolean> & { ruleId?: string; ranges?: IRange[] };
 
 export const FactoryManageConditionalFormattingRule = (accessor: IAccessor): IMenuSelectorItem => {
     const commonSelections = [
@@ -112,8 +116,24 @@ export const FactoryManageConditionalFormattingRule = (accessor: IAccessor): IMe
         ).pipe(debounceTime(16)).subscribe(() => {
             const workbook = univerInstanceService.getCurrentUnitForType<Workbook>(UniverInstanceType.UNIVER_SHEET);
             if (!workbook) return;
+            const worksheet = workbook.getActiveSheet();
             const allRule = conditionalFormattingRuleModel.getSubunitRules(workbook.getUnitId(), workbook.getActiveSheet().getSheetId()) || [];
-            subscriber.next(!!allRule.length);
+            const hasNotPermission = allRule.some((rule) => {
+                const ranges = rule.ranges;
+                return ranges.some((range) => {
+                    const { startRow, startColumn, endRow, endColumn } = range;
+                    for (let row = startRow; row <= endRow; row++) {
+                        for (let col = startColumn; col <= endColumn; col++) {
+                            const permission = (worksheet.getCell(row, col) as (ICellDataForSheetInterceptor & { selectionProtection: ICellPermission[] }))?.selectionProtection?.[0];
+                            if (permission?.Edit === false || permission?.View === false) {
+                                return true;
+                            }
+                        }
+                    }
+                    return false;
+                });
+            });
+            subscriber.next(!hasNotPermission);
         })
     );
     const selections$ = new Observable((subscriber) => {
@@ -133,7 +153,6 @@ export const FactoryManageConditionalFormattingRule = (accessor: IAccessor): IMe
         });
         subscriber.next(commonSelections);
     });
-
     return {
         id: OpenConditionalFormattingOperator.id,
         type: MenuItemType.SELECTOR,
@@ -143,5 +162,7 @@ export const FactoryManageConditionalFormattingRule = (accessor: IAccessor): IMe
         tooltip: 'sheet.cf.title',
         selections: selections$,
         hidden$: getMenuHiddenObservable(accessor, UniverInstanceType.UNIVER_SHEET),
+        disabled$: getCurrentRangeDisable$(accessor, { workbookTypes: [UnitPermissionType.Edit], worksheetTypes: [SubUnitPermissionType.SetCellStyle, SubUnitPermissionType.Edit], rangeTypes: [RangeUnitPermissionType.Edit] }),
     } as IMenuSelectorItem;
 };
+

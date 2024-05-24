@@ -16,3 +16,4 @@
 
 export { enUS, zhCN, ruRU } from './locale';
 export { UniverSheetsFindReplacePlugin } from './plugin';
+export { SheetsFindReplaceController } from './controllers/sheet-find-replace.controller';

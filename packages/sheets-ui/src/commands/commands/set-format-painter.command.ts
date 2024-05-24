@@ -42,7 +42,8 @@ import {
     SetRangeValuesMutation,
     SetRangeValuesUndoMutationFactory,
     SheetInterceptorService,
-    SheetPermissionService,
+    WorksheetPermissionService,
+
 } from '@univerjs/sheets';
 import type { IAccessor } from '@wendellhu/redi';
 
@@ -111,17 +112,13 @@ export const ApplyFormatPainterCommand: ICommand = {
         if (!target) return false;
 
         const { worksheet, unitId, subUnitId } = target;
-        const sheetPermissionService = accessor.get(SheetPermissionService);
+        const worksheetPermissionService = accessor.get(WorksheetPermissionService);
 
         const {
             styleValues: value,
             styleRange: range,
             mergeRanges,
         } = params;
-
-        if (!sheetPermissionService.getSheetEditable(unitId, subUnitId)) {
-            return false;
-        }
 
         const currentSelections = range ? [range] : selectionManagerService.getSelectionRanges();
         if (!currentSelections || !currentSelections.length) {

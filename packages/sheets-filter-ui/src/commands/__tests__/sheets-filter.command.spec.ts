@@ -15,9 +15,9 @@
  */
 
 import type { IRange, IWorkbookData } from '@univerjs/core';
-import { ICommandService, IUniverInstanceService, LocaleType, Plugin, RANGE_TYPE, RedoCommand, UndoCommand, Univer, UniverInstanceType } from '@univerjs/core';
+import { AuthzIoMockService, ICommandService, IUniverInstanceService, LocaleType, Plugin, RANGE_TYPE, RedoCommand, UndoCommand, Univer, UniverInstanceType } from '@univerjs/core';
 import type { ISetRangeValuesCommandParams } from '@univerjs/sheets';
-import { NORMAL_SELECTION_PLUGIN_NAME, RefRangeService, SelectionManagerService, SetRangeValuesCommand, SetRangeValuesMutation, SheetInterceptorService, SheetPermissionService } from '@univerjs/sheets';
+import { NORMAL_SELECTION_PLUGIN_NAME, RefRangeService, SelectionManagerService, SetRangeValuesCommand, SetRangeValuesMutation, SheetInterceptorService, WorkbookPermissionService, WorksheetPermissionService, WorksheetProtectionPointModel, WorksheetProtectionRuleModel } from '@univerjs/sheets';
 import type { FilterModel, ISetSheetsFilterRangeMutationParams } from '@univerjs/sheets-filter';
 import { SetSheetsFilterRangeMutation, SheetsFilterService, UniverSheetsFilterPlugin } from '@univerjs/sheets-filter';
 import type { Dependency } from '@wendellhu/redi';
@@ -26,6 +26,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { IMessageService } from '@univerjs/ui';
 import { MockMessageService } from '@univerjs/ui/services/message/__testing__/mock-message.service.js';
 
+import { SelectionProtectionRuleModel } from '@univerjs/sheets-selection-protection';
 import type { ISetSheetsFilterCriteriaCommandParams } from '../sheets-filter.command';
 import { ClearSheetsFilterCriteriaCommand, ReCalcSheetsFilterCommand, SetSheetsFilterCriteriaCommand, SmartToggleSheetsFilterCommand } from '../sheets-filter.command';
 
@@ -94,7 +95,12 @@ function createFilterCommandTestBed() {
                 [RefRangeService],
                 [SheetInterceptorService],
                 [SelectionManagerService],
-                [SheetPermissionService],
+                [WorksheetPermissionService],
+                [WorksheetProtectionPointModel],
+                [WorkbookPermissionService],
+                [AuthzIoMockService],
+                [WorksheetProtectionRuleModel],
+                [SelectionProtectionRuleModel],
                 [IMessageService, { useClass: MockMessageService }],
             ] as Dependency[]).forEach((d) => injector.add(d));
         }

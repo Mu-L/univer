@@ -14,19 +14,14 @@
  * limitations under the License.
  */
 
-import type { Workbook } from '@univerjs/core';
-import { IUniverInstanceService, UniverInstanceType } from '@univerjs/core';
-import type { IAccessor } from '@wendellhu/redi';
-import { map } from 'rxjs';
+import type { IRange, RangeUnitPermissionType, SubUnitPermissionType, UnitPermissionType } from '@univerjs/core';
+import { PermissionType } from '@univerjs/core';
 
-import { SheetPermissionService } from './sheet-permission.service';
-
-export function getCurrentSheetDisabled$(accessor: IAccessor) {
-    const univerInstanceService = accessor.get(IUniverInstanceService);
-    const sheetPermissionService = accessor.get(SheetPermissionService);
-
-    const unitId = univerInstanceService.getCurrentUnitForType<Workbook>(UniverInstanceType.UNIVER_SHEET)?.getUnitId();
-    const sheetId = univerInstanceService.getCurrentUnitForType<Workbook>(UniverInstanceType.UNIVER_SHEET)?.getActiveSheet().getSheetId();
-
-    return sheetPermissionService.getEditable$(unitId, sheetId)?.pipe(map((e) => !e.value));
+export function getIdByRange(range: IRange) {
+    const { startRow, startColumn, endRow, endColumn } = range;
+    return `${startRow}-${startColumn}-${endRow}-${endColumn}`;
 }
+
+export const getWorkbookPointId = (unitId: string, type: UnitPermissionType) => `${PermissionType.WORK_BOOK}.${type}_${unitId}`;
+export const getWorksheetPointId = (unitId: string, subUnitId: string, type: SubUnitPermissionType) => `${PermissionType.WORK_SHEET}.${type}_${unitId}_${subUnitId}`;
+export const getRangePointId = (permissionId: string, type: RangeUnitPermissionType) => `${PermissionType.SHEET_RANGE}.${type}.${permissionId}`;

@@ -269,8 +269,8 @@ export class Spreadsheet extends SheetComponent {
             // }
 
             if (viewPortKey === 'viewMain') {
-                const ctx = this._cacheCanvas.getContext();
-                ctx.save();
+                const cacheCtx = this._cacheCanvas.getContext();
+                cacheCtx.save();
 
                 const { left, top, right, bottom } = viewPortPosition;
 
@@ -281,36 +281,35 @@ export class Spreadsheet extends SheetComponent {
                 if (diffBounds.length === 0 || (diffX === 0 && diffY === 0) || this._forceDirty) {
                     if (this.isDirty() || this._forceDirty) {
                         this._cacheCanvas.clear();
-                        ctx.setTransform(mainCtx.getTransform());
-                        this._draw(ctx, bounds);
+                        cacheCtx.setTransform(mainCtx.getTransform());
+                        this._draw(cacheCtx, bounds);
                         this._forceDirty = false;
                     }
                     this._applyCache(mainCtx, left, top, dw, dh, left, top, dw, dh);
                 } else {
                     if (this.isDirty()) {
-                        ctx.save();
-                        ctx.globalCompositeOperation = 'copy';
-                        ctx.setTransform(1, 0, 0, 1, 0, 0);
-                        ctx.drawImage(this._cacheCanvas.getCanvasEle(), diffX * scaleX, diffY * scaleY);
-                        ctx.restore();
+                        cacheCtx.save();
+                        cacheCtx.globalCompositeOperation = 'copy';
+                        cacheCtx.setTransform(1, 0, 0, 1, 0, 0);
+                        cacheCtx.drawImage(this._cacheCanvas.getCanvasEle(), diffX * scaleX, diffY * scaleY);
+                        cacheCtx.restore();
 
                         this._refreshIncrementalState = true;
-                        ctx.setTransform(mainCtx.getTransform());
+                        cacheCtx.setTransform(mainCtx.getTransform());
 
                         for (const diffBound of diffBounds) {
                             const { left: diffLeft, right: diffRight, bottom: diffBottom, top: diffTop } = diffBound;
-                            ctx.save();
-                            ctx.beginPath();
-                            ctx.rectByPrecision(
-                                diffLeft - rowHeaderWidth - FIX_ONE_PIXEL_BLUR_OFFSET,
-                                diffTop - columnHeaderHeight - FIX_ONE_PIXEL_BLUR_OFFSET,
-                                diffRight - diffLeft + rowHeaderWidth + FIX_ONE_PIXEL_BLUR_OFFSET * 2,
-                                diffBottom - diffTop + columnHeaderHeight + FIX_ONE_PIXEL_BLUR_OFFSET * 2
-                            );
+                            cacheCtx.save();
+                            cacheCtx.beginPath();
+                            const x = diffLeft - rowHeaderWidth - FIX_ONE_PIXEL_BLUR_OFFSET;
+                            const y = diffTop - columnHeaderHeight - FIX_ONE_PIXEL_BLUR_OFFSET;
+                            const w = diffRight - diffLeft + rowHeaderWidth + FIX_ONE_PIXEL_BLUR_OFFSET * 2;
+                            const h = diffBottom - diffTop + columnHeaderHeight + FIX_ONE_PIXEL_BLUR_OFFSET * 2;
+                            cacheCtx.rectByPrecision(x, y, w, h);
                             // ctx.fillStyle = 'rgb(0,0,0)';
-
-                            ctx.clip();
-                            this._draw(ctx, {
+                            cacheCtx.clearRect(x, y, w, h);
+                            cacheCtx.clip();
+                            this._draw(cacheCtx, {
                                 viewBound: bounds.viewBound,
                                 diffBounds: [diffBound],
                                 diffX: bounds.diffX,
@@ -318,7 +317,7 @@ export class Spreadsheet extends SheetComponent {
                                 viewPortPosition: bounds.viewPortPosition,
                                 viewPortKey: bounds.viewPortKey,
                             });
-                            ctx.restore();
+                            cacheCtx.restore();
                         }
 
                         this._refreshIncrementalState = false;
@@ -326,7 +325,7 @@ export class Spreadsheet extends SheetComponent {
                     this._applyCache(mainCtx, left, top, dw, dh, left, top, dw, dh);
                 }
 
-                ctx.restore();
+                cacheCtx.restore();
             } else {
                 this._draw(mainCtx, bounds);
             }

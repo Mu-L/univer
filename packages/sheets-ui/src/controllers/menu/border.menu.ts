@@ -14,22 +14,23 @@
  * limitations under the License.
  */
 
-import { ICommandService, UniverInstanceType } from '@univerjs/core';
+import { ICommandService, RangeUnitPermissionType, SubUnitPermissionType, UnitPermissionType, UniverInstanceType } from '@univerjs/core';
 import type { IBorderInfo } from '@univerjs/sheets';
-import { BorderStyleManagerService, getCurrentSheetDisabled$, SetBorderBasicCommand } from '@univerjs/sheets';
+import { BorderStyleManagerService, SetBorderBasicCommand } from '@univerjs/sheets';
 import type { IMenuSelectorItem } from '@univerjs/ui';
 import { getMenuHiddenObservable, MenuGroup, MenuItemType, MenuPosition } from '@univerjs/ui';
 import type { IAccessor } from '@wendellhu/redi';
 import { Observable } from 'rxjs';
 
 import { BORDER_LINE_CHILDREN, BORDER_PANEL_COMPONENT } from '../../components/border-panel/interface';
+import { getCurrentRangeDisable$ } from './menu-util';
 
 export function CellBorderSelectorMenuItemFactory(accessor: IAccessor): IMenuSelectorItem<IBorderInfo, IBorderInfo> {
     // const permissionService = accessor.get(IPermissionService);
 
     const borderStyleManagerService = accessor.get(BorderStyleManagerService);
 
-    const disabled$ = getCurrentSheetDisabled$(accessor);
+    const disabled$ = getCurrentRangeDisable$(accessor, { workbookTypes: [UnitPermissionType.Edit], worksheetTypes: [SubUnitPermissionType.Edit, SubUnitPermissionType.SetCellStyle], rangeTypes: [RangeUnitPermissionType.Edit] });
 
     return {
         id: SetBorderBasicCommand.id,

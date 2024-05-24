@@ -19,16 +19,16 @@ import {
     InsertColBeforeCommand,
     InsertRowAfterCommand,
     InsertRowBeforeCommand,
-    SelectionManagerService,
 } from '@univerjs/sheets';
 import type { IMenuButtonItem, IMenuSelectorItem } from '@univerjs/ui';
 import { MenuGroup, MenuItemType, MenuPosition } from '@univerjs/ui';
 import type { IAccessor } from '@wendellhu/redi';
-import { Observable } from 'rxjs';
 
+import { RangeUnitPermissionType, SubUnitPermissionType, UnitPermissionType } from '@univerjs/core';
 import { InsertRangeMoveDownConfirmCommand } from '../../commands/commands/insert-range-move-down-confirm.command';
 import { InsertRangeMoveRightConfirmCommand } from '../../commands/commands/insert-range-move-right-confirm.command';
 import { SheetMenuPosition } from './menu';
+import { getBaseRangeMenuHidden$, getCellMenuHidden$, getCurrentRangeDisable$, getInsertAfterMenuHidden$, getInsertBeforeMenuHidden$ } from './menu-util';
 
 const COL_INSERT_MENU_ID = 'sheet.menu.col-insert';
 export function ColInsertMenuItemFactory(accessor: IAccessor): IMenuSelectorItem<string> {
@@ -39,6 +39,8 @@ export function ColInsertMenuItemFactory(accessor: IAccessor): IMenuSelectorItem
         title: 'rightClick.insert',
         icon: 'Insert',
         positions: [SheetMenuPosition.COL_HEADER_CONTEXT_MENU],
+        hidden$: getBaseRangeMenuHidden$(accessor),
+        disabled$: getCurrentRangeDisable$(accessor, { workbookTypes: [UnitPermissionType.Edit], worksheetTypes: [SubUnitPermissionType.Edit, SubUnitPermissionType.InsertColumn] }),
     };
 }
 
@@ -51,6 +53,8 @@ export function RowInsertMenuItemFactory(accessor: IAccessor): IMenuSelectorItem
         title: 'rightClick.insert',
         icon: 'Insert',
         positions: [SheetMenuPosition.ROW_HEADER_CONTEXT_MENU],
+        hidden$: getBaseRangeMenuHidden$(accessor),
+        disabled$: getCurrentRangeDisable$(accessor, { workbookTypes: [UnitPermissionType.Edit], worksheetTypes: [SubUnitPermissionType.InsertRow, SubUnitPermissionType.Edit], rangeTypes: [RangeUnitPermissionType.Edit] }),
     };
 }
 
@@ -63,74 +67,59 @@ export function CellInsertMenuItemFactory(accessor: IAccessor): IMenuSelectorIte
         title: 'rightClick.insert',
         icon: 'Insert',
         positions: [MenuPosition.CONTEXT_MENU],
+        hidden$: getBaseRangeMenuHidden$(accessor),
+        disabled$: getCurrentRangeDisable$(accessor, { workbookTypes: [UnitPermissionType.Edit], worksheetTypes: [SubUnitPermissionType.InsertColumn, SubUnitPermissionType.Edit], rangeTypes: [RangeUnitPermissionType.Edit] }),
     };
 }
 
 export function InsertRowBeforeMenuItemFactory(accessor: IAccessor): IMenuButtonItem {
-    const selectionManager = accessor.get(SelectionManagerService);
-
     return {
         id: InsertRowBeforeCommand.id,
         type: MenuItemType.BUTTON,
         title: 'rightClick.insertRowBefore',
         icon: 'InsertRowAbove',
         positions: [ROW_INSERT_MENU_ID, CELL_INSERT_MENU_ID],
-        hidden$: new Observable((observer) => {
-            // if there are multi selections this item should be hidden
-            const selections = selectionManager.getSelections();
-            observer.next(selections?.length !== 1);
-        }),
+        disabled$: getCurrentRangeDisable$(accessor, { workbookTypes: [UnitPermissionType.Edit], worksheetTypes: [SubUnitPermissionType.InsertRow, SubUnitPermissionType.Edit], rangeTypes: [RangeUnitPermissionType.Edit] }),
+        hidden$: getInsertBeforeMenuHidden$(accessor, 'row'),
     };
 }
 
 export function InsertRowAfterMenuItemFactory(accessor: IAccessor): IMenuButtonItem {
-    const selectionManager = accessor.get(SelectionManagerService);
-
     return {
         id: InsertRowAfterCommand.id,
         type: MenuItemType.BUTTON,
         positions: [ROW_INSERT_MENU_ID],
         title: 'rightClick.insertRow',
         icon: 'InsertRowBelow',
-        hidden$: new Observable((observer) => {
-            // if there are multi selections this item should be hidden
-            const selections = selectionManager.getSelections();
-            observer.next(selections?.length !== 1);
-        }),
+        disabled$: getCurrentRangeDisable$(accessor, { workbookTypes: [UnitPermissionType.Edit], worksheetTypes: [SubUnitPermissionType.InsertRow, SubUnitPermissionType.Edit], rangeTypes: [RangeUnitPermissionType.Edit] }),
+        hidden$: getInsertAfterMenuHidden$(accessor, 'row'),
     };
 }
 
 export function InsertColBeforeMenuItemFactory(accessor: IAccessor): IMenuButtonItem {
-    const selectionManager = accessor.get(SelectionManagerService);
-
     return {
         id: InsertColBeforeCommand.id,
         type: MenuItemType.BUTTON,
         positions: [COL_INSERT_MENU_ID, CELL_INSERT_MENU_ID],
         title: 'rightClick.insertColumnBefore',
         icon: 'LeftInsertColumn',
-        hidden$: new Observable((observer) => {
-            // if there are multi selections this item should be hidden
-            const selections = selectionManager.getSelections();
-            observer.next(selections?.length !== 1);
-        }),
+        disabled$: getCurrentRangeDisable$(accessor, { workbookTypes: [UnitPermissionType.Edit], worksheetTypes: [SubUnitPermissionType.InsertColumn, SubUnitPermissionType.Edit], rangeTypes: [RangeUnitPermissionType.Edit] }),
+
+        hidden$: getInsertBeforeMenuHidden$(accessor, 'col'),
+
     };
 }
 
 export function InsertColAfterMenuItemFactory(accessor: IAccessor): IMenuButtonItem {
-    const selectionManager = accessor.get(SelectionManagerService);
-
     return {
         id: InsertColAfterCommand.id,
         type: MenuItemType.BUTTON,
         positions: [COL_INSERT_MENU_ID],
         title: 'rightClick.insertColumn',
         icon: 'RightInsertColumn',
-        hidden$: new Observable((observer) => {
-            // if there are multi selections this item should be hidden
-            const selections = selectionManager.getSelections();
-            observer.next(selections?.length !== 1);
-        }),
+        disabled$: getCurrentRangeDisable$(accessor, { workbookTypes: [UnitPermissionType.Edit], worksheetTypes: [SubUnitPermissionType.InsertColumn, SubUnitPermissionType.Edit], rangeTypes: [RangeUnitPermissionType.Edit] }),
+
+        hidden$: getInsertAfterMenuHidden$(accessor, 'col'),
     };
 }
 
@@ -141,6 +130,8 @@ export function InsertRangeMoveRightMenuItemFactory(accessor: IAccessor): IMenuB
         title: 'rightClick.moveRight',
         icon: 'InsertCellShiftRight',
         positions: [CELL_INSERT_MENU_ID],
+        disabled$: getCurrentRangeDisable$(accessor, { workbookTypes: [UnitPermissionType.Edit], worksheetTypes: [SubUnitPermissionType.InsertColumn, SubUnitPermissionType.Edit], rangeTypes: [RangeUnitPermissionType.Edit] }),
+        hidden$: getCellMenuHidden$(accessor, 'col'),
     };
 }
 
@@ -151,5 +142,8 @@ export function InsertRangeMoveDownMenuItemFactory(accessor: IAccessor): IMenuBu
         title: 'rightClick.moveDown',
         icon: 'InsertCellDown',
         positions: [CELL_INSERT_MENU_ID],
+        disabled$: getCurrentRangeDisable$(accessor, { workbookTypes: [UnitPermissionType.Edit], worksheetTypes: [SubUnitPermissionType.InsertRow, SubUnitPermissionType.Edit], rangeTypes: [RangeUnitPermissionType.Edit] }),
+
+        hidden$: getCellMenuHidden$(accessor, 'row'),
     };
 }

@@ -15,8 +15,8 @@
  */
 
 import type { ICommand, Workbook } from '@univerjs/core';
-import { CommandType, IUniverInstanceService, UniverInstanceType, UniverPermissionService } from '@univerjs/core';
-import { SheetPermissionService } from '@univerjs/sheets';
+import { CommandType, IUniverInstanceService, UniverInstanceType } from '@univerjs/core';
+import { WorkbookPermissionService, WorksheetPermissionService } from '@univerjs/sheets';
 import type { IAccessor } from '@wendellhu/redi';
 
 export interface ISetEditableCommandParams {
@@ -26,17 +26,25 @@ export interface ISetEditableCommandParams {
 export const SetEditable: ICommand = {
     id: 'debugger.operation.set.editable',
     type: CommandType.OPERATION,
-    handler: async (accessor: IAccessor, params: ISetEditableCommandParams) => {
+    handler: (accessor: IAccessor, params: ISetEditableCommandParams) => {
+        const univerInstanceService = accessor.get(IUniverInstanceService);
+        const workbook = univerInstanceService.getCurrentUnitForType<Workbook>(UniverInstanceType.UNIVER_SHEET);
+        const worksheet = workbook?.getActiveSheet();
+        if (!workbook || !worksheet) {
+            return false;
+        }
         if (params.value === 'sheet') {
-            const sheetPermissionService = accessor.get(SheetPermissionService);
-            const editable = sheetPermissionService.getSheetEditable();
-            sheetPermissionService.setSheetEditable(!editable);
+            const workSheetPermissionService = accessor.get(WorksheetPermissionService);
+            const editable = workSheetPermissionService.getSetCellValuePermission({
+                unitId: workbook.getUnitId(),
+                subUnitId: worksheet.getSheetId(),
+            });
+            workSheetPermissionService.setSetCellValuePermission(!editable);
         } else {
-            const univerPermissionService = accessor.get(UniverPermissionService);
-            const univerInstanceService = accessor.get(IUniverInstanceService);
-            const unitId = univerInstanceService.getCurrentUnitForType<Workbook>(UniverInstanceType.UNIVER_SHEET)!.getUnitId();
-            const editable = univerPermissionService.getEditable(unitId);
-            univerPermissionService.setEditable(unitId, !editable);
+            const workbookPermissionService = accessor.get(WorkbookPermissionService);
+            const unitId = workbook!.getUnitId();
+            const editable = workbookPermissionService.getEditPermission(unitId);
+            workbookPermissionService.setEditPermission(unitId, !editable);
         }
         return true;
     },

@@ -18,9 +18,10 @@ import { getMenuHiddenObservable, MenuGroup, MenuItemType, MenuPosition } from '
 import type { IMenuButtonItem, IMenuSelectorItem } from '@univerjs/ui';
 import type { IAccessor } from '@wendellhu/redi';
 import { SheetsFilterService } from '@univerjs/sheets-filter';
-import { UniverInstanceType } from '@univerjs/core';
+import { RangeUnitPermissionType, SubUnitPermissionType, UnitPermissionType, UniverInstanceType } from '@univerjs/core';
 
 import { map, of, switchMap } from 'rxjs';
+import { getCurrentRangeDisable$ } from '@univerjs/sheets-ui';
 import { ClearSheetsFilterCriteriaCommand, ReCalcSheetsFilterCommand, SmartToggleSheetsFilterCommand } from '../commands/sheets-filter.command';
 
 export function SmartToggleFilterMenuItemFactory(accessor: IAccessor): IMenuSelectorItem {
@@ -35,6 +36,7 @@ export function SmartToggleFilterMenuItemFactory(accessor: IAccessor): IMenuSele
         positions: [MenuPosition.TOOLBAR_START],
         hidden$: getMenuHiddenObservable(accessor, UniverInstanceType.UNIVER_SHEET),
         activated$: sheetsFilterService.activeFilterModel$.pipe(map((model) => !!model)),
+        disabled$: getCurrentRangeDisable$(accessor, { workbookTypes: [UnitPermissionType.Edit], worksheetTypes: [SubUnitPermissionType.Filter, SubUnitPermissionType.Edit], rangeTypes: [RangeUnitPermissionType.View] }),
     };
 }
 

@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-import { UniverInstanceType } from '@univerjs/core';
-import { getCurrentSheetDisabled$ } from '@univerjs/sheets';
-import { PASTE_SPECIAL_MENU_ID } from '@univerjs/sheets-ui';
+import { RangeUnitPermissionType, SubUnitPermissionType, UnitPermissionType, UniverInstanceType } from '@univerjs/core';
+import { getCurrentRangeDisable$, PASTE_SPECIAL_MENU_ID } from '@univerjs/sheets-ui';
 import type { IMenuItem } from '@univerjs/ui';
 import { getMenuHiddenObservable, IClipboardInterfaceService, MenuGroup, MenuItemType, MenuPosition } from '@univerjs/ui';
 import type { IAccessor } from '@wendellhu/redi';
-import { Observable } from 'rxjs';
+import { combineLatestWith, map, Observable } from 'rxjs';
 
 import { SheetOnlyPasteFormulaCommand } from '../commands/commands/formula-clipboard.command';
 import { InsertFunctionOperation } from '../commands/operations/insert-function.operation';
@@ -62,7 +61,7 @@ export function InsertFunctionMenuItemFactory(accessor: IAccessor): IMenuItem {
             },
         ],
         hidden$: getMenuHiddenObservable(accessor, UniverInstanceType.UNIVER_SHEET),
-        disabled$: getCurrentSheetDisabled$(accessor),
+        disabled$: getCurrentRangeDisable$(accessor, { workbookTypes: [UnitPermissionType.Edit], worksheetTypes: [SubUnitPermissionType.Edit, SubUnitPermissionType.SetCellValue], rangeTypes: [RangeUnitPermissionType.Edit] }),
     };
 }
 
@@ -76,7 +75,8 @@ export function MoreFunctionsMenuItemFactory(accessor: IAccessor): IMenuItem {
 }
 
 function menuClipboardDisabledObservable(injector: IAccessor): Observable<boolean> {
-    return new Observable((subscriber) => subscriber.next(!injector.get(IClipboardInterfaceService).supportClipboard));
+    const clipboardDisabled$: Observable<boolean> = new Observable((subscriber) => subscriber.next(!injector.get(IClipboardInterfaceService).supportClipboard));
+    return clipboardDisabled$;
 }
 
 export function PasteFormulaMenuItemFactory(accessor: IAccessor): IMenuItem {
@@ -85,6 +85,9 @@ export function PasteFormulaMenuItemFactory(accessor: IAccessor): IMenuItem {
         type: MenuItemType.BUTTON,
         title: 'formula.operation.pasteFormula',
         positions: [PASTE_SPECIAL_MENU_ID],
-        disabled$: menuClipboardDisabledObservable(accessor),
+        disabled$: menuClipboardDisabledObservable(accessor).pipe(
+            combineLatestWith(getCurrentRangeDisable$(accessor, { workbookTypes: [UnitPermissionType.Edit], rangeTypes: [RangeUnitPermissionType.Edit], worksheetTypes: [SubUnitPermissionType.SetCellValue, SubUnitPermissionType.Edit] })),
+            map(([d1, d2]) => d1 || d2)
+        ),
     };
 }

@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { UniverInstanceType } from '@univerjs/core';
-import { getCurrentSheetDisabled$, RemoveWorksheetMergeCommand } from '@univerjs/sheets';
+import { RangeUnitPermissionType, SubUnitPermissionType, UnitPermissionType, UniverInstanceType } from '@univerjs/core';
+import { RemoveWorksheetMergeCommand } from '@univerjs/sheets';
 import type { IMenuButtonItem, IMenuSelectorItem } from '@univerjs/ui';
 import { getMenuHiddenObservable, MenuGroup, MenuItemType, MenuPosition } from '@univerjs/ui';
 import type { IAccessor } from '@wendellhu/redi';
@@ -28,9 +28,10 @@ import {
     AddWorksheetMergeVerticalCommand,
 } from '../../commands/commands/add-worksheet-merge.command';
 import { getSheetSelectionsDisabled$ } from '../utils/selections-tools';
+import { getCurrentRangeDisable$ } from './menu-util';
 
 export function CellMergeMenuItemFactory(accessor: IAccessor): IMenuSelectorItem<string> {
-    const disabled$ = getCurrentSheetDisabled$(accessor);
+    const editDisabled$ = getCurrentRangeDisable$(accessor, { workbookTypes: [UnitPermissionType.Edit], worksheetTypes: [SubUnitPermissionType.Edit, SubUnitPermissionType.SetCellStyle, SubUnitPermissionType.SetCellValue], rangeTypes: [RangeUnitPermissionType.Edit] });
     const selectionsHasCross$ = getSheetSelectionsDisabled$(accessor);
 
     return {
@@ -42,7 +43,7 @@ export function CellMergeMenuItemFactory(accessor: IAccessor): IMenuSelectorItem
         type: MenuItemType.SUBITEMS,
         // selections: [...MERGE_CHILDREN],
         hidden$: getMenuHiddenObservable(accessor, UniverInstanceType.UNIVER_SHEET),
-        disabled$: disabled$.pipe(
+        disabled$: editDisabled$.pipe(
             combineLatestWith(selectionsHasCross$),
             map(([disable, hasCross]) => disable || hasCross)
         ),
