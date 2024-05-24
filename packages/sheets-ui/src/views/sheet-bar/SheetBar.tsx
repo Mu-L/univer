@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-import { ICommandService, IUniverInstanceService, UniverInstanceType, Workbook } from '@univerjs/core';
+import type { Workbook } from '@univerjs/core';
+import { ICommandService, IUniverInstanceService, UniverInstanceType } from '@univerjs/core';
 import { IncreaseSingle, MoreSingle } from '@univerjs/icons';
 import { InsertSheetCommand, WorkbookPermissionService } from '@univerjs/sheets';
-import { useDependency, useObservable } from '@wendellhu/redi/react-bindings';
+import { useDependency } from '@wendellhu/redi/react-bindings';
 import React, { useEffect, useState } from 'react';
 
 import { ISheetBarService } from '../../services/sheet-bar/sheet-bar.service';
@@ -56,12 +57,12 @@ export const SheetBar = () => {
     useEffect(() => {
         const subscription = workbookPermissionService.getEditPermission$(unitId).subscribe((permission) => {
             setEditPermission(permission);
-        })
+        });
 
         return () => {
             subscription.unsubscribe();
-        }
-    }, [])
+        };
+    }, []);
 
     const updateScrollButtonState = (state: IScrollState) => {
         const { leftEnd, rightEnd } = state;

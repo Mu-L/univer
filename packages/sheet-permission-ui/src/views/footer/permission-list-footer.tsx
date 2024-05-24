@@ -19,7 +19,7 @@ import { useDependency } from '@wendellhu/redi/react-bindings';
 import React from 'react';
 import { ISidebarService, useObservable } from '@univerjs/ui';
 import type { Workbook } from '@univerjs/core';
-import { IUniverInstanceService, LocaleService, UniverInstanceType, Worksheet } from '@univerjs/core';
+import { IUniverInstanceService, LocaleService, UniverInstanceType } from '@univerjs/core';
 import { WorkbookPermissionService, WorksheetProtectionRuleModel } from '@univerjs/sheets';
 import { UNIVER_SHEET_PERMISSION_PANEL, UNIVER_SHEET_PERMISSION_PANEL_FOOTER } from '../../const';
 import { SheetPermissionPanelModel } from '../../service/sheet-permission-panel.model';
@@ -43,12 +43,11 @@ export const SheetPermissionPanelAddFooter = () => {
     const worksheetProtectionRuleModel = useDependency(WorksheetProtectionRuleModel);
 
     const subUnitId = activeSheet$?.getSheetId();
-    if(!subUnitId) {
+    if (!subUnitId) {
         return null;
     }
 
     const worksheetRule = worksheetProtectionRuleModel.getRule(unitId, subUnitId);
-
 
     if (!hasSetProtectPermission || worksheetRule) {
         return null;
