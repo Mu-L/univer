@@ -29,7 +29,7 @@ import { AddRangeProtectionCommand, SelectionProtectionRuleModel, SetRangeProtec
 
 import type { IRenderContext, SpreadsheetSkeleton } from '@univerjs/engine-render';
 import type { ISheetPasteParams } from '@univerjs/sheets-ui';
-import { ApplyFormatPainterCommand, AutoFillCommand, HeaderMoveRenderController, HeaderResizeRenderController, IAutoFillService, ISelectionRenderService, ISheetClipboardService, SetCellEditVisibleOperation, SetRangeBoldCommand, SetRangeItalicCommand, SetRangeStrickThroughCommand, SetRangeUnderlineCommand, SheetCopyCommand, SheetCutCommand, SheetPasteColWidthCommand, SheetPasteCommand, SheetPasteShortKeyCommand, virtualizeDiscreteRanges } from '@univerjs/sheets-ui';
+import { ApplyFormatPainterCommand, AutoFillCommand, HeaderMoveRenderController, HeaderResizeRenderController, IAutoFillService, ISelectionRenderService, ISheetClipboardService, SetCellEditVisibleOperation, SetRangeBoldCommand, SetRangeItalicCommand, SetRangeStrickThroughCommand, SetRangeUnderlineCommand, SheetCopyCommand, SheetCutCommand, SheetPasteColWidthCommand, SheetPasteShortKeyCommand, virtualizeDiscreteRanges } from '@univerjs/sheets-ui';
 import { SheetsFilterService } from '@univerjs/sheets-filter';
 import { OpenFilterPanelOperation } from '@univerjs/sheets-filter-ui';
 import { SheetsFindReplaceController } from '@univerjs/sheets-find-replace';
@@ -148,7 +148,6 @@ export class SheetPermissionInterceptorController extends RxDisposable {
                 });
                 errorMsg = this._localService.t('permission.dialog.pasteErr');
                 break;
-            case SheetPasteCommand.id:
             case SheetPasteShortKeyCommand.id:
                 permission = this._permissionCheckByPaste(params as ISheetPasteParams);
                 errorMsg = this._localService.t('permission.dialog.pasteErr');

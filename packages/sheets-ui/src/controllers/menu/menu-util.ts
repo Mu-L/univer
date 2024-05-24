@@ -53,6 +53,9 @@ export function getCurrentRangeDisable$(accessor: IAccessor, permissionTypes: IP
     const worksheetRuleModel = accessor.get(WorksheetProtectionRuleModel);
     const workbook = univerInstanceService.getCurrentUnitForType<Workbook>(UniverInstanceType.UNIVER_SHEET)!;
     const userManagerService = accessor.get(UserManagerService);
+    if (!workbook) {
+        return of(true);
+    }
     return combineLatest([userManagerService.currentUser$, workbook.activeSheet$, selectionManagerService.selectionMoveEnd$]).pipe(
         switchMap(() => {
             const worksheet = workbook.getActiveSheet();
