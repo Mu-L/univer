@@ -22,6 +22,7 @@ import type { Workbook } from '@univerjs/core';
 import { IUniverInstanceService, LocaleService, UniverInstanceType } from '@univerjs/core';
 import { WorkbookPermissionService } from '@univerjs/sheets';
 import { UNIVER_SHEET_PERMISSION_PANEL, UNIVER_SHEET_PERMISSION_PANEL_FOOTER } from '../../const';
+import { SheetPermissionPanelModel } from '../../service/sheet-permission-panel.model';
 import styles from './index.module.less';
 
 export const SheetPermissionPanelAddFooter = () => {
@@ -37,6 +38,7 @@ export const SheetPermissionPanelAddFooter = () => {
     const workbookManagePermission = workbookPermissionService.getManageCollaboratorPermission(unitId);
 
     const hasSetProtectPermission = workbookEditPermission && workbookManagePermission;
+    const sheetPermissionPanelModel = useDependency(SheetPermissionPanelModel);
 
     if (!hasSetProtectPermission) {
         return null;
@@ -47,6 +49,7 @@ export const SheetPermissionPanelAddFooter = () => {
                 className={styles.sheetPermissionPanelAddButton}
                 type="primary"
                 onClick={() => {
+                    sheetPermissionPanelModel.resetRule();
                     const sidebarProps = {
                         header: { title: '保护行列' },
                         children: {
