@@ -31,7 +31,7 @@ export interface IAddSelectionProtectionParams {
 export type ISetSelectionProtectionParams = IAddSelectionProtectionParams;
 
 export const SetSelectionProtection: IMutation<ISetSelectionProtectionParams> = {
-    id: 'sheet.mutation.selection-protection.add',
+    id: 'sheet.mutation.set-selection-protection',
     type: CommandType.MUTATION,
     handler: (accessor, params) => {
         const { unitId, subUnitId, rule, ruleId } = params;

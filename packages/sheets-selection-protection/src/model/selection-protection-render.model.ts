@@ -25,7 +25,7 @@ import type { ICellPermission } from './type';
 
 @OnLifecycle(LifecycleStages.Ready, SelectionProtectionRenderModel)
 export class SelectionProtectionRenderModel {
-    _cache = new LRUMap<string, ICellPermission[]>(10000);
+    private _cache = new LRUMap<string, ICellPermission[]>(10000);
     constructor(
         @Inject(SelectionProtectionRuleModel) private _selectionProtectionRuleModel: SelectionProtectionRuleModel,
         @Inject(IPermissionService) private _permissionService: IPermissionService
@@ -92,5 +92,9 @@ export class SelectionProtectionRenderModel {
 
     _createKey(unitId: string, subUnitId: string, row: number, col: number) {
         return `${unitId}_${subUnitId}_${row}_${col}`;
+    }
+
+    clear() {
+        this._cache.clear();
     }
 }

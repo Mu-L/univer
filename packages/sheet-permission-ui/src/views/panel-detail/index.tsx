@@ -183,7 +183,7 @@ export const SheetPermissionPanelDetail = ({ fromSheetBar }: { fromSheetBar: boo
             sheetPermissionPanelModel.setRangeErrorMsg('');
             sheetPermissionPanelModel.resetRule();
         };
-    }, [activeRule?.permissionId, activeRule?.unitType, fromSheetBar, selectionManagerService, sheetPermissionPanelModel, subUnitId, unitId, worksheet]);
+    }, [activeRule?.permissionId, fromSheetBar, selectionManagerService, sheetPermissionPanelModel, subUnitId, unitId, worksheet]);
 
     useEffect(() => {
         const getSelectUserList = async () => {
@@ -252,6 +252,8 @@ export const SheetPermissionPanelDetail = ({ fromSheetBar }: { fromSheetBar: boo
             activeSheetSubscribe.unsubscribe();
         };
     }, [sidebarService, subUnitId, univerInstanceService]);
+
+    const tmp = activeRule?.ranges?.map((i) => serializeRange(i)).join(',');
 
     return (
         <div className={styles.permissionPanelDetailWrapper}>

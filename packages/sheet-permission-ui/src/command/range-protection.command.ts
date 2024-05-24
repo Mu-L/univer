@@ -18,7 +18,7 @@ import type { ICommand, Workbook } from '@univerjs/core';
 import { CommandType, ICommandService, IUndoRedoService, IUniverInstanceService, Rectangle, sequenceExecute, UniverInstanceType } from '@univerjs/core';
 import type { ISelectionProtectionRule } from '@univerjs/sheets-selection-protection';
 import { AddSelectionProtection, DeleteSelectionProtection, SelectionProtectionRuleModel, SetSelectionProtection } from '@univerjs/sheets-selection-protection';
-import { AddWorksheetProtectionMutation, DeleteWorksheetProtectionMutation, SelectionManagerService, WorksheetProtectionRuleModel } from '@univerjs/sheets';
+import { AddWorksheetProtectionMutation, DeleteWorksheetProtectionMutation, SelectionManagerService, SetWorksheetProtectionMutation, WorksheetProtectionRuleModel } from '@univerjs/sheets';
 import { UnitObject } from '@univerjs/protocol';
 import { SheetPermissionOpenPanelOperation } from '../operation/sheet-permission-open-panel.operation';
 import { SheetPermissionPanelModel } from '../service/sheet-permission-panel.model';
@@ -329,23 +329,34 @@ export const SetProtectionCommand: ICommand<ISetProtectionParams> = {
         const undoMutations = [];
 
         const oldRule = sheetPermissionPanelModel.oldRule;
-        if (oldRule) {
-            if (oldRule.unitType === UnitObject.Worksheet) {
-                redoMutations.push({ id: DeleteWorksheetProtectionMutation.id, params: { unitId, subUnitId } });
-                undoMutations.push({ id: AddWorksheetProtectionMutation.id, params: { unitId, rule: oldRule } });
-            } else if (oldRule.unitType === UnitObject.SelectRange) {
-                redoMutations.push({ id: DeleteSelectionProtection.id, params: { unitId, subUnitId, ruleIds: [(oldRule as ISelectionProtectionRule).id] } });
-                undoMutations.push({ id: AddSelectionProtection.id, params: { unitId, subUnitId, rules: [oldRule] } });
-            }
-        }
 
-        if (rule.unitType === UnitObject.Worksheet) {
-            redoMutations.push({ id: AddWorksheetProtectionMutation.id, params: { unitId, rule } });
-            undoMutations.unshift({ id: DeleteWorksheetProtectionMutation.id, params: { unitId, subUnitId } });
-        } else if (rule.unitType === UnitObject.SelectRange) {
-            (rule as ISelectionProtectionRule).id = selectionProtectionRuleModel.createRuleId(unitId, subUnitId);
-            redoMutations.push({ id: AddSelectionProtection.id, params: { unitId, subUnitId, rules: [rule] } });
-            undoMutations.unshift({ id: DeleteSelectionProtection.id, params: { unitId, subUnitId, ruleIds: [(rule as ISelectionProtectionRule).id] } });
+        if (oldRule?.unitType === rule.unitType) {
+            if (rule.unitType === UnitObject.Worksheet) {
+                redoMutations.push({ id: SetWorksheetProtectionMutation.id, params: { unitId, subUnitId, rule } });
+                undoMutations.push({ id: SetWorksheetProtectionMutation.id, params: { unitId, subUnitId, rule: oldRule } });
+            } else {
+                redoMutations.push({ id: SetSelectionProtection.id, params: { unitId, subUnitId, rule, ruleId: (rule as ISelectionProtectionRule).id } });
+                undoMutations.push({ id: SetSelectionProtection.id, params: { unitId, subUnitId, ruleId: (oldRule as ISelectionProtectionRule).id, rule: oldRule } });
+            }
+        } else {
+            if (oldRule) {
+                if (oldRule.unitType === UnitObject.Worksheet) {
+                    redoMutations.push({ id: DeleteWorksheetProtectionMutation.id, params: { unitId, subUnitId } });
+                    undoMutations.push({ id: AddWorksheetProtectionMutation.id, params: { unitId, rule: oldRule } });
+                } else if (oldRule.unitType === UnitObject.SelectRange) {
+                    redoMutations.push({ id: DeleteSelectionProtection.id, params: { unitId, subUnitId, ruleIds: [(oldRule as ISelectionProtectionRule).id] } });
+                    undoMutations.push({ id: AddSelectionProtection.id, params: { unitId, subUnitId, rules: [oldRule] } });
+                }
+            }
+
+            if (rule.unitType === UnitObject.Worksheet) {
+                redoMutations.push({ id: AddWorksheetProtectionMutation.id, params: { unitId, rule } });
+                undoMutations.unshift({ id: DeleteWorksheetProtectionMutation.id, params: { unitId, subUnitId } });
+            } else if (rule.unitType === UnitObject.SelectRange) {
+                (rule as ISelectionProtectionRule).id = selectionProtectionRuleModel.createRuleId(unitId, subUnitId);
+                redoMutations.push({ id: AddSelectionProtection.id, params: { unitId, subUnitId, rules: [rule] } });
+                undoMutations.unshift({ id: DeleteSelectionProtection.id, params: { unitId, subUnitId, ruleIds: [(rule as ISelectionProtectionRule).id] } });
+            }
         }
 
         const result = sequenceExecute(redoMutations, commandService);

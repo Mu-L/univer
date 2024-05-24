@@ -57,13 +57,10 @@ export const SheetPermissionPanelDetailFooter = () => {
                             }
                         });
                     }
+                    // edit rule
                     if (activeRule.permissionId) {
                         const oldRule = sheetPermissionPanelModel.oldRule;
-                        let isSetCollaborators = false;
                         if (activeRule.unitType === oldRule?.unitType && activeRule.name === oldRule.name && activeRule.description === oldRule.description && activeRule.ranges === oldRule.ranges) {
-                            isSetCollaborators = true;
-                        }
-                        if (isSetCollaborators) {
                             await authzIoService.putCollaborators({
                                 objectID: activeRule.permissionId,
                                 unitID: activeRule.unitId,
@@ -99,6 +96,7 @@ export const SheetPermissionPanelDetailFooter = () => {
                             });
                         }
                     } else {
+                    //  create rule
                         if (activeRule.unitType === UnitObject.Worksheet) {
                             const permissionId = await authzIoService.create({
                                 worksheetObject: {

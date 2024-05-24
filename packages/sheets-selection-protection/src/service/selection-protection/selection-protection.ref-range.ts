@@ -26,6 +26,7 @@ import type { ISelectionProtectionRule } from '../../model/type';
 import { SelectionProtectionRuleModel } from '../../model/selection-protection-rule.model';
 import type { ISetSelectionProtectionParams } from '../../commands';
 import { SetSelectionProtection } from '../../commands';
+import { SelectionProtectionRenderModel } from '../../model/selection-protection-render.model';
 
 const mutationIdByRowCol = [InsertColMutation.id, InsertRowMutation.id, RemoveColMutation.id, RemoveRowMutation.id];
 const mutationIdArrByMove = [MoveRowsMutation.id, MoveColsMutation.id];
@@ -40,7 +41,8 @@ export class SelectionProtectionRefRangeService extends Disposable {
         @Inject(SelectionProtectionRuleModel) private _selectionProtectionRuleModel: SelectionProtectionRuleModel,
         @Inject(IUniverInstanceService) private _univerInstanceService: IUniverInstanceService,
         @ICommandService private readonly _commandService: ICommandService,
-        @Inject(RefRangeService) private readonly _refRangeService: RefRangeService
+        @Inject(RefRangeService) private readonly _refRangeService: RefRangeService,
+        @Inject(SelectionProtectionRenderModel) private readonly _selectionProtectionRenderModel: SelectionProtectionRenderModel
 
     ) {
         super();
@@ -424,6 +426,8 @@ export class SelectionProtectionRefRangeService extends Disposable {
                 permissionRanges.forEach((range) => {
                     this.disposableCollection.add(this._refRangeService.registerRefRange(range, handler, unitId, subUnitId));
                 });
+
+                this._selectionProtectionRenderModel.clear();
             }
 
             // 2. InsertRowsOrCols / RemoveRowsOrCols Mutations
@@ -499,6 +503,8 @@ export class SelectionProtectionRefRangeService extends Disposable {
                 permissionRanges.forEach((range) => {
                     this.disposableCollection.add(this._refRangeService.registerRefRange(range, handler, unitId, subUnitId));
                 });
+
+                this._selectionProtectionRenderModel.clear();
             }
         }));
     }
