@@ -51,26 +51,9 @@ export class SelectionProtectionPermissionViewPoint implements IPermissionPoint 
     }
 }
 
-export class SelectionProtectionPermissionManageCollaboratorPoint implements IPermissionPoint {
-    type = PermissionType.SHEET_RANGE;
-    subType = RangeUnitPermissionType.ManageCollaborator;
-    status = PermissionStatus.INIT;
-    value = true;
-    id: IRangePermissionId;
-    unitId: string;
-    subUnitId: string;
-    permissionId: string;
-    constructor(unitId: string, subUnitId: string, permissionId: string) {
-        this.unitId = unitId;
-        this.subUnitId = subUnitId;
-        this.permissionId = permissionId;
-        this.id = `${PermissionType.SHEET_RANGE}.${RangeUnitPermissionType.ManageCollaborator}.${permissionId}` as IRangePermissionId;
-    }
-}
+export type ISelectionPermissionPoint = SelectionProtectionPermissionViewPoint | SelectionProtectionPermissionEditPoint;
 
-export type ISelectionPermissionPoint = SelectionProtectionPermissionViewPoint | SelectionProtectionPermissionEditPoint | SelectionProtectionPermissionManageCollaboratorPoint;
-
-export const getAllRangePermissionPoint = () => [SelectionProtectionPermissionViewPoint, SelectionProtectionPermissionEditPoint, SelectionProtectionPermissionManageCollaboratorPoint];
+export const getAllRangePermissionPoint = () => [SelectionProtectionPermissionViewPoint, SelectionProtectionPermissionEditPoint];
 
 export const getDefaultPermission = (unitId = 'unitId', subUnitId = 'subUnitId', permissionId = 'permissionId') => getAllRangePermissionPoint().reduce((r, F) => {
     const i = new F(unitId, subUnitId, permissionId);

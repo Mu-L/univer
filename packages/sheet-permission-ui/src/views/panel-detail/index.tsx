@@ -40,7 +40,7 @@ export const SheetPermissionPanelDetail = ({ fromSheetBar }: { fromSheetBar: boo
     const univerInstanceService = useDependency(IUniverInstanceService);
     const selectionManagerService = useDependency(SelectionManagerService);
     const sheetPermissionPanelModel = useDependency(SheetPermissionPanelModel);
-    const activeRule = useObservable(sheetPermissionPanelModel.rule$);
+    const activeRule = useObservable(sheetPermissionPanelModel.rule$, sheetPermissionPanelModel.rule);
     const userManagerService = useDependency(UserManagerService);
     const sheetPermissionUserManagerService = useDependency(SheetPermissionUserManagerService);
     const authzIoService = useDependency(IAuthzIoService);
@@ -178,11 +178,6 @@ export const SheetPermissionPanelDetail = ({ fromSheetBar }: { fromSheetBar: boo
             unitType: fromSheetBar ? UnitObject.Worksheet : UnitObject.SelectRange,
 
         });
-
-        return () => {
-            sheetPermissionPanelModel.setRangeErrorMsg('');
-            sheetPermissionPanelModel.resetRule();
-        };
     }, [activeRule?.permissionId, fromSheetBar, selectionManagerService, sheetPermissionPanelModel, subUnitId, unitId, worksheet]);
 
     useEffect(() => {
@@ -201,13 +196,15 @@ export const SheetPermissionPanelDetail = ({ fromSheetBar }: { fromSheetBar: boo
             if (selectUserList?.length > 0) {
                 setEditorGroupValue('designedUserCanEdit');
             }
-            const hasReader = collaborators.some((user) => {
+            const readerList = collaborators.filter((user) => {
                 return user.role === UnitRole.Reader;
             });
 
-            if (!hasReader) {
+            if (readerList.length === 0) {
                 setViewGroupValue(viewState.noOneElseCanView);
             }
+
+            sheetPermissionUserManagerService.setOldCollaboratorList(selectUserList.concat(readerList));
         };
         if (activeRule?.permissionId) {
             getSelectUserList();

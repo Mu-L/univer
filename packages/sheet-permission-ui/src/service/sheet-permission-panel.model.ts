@@ -67,6 +67,7 @@ export class SheetPermissionPanelModel {
 
     resetRule() {
         this._rule = DEFAULT_RANGE_RULE;
+        this._rule$.next(this._rule);
     }
 
     get oldRule() {

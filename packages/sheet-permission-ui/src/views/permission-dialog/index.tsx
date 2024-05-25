@@ -47,7 +47,10 @@ export const SheetPermissionDialog = () => {
     const worksheet = workbook.getActiveSheet();
     const [collaborators, setCollaborators] = useState<ICollaborator[]>([]);
     const commandService = useDependency(ICommandService);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(() => {
+        const pointRule = worksheetProtectionPointRuleModel.getRule(workbook.getUnitId(), worksheet.getSheetId());
+        return !!pointRule;
+    });
 
     const [permissionMap, setPermissionMap] = useState(() => {
         return Object.keys(subUnitPermissionTypeMap).reduce((acc, action) => {
@@ -88,7 +91,7 @@ export const SheetPermissionDialog = () => {
                 if (subUnitPermissionTypeMap[c.action]) {
                     p[c.action] = {
                         text: localeService.t(`permission.panel.${subUnitPermissionTypeMap[c.action]}`),
-                        allowed: c.role === UnitRole.Editor,
+                        allowed: c.role === UnitRole.Owner,
                     };
                 }
                 return p;

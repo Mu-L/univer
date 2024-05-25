@@ -26,6 +26,7 @@ import { UNIVER_SHEET_PERMISSION_PANEL, UNIVER_SHEET_PERMISSION_PANEL_FOOTER } f
 import { AddWorksheetProtectionCommand } from '../../command/worksheet-protection.command';
 import { SheetPermissionPanelModel, viewState } from '../../service/sheet-permission-panel.model';
 import { SetProtectionCommand } from '../../command/range-protection.command';
+import { getUserListEqual } from '../../utils';
 import styles from './index.module.less';
 
 export const SheetPermissionPanelDetailFooter = () => {
@@ -58,35 +59,39 @@ export const SheetPermissionPanelDetailFooter = () => {
                         });
                     }
                     // edit rule
+
+                    const isSameCollaborators = getUserListEqual(collaborators, sheetPermissionUserManagerService.oldCollaboratorList);
                     if (activeRule.permissionId) {
                         const oldRule = sheetPermissionPanelModel.oldRule;
-                        if (activeRule.unitType === oldRule?.unitType && activeRule.name === oldRule.name && activeRule.description === oldRule.description && activeRule.ranges === oldRule.ranges) {
+                        if (activeRule.unitType === oldRule?.unitType && activeRule.name === oldRule.name && activeRule.description === oldRule.description && activeRule.ranges === oldRule.ranges && !isSameCollaborators) {
                             await authzIoService.putCollaborators({
                                 objectID: activeRule.permissionId,
                                 unitID: activeRule.unitId,
                                 collaborators,
                             });
                         } else {
-                            let newPermissionId = '';
-                            if (activeRule.unitType === UnitObject.Worksheet) {
-                                newPermissionId = await authzIoService.create({
-                                    worksheetObject: {
-                                        collaborators,
-                                        unitID: activeRule.unitId,
-                                        name: activeRule.name,
-                                        strategies: [{ role: UnitRole.Editor, action: UnitAction.Edit }, { role: UnitRole.Reader, action: UnitAction.View }],
-                                    },
-                                    objectType: UnitObject.Worksheet,
-                                });
-                            } else {
-                                newPermissionId = await authzIoService.create({
-                                    selectRangeObject: {
-                                        collaborators,
-                                        unitID: activeRule.unitId,
-                                        name: activeRule.name,
-                                    },
-                                    objectType: UnitObject.SelectRange,
-                                });
+                            let newPermissionId = activeRule.permissionId;
+                            if (!isSameCollaborators) {
+                                if (activeRule.unitType === UnitObject.Worksheet) {
+                                    newPermissionId = await authzIoService.create({
+                                        worksheetObject: {
+                                            collaborators,
+                                            unitID: activeRule.unitId,
+                                            name: activeRule.name,
+                                            strategies: [{ role: UnitRole.Editor, action: UnitAction.Edit }, { role: UnitRole.Reader, action: UnitAction.View }],
+                                        },
+                                        objectType: UnitObject.Worksheet,
+                                    });
+                                } else {
+                                    newPermissionId = await authzIoService.create({
+                                        selectRangeObject: {
+                                            collaborators,
+                                            unitID: activeRule.unitId,
+                                            name: activeRule.name,
+                                        },
+                                        objectType: UnitObject.SelectRange,
+                                    });
+                                }
                             }
                             commandService.executeCommand(SetProtectionCommand.id, {
                                 rule: {
@@ -96,7 +101,7 @@ export const SheetPermissionPanelDetailFooter = () => {
                             });
                         }
                     } else {
-                    //  create rule
+                        //  create rule
                         if (activeRule.unitType === UnitObject.Worksheet) {
                             const permissionId = await authzIoService.create({
                                 worksheetObject: {

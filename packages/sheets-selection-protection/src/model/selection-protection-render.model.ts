@@ -60,6 +60,14 @@ export class SelectionProtectionRenderModel {
                     this._cache.delete(key);
                 });
             });
+            if (info.type === 'set') {
+                info.oldRule?.ranges.forEach((range) => {
+                    Range.foreach(range, (row, col) => {
+                        const key = this._createKey(info.unitId, info.subUnitId, row, col);
+                        this._cache.delete(key);
+                    });
+                });
+            }
         });
     }
 

@@ -18,6 +18,8 @@ import type { ICommand } from '@univerjs/core';
 import { CommandType } from '@univerjs/core';
 import { ISidebarService } from '@univerjs/ui';
 import { UNIVER_SHEET_PERMISSION_PANEL, UNIVER_SHEET_PERMISSION_PANEL_FOOTER } from '../const';
+import { SheetPermissionPanelModel } from '../service/sheet-permission-panel.model';
+import { SheetPermissionUserManagerService } from '../service';
 import type { IPermissionOpenPanelParam } from './type';
 
 export const SheetPermissionOpenPanelOperation: ICommand<IPermissionOpenPanelParam> = {
@@ -25,6 +27,8 @@ export const SheetPermissionOpenPanelOperation: ICommand<IPermissionOpenPanelPar
     id: 'sheet-permission.operation.openPanel',
     async handler(accessor, _params = {}) {
         const sidebarService = accessor.get(ISidebarService);
+        const sheetPermissionPanelModel = accessor.get(SheetPermissionPanelModel);
+        const sheetPermissionUserManagerService = accessor.get(SheetPermissionUserManagerService);
 
         const { showDetail = true, fromSheetBar = false } = _params;
 
@@ -39,6 +43,13 @@ export const SheetPermissionOpenPanelOperation: ICommand<IPermissionOpenPanelPar
             footer: {
                 label: UNIVER_SHEET_PERMISSION_PANEL_FOOTER,
                 showDetail,
+            },
+            onClose: () => {
+                sheetPermissionPanelModel.setRangeErrorMsg('');
+                sheetPermissionPanelModel.resetRule();
+                sheetPermissionUserManagerService.setUserList([]);
+                sheetPermissionUserManagerService.setSelectUserList([]);
+                sheetPermissionUserManagerService.setOldCollaboratorList([]);
             },
         };
 

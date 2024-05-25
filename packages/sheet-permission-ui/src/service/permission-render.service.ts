@@ -22,6 +22,7 @@ import type { Workbook } from '@univerjs/core';
 import { Disposable, IPermissionService, IUniverInstanceService, LifecycleStages, OnLifecycle, UniverInstanceType } from '@univerjs/core';
 import { selectionProtectionKey, SelectionProtectionRenderExtension, SelectionProtectionRuleModel } from '@univerjs/sheets-selection-protection';
 import { SheetSkeletonManagerService } from '@univerjs/sheets-ui';
+import { merge } from 'rxjs';
 
 @OnLifecycle(LifecycleStages.Ready, PermissionRenderService)
 export class PermissionRenderService extends Disposable {
@@ -68,6 +69,6 @@ export class PermissionRenderService extends Disposable {
             const unitId = this._univerInstanceService.getCurrentUnitForType<Workbook>(UniverInstanceType.UNIVER_SHEET)!.getUnitId();
             this._renderManagerService.getRenderById(unitId)?.mainComponent?.makeDirty();
         };
-        this.disposeWithMe(this._permissionService.permissionPointUpdate$.pipe(throttleTime(300, undefined, { trailing: true })).subscribe(markDirtySkeleton));
+        this.disposeWithMe(merge(this._permissionService.permissionPointUpdate$.pipe(throttleTime(300, undefined, { trailing: true })), this._selectionProtectionRuleModel.ruleChange$).pipe().subscribe(markDirtySkeleton));
     }
 }

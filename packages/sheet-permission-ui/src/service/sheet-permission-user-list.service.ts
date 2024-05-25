@@ -19,6 +19,7 @@ import type { ICollaborator } from '@univerjs/protocol';
 
 export class SheetPermissionUserManagerService {
     private _userList: ICollaborator[] = [];
+    private _oldCollaboratorList: ICollaborator[] = [];
     private _selectUserList: ICollaborator[] = [];
 
     private _selectUserList$ = new BehaviorSubject<ICollaborator[]>(this._selectUserList);
@@ -31,6 +32,14 @@ export class SheetPermissionUserManagerService {
 
     setUserList(userList: ICollaborator[]) {
         this._userList = userList;
+    }
+
+    get oldCollaboratorList() {
+        return this._oldCollaboratorList;
+    }
+
+    setOldCollaboratorList(userList: ICollaborator[]) {
+        this._oldCollaboratorList = userList;
     }
 
     get selectUserList() {

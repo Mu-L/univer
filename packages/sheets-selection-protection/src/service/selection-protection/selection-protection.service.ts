@@ -93,12 +93,14 @@ export class SelectionProtectionService extends Disposable {
                         break;
                     }
                     case 'set': {
-                        getAllRangePermissionPoint().forEach((F) => {
-                            const oldPermissionPoint = new F(info.unitId, info.subUnitId, info.oldRule!.permissionId);
-                            this._permissionService.deletePermissionPoint(oldPermissionPoint.id);
-                            const newPermissionPoint = new F(info.unitId, info.subUnitId, info.rule.permissionId);
-                            this._permissionService.addPermissionPoint(newPermissionPoint);
-                        });
+                        if (info.oldRule!.permissionId !== info.rule.permissionId) {
+                            getAllRangePermissionPoint().forEach((F) => {
+                                const oldPermissionPoint = new F(info.unitId, info.subUnitId, info.oldRule!.permissionId);
+                                this._permissionService.deletePermissionPoint(oldPermissionPoint.id);
+                                const newPermissionPoint = new F(info.unitId, info.subUnitId, info.rule.permissionId);
+                                this._permissionService.addPermissionPoint(newPermissionPoint);
+                            });
+                        }
                         break;
                     }
                 }

@@ -105,6 +105,12 @@ export class SheetPermissionInitController extends RxDisposable {
                         actions: [UnitAction.Edit, UnitAction.View],
                     }).then((actionList) => {
                         getAllRangePermissionPoint().forEach((F) => {
+                            if (info.type === 'set') {
+                                const { rule, oldRule } = info;
+                                if (rule.permissionId === oldRule?.permissionId) {
+                                    return;
+                                }
+                            }
                             const rule = info.rule;
                             const instance = new F(rule.unitId, rule.subUnitId, rule.permissionId);
                             const unitActionName = mapPermissionPointToSubEnum(instance.subType as unknown as SubUnitPermissionType);
