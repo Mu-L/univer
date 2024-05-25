@@ -41,8 +41,6 @@ export class UserManagerService {
         this._currentUser$.next(user);
     }
 
-    private _currentUser: IUser | null;
-
     addUser(user: IUser) {
         this._model.set(user.userID, user);
         this._userChange$.next({ type: 'add', user });
