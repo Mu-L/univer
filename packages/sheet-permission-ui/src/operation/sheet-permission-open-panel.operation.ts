@@ -50,6 +50,7 @@ export const SheetPermissionOpenPanelOperation: ICommand<IPermissionOpenPanelPar
                 sheetPermissionUserManagerService.setUserList([]);
                 sheetPermissionUserManagerService.setSelectUserList([]);
                 sheetPermissionUserManagerService.setOldCollaboratorList([]);
+                sheetPermissionUserManagerService.setAllUserList([]);
             },
         };
 

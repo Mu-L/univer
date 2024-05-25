@@ -47,7 +47,7 @@ export const SheetPermissionPanelDetailFooter = () => {
                     if (!activeRule.name || rangeErrMsg) return;
                     const collaborators = sheetPermissionUserManagerService.selectUserList;
                     if (activeRule.viewStatus === viewState.othersCanView) {
-                        sheetPermissionUserManagerService.userList.forEach((user) => {
+                        sheetPermissionUserManagerService.allUserList.forEach((user) => {
                             const hasInCollaborators = collaborators.some((collaborator) => collaborator.id === user.id);
                             if (!hasInCollaborators) {
                                 const userCanRead = {

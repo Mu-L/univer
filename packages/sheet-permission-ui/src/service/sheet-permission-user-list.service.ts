@@ -21,6 +21,7 @@ export class SheetPermissionUserManagerService {
     private _userList: ICollaborator[] = [];
     private _oldCollaboratorList: ICollaborator[] = [];
     private _selectUserList: ICollaborator[] = [];
+    private _allUserList: ICollaborator[] = [];
 
     private _selectUserList$ = new BehaviorSubject<ICollaborator[]>(this._selectUserList);
 
@@ -28,6 +29,14 @@ export class SheetPermissionUserManagerService {
 
     get userList() {
         return this._userList;
+    }
+
+    get allUserList() {
+        return this._allUserList;
+    }
+
+    setAllUserList(userList: ICollaborator[]) {
+        this._allUserList = userList;
     }
 
     setUserList(userList: ICollaborator[]) {

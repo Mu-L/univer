@@ -68,6 +68,7 @@ export class SelectionProtectionRenderExtension extends SheetExtension {
                 return;
             }
             ctx.fillStyle = this._pattern;
+
             selectionProtection.forEach((config) => {
                 if (!config.ruleId) {
                     return;

@@ -227,6 +227,7 @@ export const SheetPermissionPanelDetail = ({ fromSheetBar }: { fromSheetBar: boo
             });
 
             sheetPermissionUserManagerService.setUserList(userList.filter((user) => user.role === UnitRole.Editor));
+            sheetPermissionUserManagerService.setAllUserList(userList.filter((user) => user.role === UnitRole.Editor || user.role === UnitRole.Reader));
         };
         getListCollaborators();
     }, []);
