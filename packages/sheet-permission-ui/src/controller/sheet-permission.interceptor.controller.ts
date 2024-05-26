@@ -20,11 +20,9 @@
 import type { ICellData, ICellDataForSheetInterceptor, ICommandInfo, IObjectMatrixPrimitiveType, IPermissionTypesInRunTime, IRange, ISheetDataValidationRule, Nullable, Workbook } from '@univerjs/core';
 import { DisposableCollection, ICommandService, IPermissionService, IUniverInstanceService, LifecycleStages, LocaleService, ObjectMatrix, OnLifecycle, Rectangle, RxDisposable, UniverInstanceType } from '@univerjs/core';
 import type { GetWorksheetPermission, IMoveColsCommandParams, IMoveRangeCommandParams, IMoveRowsCommandParams, ISetRangeValuesCommandParams, ISetSpecificColsVisibleCommandParams, ISetSpecificRowsVisibleCommandParams, ISetWorksheetNameMutationParams } from '@univerjs/sheets';
-import { ClearSelectionContentCommand, DeleteRangeMoveLeftCommand, DeleteRangeMoveUpCommand, DeltaColumnWidthCommand, DeltaRowHeightCommand, InsertRangeMoveDownCommand, InsertRangeMoveRightCommand, MoveColsCommand, MoveRangeCommand, MoveRowsCommand, SelectionManagerService, SetBackgroundColorCommand, SetColWidthCommand, SetRangeValuesCommand, SetRowHeightCommand, SetSelectedColsVisibleCommand, SetSelectedRowsVisibleCommand, SetSpecificColsVisibleCommand, SetSpecificRowsVisibleCommand, SetWorksheetNameCommand, SetWorksheetNameMutation, SetWorksheetOrderCommand, SetWorksheetRowIsAutoHeightCommand, SetWorksheetShowCommand, WorkbookEditablePermission, WorkbookManageCollaboratorPermission, WorkbookPermissionService, WorksheetEditPermission, WorksheetPermissionService, WorksheetProtectionRuleModel, WorksheetSetColumnStylePermission, WorksheetSetRowStylePermission } from '@univerjs/sheets';
+import { ClearSelectionContentCommand, DeleteRangeMoveLeftCommand, DeleteRangeMoveUpCommand, DeltaColumnWidthCommand, DeltaRowHeightCommand, InsertRangeMoveDownCommand, InsertRangeMoveRightCommand, MoveColsCommand, MoveRangeCommand, MoveRowsCommand, RangeProtectionRuleModel, SelectionManagerService, SetBackgroundColorCommand, SetColWidthCommand, SetRangeValuesCommand, SetRowHeightCommand, SetSelectedColsVisibleCommand, SetSelectedRowsVisibleCommand, SetSpecificColsVisibleCommand, SetSpecificRowsVisibleCommand, SetWorksheetNameCommand, SetWorksheetNameMutation, SetWorksheetOrderCommand, SetWorksheetRowIsAutoHeightCommand, SetWorksheetShowCommand, WorkbookEditablePermission, WorkbookManageCollaboratorPermission, WorkbookPermissionService, WorksheetEditPermission, WorksheetPermissionService, WorksheetProtectionRuleModel, WorksheetSetColumnStylePermission, WorksheetSetRowStylePermission } from '@univerjs/sheets';
 import { Inject } from '@wendellhu/redi';
 import { IDialogService } from '@univerjs/ui';
-
-import { SelectionProtectionRuleModel } from '@univerjs/sheets-selection-protection';
 
 import type { IRenderContext, SpreadsheetSkeleton } from '@univerjs/engine-render';
 import type { ISheetPasteParams } from '@univerjs/sheets-ui';
@@ -62,7 +60,7 @@ export class SheetPermissionInterceptorController extends RxDisposable {
         @IPermissionService private readonly _permissionService: IPermissionService,
         @Inject(SelectionManagerService) private readonly _selectionManagerService: SelectionManagerService,
         @IDialogService private readonly _dialogService: IDialogService,
-        @Inject(SelectionProtectionRuleModel) private _selectionProtectionRuleModel: SelectionProtectionRuleModel,
+        @Inject(RangeProtectionRuleModel) private _rangeProtectionRuleModel: RangeProtectionRuleModel,
         @Inject(WorksheetProtectionRuleModel) private _worksheetProtectionRuleModel: WorksheetProtectionRuleModel,
         @Inject(HeaderMoveRenderController) private _headerMoveRenderController: HeaderMoveRenderController,
         @Inject(HeaderResizeRenderController) private _headerResizeRenderController: HeaderResizeRenderController,
@@ -336,12 +334,12 @@ export class SheetPermissionInterceptorController extends RxDisposable {
                         return;
                     }
                     const worksheetRule = this._worksheetProtectionRuleModel.getRule(unitId, subUnitId);
-                    const selectionRuleList = this._selectionProtectionRuleModel.getSubunitRuleList(unitId, subUnitId);
+                    const selectionRuleList = this._rangeProtectionRuleModel.getSubunitRuleList(unitId, subUnitId);
                     if (worksheetRule) {
                         this._worksheetProtectionRuleModel.ruleRefresh(worksheetRule.permissionId);
                     }
                     if (selectionRuleList.length) {
-                        this._selectionProtectionRuleModel.ruleRefresh(subUnitId);
+                        this._rangeProtectionRuleModel.ruleRefresh(subUnitId);
                     }
                 }
             })
@@ -367,7 +365,7 @@ export class SheetPermissionInterceptorController extends RxDisposable {
             selectionRange.endRow = worksheet.getRowCount() - 1;
         }
 
-        const selectionRuleRanges = this._selectionProtectionRuleModel.getSubunitRuleList(unitId, subUnitId).map((rule) => rule.ranges).flat();
+        const selectionRuleRanges = this._rangeProtectionRuleModel.getSubunitRuleList(unitId, subUnitId).map((rule) => rule.ranges).flat();
         const hasLap = selectionRuleRanges.some((range) => {
             return Rectangle.getIntersects(selectionRange, range);
         });
@@ -399,7 +397,7 @@ export class SheetPermissionInterceptorController extends RxDisposable {
         const worksheet = workbook?.getActiveSheet();
         const subUnitId = worksheet.getSheetId();
         const worksheetRule = this._worksheetProtectionRuleModel.getRule(unitId, subUnitId);
-        const selectionRule = this._selectionProtectionRuleModel.getSubunitRuleList(unitId, subUnitId).length > 0;
+        const selectionRule = this._rangeProtectionRuleModel.getSubunitRuleList(unitId, subUnitId).length > 0;
         if (worksheetRule || selectionRule) {
             return this._permissionService.getPermissionPoint(new WorkbookManageCollaboratorPermission(unitId).id)?.value ?? false;
         } else {
@@ -541,7 +539,7 @@ export class SheetPermissionInterceptorController extends RxDisposable {
         } else {
             toRange.endRow = toRange.startRow;
         }
-        const permissionLapRanges = this._selectionProtectionRuleModel.getSubunitRuleList(unitId, subUnitId).reduce((p, c) => {
+        const permissionLapRanges = this._rangeProtectionRuleModel.getSubunitRuleList(unitId, subUnitId).reduce((p, c) => {
             return [...p, ...c.ranges];
         }, [] as IRange[]).filter((range) => {
             return Rectangle.intersects(range, toRange);
@@ -580,7 +578,7 @@ export class SheetPermissionInterceptorController extends RxDisposable {
         const unitId = workbook.getUnitId();
         const subUnitId = worksheet.getSheetId();
 
-        const permissionLapRanges = this._selectionProtectionRuleModel.getSubunitRuleList(unitId, subUnitId).reduce((p, c) => {
+        const permissionLapRanges = this._rangeProtectionRuleModel.getSubunitRuleList(unitId, subUnitId).reduce((p, c) => {
             return [...p, ...c.ranges];
         }, [] as IRange[]).filter((range) => {
             return Rectangle.intersects(range, targetRange);
@@ -607,7 +605,7 @@ export class SheetPermissionInterceptorController extends RxDisposable {
         const unitId = workbook.getUnitId();
         const subUnitId = worksheet.getSheetId();
         const toRange = params.toRange;
-        const permissionLapRanges = this._selectionProtectionRuleModel.getSubunitRuleList(unitId, subUnitId).reduce((p, c) => {
+        const permissionLapRanges = this._rangeProtectionRuleModel.getSubunitRuleList(unitId, subUnitId).reduce((p, c) => {
             return [...p, ...c.ranges];
         }, [] as IRange[]).filter((range) => {
             return Rectangle.intersects(range, toRange);
@@ -659,7 +657,7 @@ export class SheetPermissionInterceptorController extends RxDisposable {
                     return true;
                 }
 
-                const protectionLapRange = this._selectionProtectionRuleModel.getSubunitRuleList(unitId, subUnitId).reduce((p, c) => {
+                const protectionLapRange = this._rangeProtectionRuleModel.getSubunitRuleList(unitId, subUnitId).reduce((p, c) => {
                     return [...p, ...c.ranges];
                 }, [] as IRange[]).filter((range) => {
                     return Rectangle.intersects(range, selectionRange);
@@ -731,7 +729,7 @@ export class SheetPermissionInterceptorController extends RxDisposable {
                     return true;
                 }
 
-                const protectionLapRange = this._selectionProtectionRuleModel.getSubunitRuleList(unitId, subUnitId).reduce((p, c) => {
+                const protectionLapRange = this._rangeProtectionRuleModel.getSubunitRuleList(unitId, subUnitId).reduce((p, c) => {
                     return [...p, ...c.ranges];
                 }, [] as IRange[]).filter((range) => {
                     return Rectangle.intersects(range, selectionRange);
@@ -816,7 +814,7 @@ export class SheetPermissionInterceptorController extends RxDisposable {
                     return selection.range;
                 });
 
-                const ruleRanges = this._selectionProtectionRuleModel.getSubunitRuleList(unitId, subUnitId).reduce((p, c) => {
+                const ruleRanges = this._rangeProtectionRuleModel.getSubunitRuleList(unitId, subUnitId).reduce((p, c) => {
                     return [...p, ...c.ranges];
                 }, [] as IRange[]);
 

@@ -23,10 +23,9 @@ import { useDependency } from '@wendellhu/redi/react-bindings';
 import clsx from 'clsx';
 import React, { useEffect, useState } from 'react';
 
-import { SelectionManagerService, WorksheetProtectionRuleModel, WorksheetSetCellStylePermission, WorksheetSetCellValuePermission } from '@univerjs/sheets';
+import type { ICellPermission } from '@univerjs/sheets';
+import { RangeProtectionRuleModel, SelectionManagerService, WorksheetProtectionRuleModel, WorksheetSetCellStylePermission, WorksheetSetCellValuePermission } from '@univerjs/sheets';
 import { merge } from 'rxjs';
-import type { ICellPermission } from '@univerjs/sheets-selection-protection';
-import { SelectionProtectionRuleModel } from '@univerjs/sheets-selection-protection';
 import { UnitAction } from '@univerjs/protocol';
 import { IFormulaEditorManagerService } from '../../services/editor/formula-editor-manager.service';
 import { IEditorBridgeService } from '../../services/editor-bridge.service';
@@ -51,14 +50,14 @@ export function FormulaBar() {
     const univerInstanceService = useDependency(IUniverInstanceService);
     const selectionManager = useDependency(SelectionManagerService);
     const worksheetProtectionRuleModel = useDependency(WorksheetProtectionRuleModel);
-    const selectionProtectionRuleModel = useDependency(SelectionProtectionRuleModel);
+    const rangeProtectionRuleModel = useDependency(RangeProtectionRuleModel);
     const permissionService = useDependency(IPermissionService);
 
     useEffect(() => {
         const workbook = univerInstanceService.getCurrentUnitForType<Workbook>(UniverInstanceType.UNIVER_SHEET)!;
         merge(
             worksheetProtectionRuleModel.ruleChange$,
-            selectionProtectionRuleModel.ruleChange$,
+            rangeProtectionRuleModel.ruleChange$,
             selectionManager.selectionMoveEnd$
         ).subscribe(() => {
             const unitId = workbook.getUnitId();
@@ -87,7 +86,7 @@ export function FormulaBar() {
             setDisable(false);
         }
         );
-    }, [selectionManager, selectionProtectionRuleModel, univerInstanceService, worksheetProtectionRuleModel]);
+    }, [selectionManager, rangeProtectionRuleModel, univerInstanceService, worksheetProtectionRuleModel]);
 
     const INITIAL_SNAPSHOT = {
         id: DOCS_FORMULA_BAR_EDITOR_UNIT_ID_KEY,

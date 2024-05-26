@@ -21,7 +21,7 @@ import { getMenuHiddenObservable, IClipboardInterfaceService, MenuGroup, MenuIte
 import type { IAccessor } from '@wendellhu/redi';
 import { combineLatestWith, map, Observable } from 'rxjs';
 
-import { SelectionProtectionPermissionEditPoint, WorkbookEditablePermission, WorksheetEditPermission, WorksheetSetCellValuePermission } from '@univerjs/sheets';
+import { RangeProtectionPermissionEditPoint, WorkbookEditablePermission, WorksheetEditPermission, WorksheetSetCellValuePermission } from '@univerjs/sheets';
 import { SheetOnlyPasteFormulaCommand } from '../commands/commands/formula-clipboard.command';
 import { InsertFunctionOperation } from '../commands/operations/insert-function.operation';
 import { MoreFunctionsOperation } from '../commands/operations/more-functions.operation';
@@ -62,7 +62,7 @@ export function InsertFunctionMenuItemFactory(accessor: IAccessor): IMenuItem {
             },
         ],
         hidden$: getMenuHiddenObservable(accessor, UniverInstanceType.UNIVER_SHEET),
-        disabled$: getCurrentRangeDisable$(accessor, { workbookTypes: [WorkbookEditablePermission], worksheetTypes: [WorksheetEditPermission, WorksheetSetCellValuePermission], rangeTypes: [SelectionProtectionPermissionEditPoint] }),
+        disabled$: getCurrentRangeDisable$(accessor, { workbookTypes: [WorkbookEditablePermission], worksheetTypes: [WorksheetEditPermission, WorksheetSetCellValuePermission], rangeTypes: [RangeProtectionPermissionEditPoint] }),
     };
 }
 
@@ -87,7 +87,7 @@ export function PasteFormulaMenuItemFactory(accessor: IAccessor): IMenuItem {
         title: 'formula.operation.pasteFormula',
         positions: [PASTE_SPECIAL_MENU_ID],
         disabled$: menuClipboardDisabledObservable(accessor).pipe(
-            combineLatestWith(getCurrentRangeDisable$(accessor, { workbookTypes: [WorkbookEditablePermission], rangeTypes: [SelectionProtectionPermissionEditPoint], worksheetTypes: [WorksheetSetCellValuePermission, WorksheetEditPermission] })),
+            combineLatestWith(getCurrentRangeDisable$(accessor, { workbookTypes: [WorkbookEditablePermission], rangeTypes: [RangeProtectionPermissionEditPoint], worksheetTypes: [WorksheetSetCellValuePermission, WorksheetEditPermission] })),
             map(([d1, d2]) => d1 || d2)
         ),
     };

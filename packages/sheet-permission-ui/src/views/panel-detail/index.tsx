@@ -20,11 +20,10 @@ import { useDependency } from '@wendellhu/redi/react-bindings';
 import type { IRange, Workbook } from '@univerjs/core';
 import { createInternalEditorID, IAuthzIoService, isValidRange, IUniverInstanceService, LocaleService, RANGE_TYPE, Rectangle, UniverInstanceType, UserManagerService } from '@univerjs/core';
 import { IDialogService, ISidebarService, RangeSelector, useObservable } from '@univerjs/ui';
-import { SelectionManagerService, setEndForRange, WorksheetProtectionRuleModel } from '@univerjs/sheets';
+import { RangeProtectionRuleModel, SelectionManagerService, setEndForRange, WorksheetProtectionRuleModel } from '@univerjs/sheets';
 import { serializeRange } from '@univerjs/engine-formula';
 import type { ICollaborator, IUser } from '@univerjs/protocol';
 import { UnitObject, UnitRole } from '@univerjs/protocol';
-import { SelectionProtectionRuleModel } from '@univerjs/sheets-selection-protection';
 import clsx from 'clsx';
 import { SheetPermissionUserManagerService } from '../../service';
 import { UNIVER_SHEET_PERMISSION_USER_DIALOG, UNIVER_SHEET_PERMISSION_USER_DIALOG_ID } from '../../const';
@@ -45,7 +44,7 @@ export const SheetPermissionPanelDetail = ({ fromSheetBar }: { fromSheetBar: boo
     const sheetPermissionUserManagerService = useDependency(SheetPermissionUserManagerService);
     const authzIoService = useDependency(IAuthzIoService);
     const sidebarService = useDependency(ISidebarService);
-    const selectionRuleModel = useDependency(SelectionProtectionRuleModel);
+    const rangeProtectionRuleModel = useDependency(RangeProtectionRuleModel);
     const worksheetRuleModel = useDependency(WorksheetProtectionRuleModel);
     const rangeErrorMsg = useObservable(sheetPermissionPanelModel.rangeErrorMsg$);
 
@@ -111,7 +110,7 @@ export const SheetPermissionPanelDetail = ({ fromSheetBar }: { fromSheetBar: boo
                 rangeErrorString = localeService.t('permission.panel.rangeOverlapOverPermissionError');
                 return rangeErrorString;
             }
-            const lapRule = selectionRuleModel.getSubunitRuleList(unitId, subUnitId).filter((rule) => {
+            const lapRule = rangeProtectionRuleModel.getSubunitRuleList(unitId, subUnitId).filter((rule) => {
                 return rule.permissionId !== activeRule?.permissionId;
             }).find((rule) => {
                 return rule.ranges.some((ruleRange) => {

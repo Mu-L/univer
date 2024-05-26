@@ -18,9 +18,8 @@ import type { ICellDataForSheetInterceptor, IPermissionTypes, IRange, Nullable, 
 import { IPermissionService, IUniverInstanceService, Rectangle, Tools, UniverInstanceType, UserManagerService } from '@univerjs/core';
 import { UnitAction } from '@univerjs/protocol';
 
-import { SelectionManagerService, WorkbookEditablePermission, WorkbookManageCollaboratorPermission, WorkbookPermissionService, WorksheetProtectionRuleModel } from '@univerjs/sheets';
-import type { ICellPermission } from '@univerjs/sheets-selection-protection';
-import { SelectionProtectionRuleModel } from '@univerjs/sheets-selection-protection';
+import type { ICellPermission } from '@univerjs/sheets';
+import { RangeProtectionRuleModel, SelectionManagerService, WorkbookEditablePermission, WorkbookManageCollaboratorPermission, WorkbookPermissionService, WorksheetProtectionRuleModel } from '@univerjs/sheets';
 import type { IAccessor } from '@wendellhu/redi';
 import type { Observable } from 'rxjs';
 import { combineLatest, map, of, switchMap } from 'rxjs';
@@ -50,7 +49,7 @@ export function deriveStateFromActiveSheet$<T>(univerInstanceService: IUniverIns
 export function getCurrentRangeDisable$(accessor: IAccessor, permissionTypes: IPermissionTypes = {}) {
     const univerInstanceService = accessor.get(IUniverInstanceService);
     const selectionManagerService = accessor.get(SelectionManagerService);
-    const selectionRuleModal = accessor.get(SelectionProtectionRuleModel);
+    const rangeProtectionRuleModel = accessor.get(RangeProtectionRuleModel);
     const worksheetRuleModel = accessor.get(WorksheetProtectionRuleModel);
     const workbook = univerInstanceService.getCurrentUnitForType<Workbook>(UniverInstanceType.UNIVER_SHEET)!;
     const userManagerService = accessor.get(UserManagerService);
@@ -86,7 +85,7 @@ export function getCurrentRangeDisable$(accessor: IAccessor, permissionTypes: IP
             }
 
             const selectionRanges = selectionManagerService.getSelections()?.map((selection) => selection.range);
-            const rules = selectionRuleModal.getSubunitRuleList(unitId, subUnitId).filter((rule) => {
+            const rules = rangeProtectionRuleModel.getSubunitRuleList(unitId, subUnitId).filter((rule) => {
                 return selectionRanges?.some((range) => {
                     return rule.ranges.some((ruleRange) => Rectangle.intersects(range, ruleRange));
                 });
@@ -108,7 +107,7 @@ export function getCurrentRangeDisable$(accessor: IAccessor, permissionTypes: IP
 export function getCommentDisable$(accessor: IAccessor, permissionTypes: IPermissionTypes = {}) {
     const univerInstanceService = accessor.get(IUniverInstanceService);
     const selectionManagerService = accessor.get(SelectionManagerService);
-    const selectionRuleModal = accessor.get(SelectionProtectionRuleModel);
+    const rangeProtectionRuleModel = accessor.get(RangeProtectionRuleModel);
     const worksheetRuleModel = accessor.get(WorksheetProtectionRuleModel);
     const userManagerService = accessor.get(UserManagerService);
     return combineLatest([userManagerService.currentUser$, selectionManagerService.selectionMoveEnd$]).pipe(
@@ -144,7 +143,7 @@ export function getCommentDisable$(accessor: IAccessor, permissionTypes: IPermis
             }
 
             const selectionRanges = selectionManagerService.getSelections()?.map((selection) => selection.range);
-            const rules = selectionRuleModal.getSubunitRuleList(unitId, subUnitId).filter((rule) => {
+            const rules = rangeProtectionRuleModel.getSubunitRuleList(unitId, subUnitId).filter((rule) => {
                 return selectionRanges?.some((range) => {
                     return rule.ranges.some((ruleRange) => Rectangle.intersects(range, ruleRange));
                 });
@@ -167,7 +166,7 @@ export function getBaseRangeMenuHidden$(accessor: IAccessor) {
     const univerInstanceService = accessor.get(IUniverInstanceService);
 
     const selectionManagerService = accessor.get(SelectionManagerService);
-    const selectionRuleModal = accessor.get(SelectionProtectionRuleModel);
+    const rangeProtectionRuleModel = accessor.get(RangeProtectionRuleModel);
 
     return selectionManagerService.selectionMoveEnd$.pipe(
         map(() => {
@@ -179,7 +178,7 @@ export function getBaseRangeMenuHidden$(accessor: IAccessor) {
             const unitId = workbook.getUnitId();
             const subUnitId = worksheet.getSheetId();
 
-            const permissionLapRanges = selectionRuleModal.getSubunitRuleList(unitId, subUnitId).reduce((acc, rule) => {
+            const permissionLapRanges = rangeProtectionRuleModel.getSubunitRuleList(unitId, subUnitId).reduce((acc, rule) => {
                 return [...acc, ...rule.ranges];
             }, [] as IRange[]).filter((ruleRange) => Rectangle.intersects(range, ruleRange));
 
@@ -203,7 +202,7 @@ export function getInsertAfterMenuHidden$(accessor: IAccessor, type: 'row' | 'co
     const univerInstanceService = accessor.get(IUniverInstanceService);
 
     const selectionManagerService = accessor.get(SelectionManagerService);
-    const selectionRuleModal = accessor.get(SelectionProtectionRuleModel);
+    const rangeProtectionRuleModel = accessor.get(RangeProtectionRuleModel);
 
     return selectionManagerService.selectionMoveEnd$.pipe(
         map(() => {
@@ -215,7 +214,7 @@ export function getInsertAfterMenuHidden$(accessor: IAccessor, type: 'row' | 'co
             const unitId = workbook.getUnitId();
             const subUnitId = worksheet.getSheetId();
 
-            const permissionLapRanges = selectionRuleModal.getSubunitRuleList(unitId, subUnitId).reduce((acc, rule) => {
+            const permissionLapRanges = rangeProtectionRuleModel.getSubunitRuleList(unitId, subUnitId).reduce((acc, rule) => {
                 return [...acc, ...rule.ranges];
             }, [] as IRange[]).filter((ruleRange) => {
                 if (type === 'row') {
@@ -245,7 +244,7 @@ export function getInsertBeforeMenuHidden$(accessor: IAccessor, type: 'row' | 'c
     const univerInstanceService = accessor.get(IUniverInstanceService);
 
     const selectionManagerService = accessor.get(SelectionManagerService);
-    const selectionRuleModal = accessor.get(SelectionProtectionRuleModel);
+    const rangeProtectionRuleModel = accessor.get(RangeProtectionRuleModel);
 
     return selectionManagerService.selectionMoveEnd$.pipe(
         map(() => {
@@ -257,7 +256,7 @@ export function getInsertBeforeMenuHidden$(accessor: IAccessor, type: 'row' | 'c
             const unitId = workbook.getUnitId();
             const subUnitId = worksheet.getSheetId();
 
-            const permissionLapRanges = selectionRuleModal.getSubunitRuleList(unitId, subUnitId).reduce((acc, rule) => {
+            const permissionLapRanges = rangeProtectionRuleModel.getSubunitRuleList(unitId, subUnitId).reduce((acc, rule) => {
                 return [...acc, ...rule.ranges];
             }, [] as IRange[]).filter((ruleRange) => {
                 if (type === 'row') {
@@ -287,7 +286,7 @@ export function getDeleteMenuHidden$(accessor: IAccessor, type: 'row' | 'col') {
     const univerInstanceService = accessor.get(IUniverInstanceService);
 
     const selectionManagerService = accessor.get(SelectionManagerService);
-    const selectionRuleModal = accessor.get(SelectionProtectionRuleModel);
+    const rangeProtectionRuleModel = accessor.get(RangeProtectionRuleModel);
 
     return selectionManagerService.selectionMoveEnd$.pipe(
         map(() => {
@@ -308,7 +307,7 @@ export function getDeleteMenuHidden$(accessor: IAccessor, type: 'row' | 'col') {
                 rowColRangeExpand.startRow = 0;
                 rowColRangeExpand.endRow = worksheet.getRowCount() - 1;
             }
-            const permissionLapRanges = selectionRuleModal.getSubunitRuleList(unitId, subUnitId).reduce((acc, rule) => {
+            const permissionLapRanges = rangeProtectionRuleModel.getSubunitRuleList(unitId, subUnitId).reduce((acc, rule) => {
                 return [...acc, ...rule.ranges];
             }, [] as IRange[]).filter((ruleRange) => Rectangle.intersects(rowColRangeExpand, ruleRange));
 
@@ -332,7 +331,7 @@ export function getCellMenuHidden$(accessor: IAccessor, type: 'row' | 'col') {
     const univerInstanceService = accessor.get(IUniverInstanceService);
 
     const selectionManagerService = accessor.get(SelectionManagerService);
-    const selectionRuleModal = accessor.get(SelectionProtectionRuleModel);
+    const rangeProtectionRuleModel = accessor.get(RangeProtectionRuleModel);
 
     return selectionManagerService.selectionMoveEnd$.pipe(
         map(() => {
@@ -351,7 +350,7 @@ export function getCellMenuHidden$(accessor: IAccessor, type: 'row' | 'col') {
                 rowColRangeExpand.endColumn = worksheet.getColumnCount() - 1;
             }
 
-            const permissionLapRanges = selectionRuleModal.getSubunitRuleList(unitId, subUnitId).reduce((acc, rule) => {
+            const permissionLapRanges = rangeProtectionRuleModel.getSubunitRuleList(unitId, subUnitId).reduce((acc, rule) => {
                 return [...acc, ...rule.ranges];
             }, [] as IRange[]).filter((ruleRange) => Rectangle.intersects(ruleRange, rowColRangeExpand));
 
@@ -375,7 +374,7 @@ export function getWorkbookPermissionDisable$(accessor: IAccessor) {
     const univerInstanceService = accessor.get(IUniverInstanceService);
     const workbook = univerInstanceService.getCurrentUnitForType<Workbook>(UniverInstanceType.UNIVER_SHEET)!;
     const worksheetRuleModel = accessor.get(WorksheetProtectionRuleModel);
-    const selectionRuleModel = accessor.get(SelectionProtectionRuleModel);
+    const selectionRuleModel = accessor.get(RangeProtectionRuleModel);
     const workbookPermissionService = accessor.get(WorkbookPermissionService);
     const permissionService = accessor.get(IPermissionService);
     const unitId = workbook.getUnitId();

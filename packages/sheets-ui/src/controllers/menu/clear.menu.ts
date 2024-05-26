@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { ClearSelectionAllCommand, ClearSelectionContentCommand, ClearSelectionFormatCommand, SelectionProtectionPermissionEditPoint, WorkbookEditablePermission, WorksheetEditPermission, WorksheetSetCellStylePermission, WorksheetSetCellValuePermission } from '@univerjs/sheets';
+import { ClearSelectionAllCommand, ClearSelectionContentCommand, ClearSelectionFormatCommand, RangeProtectionPermissionEditPoint, WorkbookEditablePermission, WorksheetEditPermission, WorksheetSetCellStylePermission, WorksheetSetCellValuePermission } from '@univerjs/sheets';
 import type { IMenuButtonItem, IMenuSelectorItem } from '@univerjs/ui';
 import { MenuGroup, MenuItemType, MenuPosition } from '@univerjs/ui';
 
@@ -44,7 +44,7 @@ export function ClearSelectionContentMenuItemFactory(accessor: IAccessor): IMenu
         type: MenuItemType.BUTTON,
         title: 'rightClick.clearContent',
         positions: [CLEAR_SELECTION_MENU_ID],
-        disabled$: getCurrentRangeDisable$(accessor, { workbookTypes: [WorkbookEditablePermission], worksheetTypes: [WorksheetEditPermission, WorksheetSetCellValuePermission], rangeTypes: [SelectionProtectionPermissionEditPoint] }),
+        disabled$: getCurrentRangeDisable$(accessor, { workbookTypes: [WorkbookEditablePermission], worksheetTypes: [WorksheetEditPermission, WorksheetSetCellValuePermission], rangeTypes: [RangeProtectionPermissionEditPoint] }),
     };
 }
 export function ClearSelectionFormatMenuItemFactory(accessor: IAccessor): IMenuButtonItem {
@@ -53,7 +53,7 @@ export function ClearSelectionFormatMenuItemFactory(accessor: IAccessor): IMenuB
         type: MenuItemType.BUTTON,
         title: 'rightClick.clearFormat',
         positions: [CLEAR_SELECTION_MENU_ID],
-        disabled$: getCurrentRangeDisable$(accessor, { workbookTypes: [WorkbookEditablePermission], worksheetTypes: [WorksheetEditPermission, WorksheetSetCellStylePermission], rangeTypes: [SelectionProtectionPermissionEditPoint] }),
+        disabled$: getCurrentRangeDisable$(accessor, { workbookTypes: [WorkbookEditablePermission], worksheetTypes: [WorksheetEditPermission, WorksheetSetCellStylePermission], rangeTypes: [RangeProtectionPermissionEditPoint] }),
     };
 }
 export function ClearSelectionAllMenuItemFactory(accessor: IAccessor): IMenuButtonItem {
@@ -62,6 +62,6 @@ export function ClearSelectionAllMenuItemFactory(accessor: IAccessor): IMenuButt
         type: MenuItemType.BUTTON,
         title: 'rightClick.clearAll',
         positions: [CLEAR_SELECTION_MENU_ID],
-        disabled$: getCurrentRangeDisable$(accessor, { workbookTypes: [WorkbookEditablePermission], worksheetTypes: [WorksheetEditPermission, WorksheetSetCellValuePermission, WorksheetSetCellStylePermission], rangeTypes: [SelectionProtectionPermissionEditPoint] }),
+        disabled$: getCurrentRangeDisable$(accessor, { workbookTypes: [WorkbookEditablePermission], worksheetTypes: [WorksheetEditPermission, WorksheetSetCellValuePermission, WorksheetSetCellStylePermission], rangeTypes: [RangeProtectionPermissionEditPoint] }),
     };
 }

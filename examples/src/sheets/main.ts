@@ -37,7 +37,6 @@ import { UniverSheetsPermissionUIPlugin } from '@univerjs/sheets-permission-ui';
 import { UniverSheetsConditionalFormattingUIPlugin } from '@univerjs/sheets-conditional-formatting-ui';
 import { UniverSheetsThreadCommentPlugin } from '@univerjs/sheets-thread-comment';
 import { UniverDebuggerPlugin } from '@univerjs/debugger';
-import { UniverSheetsSelectionProtectionPlugin } from '@univerjs/sheets-selection-protection';
 
 import { FUniver } from '@univerjs/facade';
 import { IThreadCommentMentionDataService } from '@univerjs/thread-comment-ui';
@@ -99,7 +98,6 @@ univer.registerPlugin(UniverSheetsConditionalFormattingUIPlugin);
 
 // sheet permission
 univer.registerPlugin(UniverSheetsPermissionUIPlugin);
-univer.registerPlugin(UniverSheetsSelectionProtectionPlugin, { override: [] });
 
 // create univer sheet instance
 if (!IS_E2E) {

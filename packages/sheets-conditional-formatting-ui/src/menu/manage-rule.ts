@@ -18,7 +18,7 @@ import { merge, Observable } from 'rxjs';
 import type { IMenuSelectorItem } from '@univerjs/ui';
 import type { IAccessor } from '@wendellhu/redi';
 import { getMenuHiddenObservable, MenuGroup, MenuItemType, MenuPosition } from '@univerjs/ui';
-import { SelectionManagerService, SelectionProtectionPermissionEditPoint, SetWorksheetActiveOperation, WorkbookEditablePermission, WorksheetEditPermission, WorksheetSetCellStylePermission } from '@univerjs/sheets';
+import { RangeProtectionPermissionEditPoint, SelectionManagerService, SetWorksheetActiveOperation, WorkbookEditablePermission, WorksheetEditPermission, WorksheetSetCellStylePermission } from '@univerjs/sheets';
 
 import { debounceTime } from 'rxjs/operators';
 import type { ICellDataForSheetInterceptor, IRange, Workbook } from '@univerjs/core';
@@ -163,7 +163,7 @@ export const FactoryManageConditionalFormattingRule = (accessor: IAccessor): IMe
         tooltip: 'sheet.cf.title',
         selections: selections$,
         hidden$: getMenuHiddenObservable(accessor, UniverInstanceType.UNIVER_SHEET),
-        disabled$: getCurrentRangeDisable$(accessor, { workbookTypes: [WorkbookEditablePermission], worksheetTypes: [WorksheetSetCellStylePermission, WorksheetEditPermission], rangeTypes: [SelectionProtectionPermissionEditPoint] }),
+        disabled$: getCurrentRangeDisable$(accessor, { workbookTypes: [WorkbookEditablePermission], worksheetTypes: [WorksheetSetCellStylePermission, WorksheetEditPermission], rangeTypes: [RangeProtectionPermissionEditPoint] }),
     } as IMenuSelectorItem;
 };
 

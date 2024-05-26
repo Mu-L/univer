@@ -15,7 +15,7 @@
  */
 
 import { Disposable, IPermissionService, IResourceManagerService, LifecycleStages, OnLifecycle } from '@univerjs/core';
-import { INTERCEPTOR_POINT, SheetInterceptorService } from '@univerjs/sheets';
+
 import { Inject } from '@wendellhu/redi';
 import { UnitAction, UnitObject, UniverType } from '@univerjs/protocol';
 import type { ISheetFontRenderExtension } from '@univerjs/engine-render';
@@ -23,6 +23,9 @@ import type { IObjectModel, IRangeProtectionRule } from '../../../model/range-pr
 import { RangeProtectionRuleModel } from '../../../model/range-protection-rule.model';
 import { RangeProtectionRenderModel } from '../../../model/range-protection-render.model';
 import type { IRangeProtectionRenderCellData } from '../../../render/range-protection/range-protection.render';
+import { SheetInterceptorService } from '../../sheet-interceptor/sheet-interceptor.service';
+import { INTERCEPTOR_POINT } from '../../sheet-interceptor/interceptor-const';
+
 import { getAllRangePermissionPoint } from './util';
 
 const PLUGIN_NAME = 'SHEET_RANGE_PROTECTION_PLUGIN';

@@ -17,11 +17,10 @@
 import type { IRange, Nullable } from '@univerjs/core';
 import { LifecycleStages, OnLifecycle } from '@univerjs/core';
 import { UnitObject } from '@univerjs/protocol';
-import type { IWorksheetProtectionRule } from '@univerjs/sheets';
-import type { ISelectionProtectionRule } from '@univerjs/sheets-selection-protection';
+import type { IRangeProtectionRule, IWorksheetProtectionRule } from '@univerjs/sheets';
 import { BehaviorSubject } from 'rxjs';
 
-const DEFAULT_RANGE_RULE: ISelectionProtectionRule = {
+const DEFAULT_RANGE_RULE: IRangeProtectionRule = {
     name: '',
     unitId: '',
     subUnitId: '',
@@ -37,7 +36,7 @@ export enum viewState {
 
 }
 
-type IPermissionPanelBaseRule = ISelectionProtectionRule | IWorksheetProtectionRule;
+type IPermissionPanelBaseRule = IRangeProtectionRule | IWorksheetProtectionRule;
 
 export type IPermissionPanelRule = IPermissionPanelBaseRule & { viewStatus?: viewState; ranges: IRange[] };
 

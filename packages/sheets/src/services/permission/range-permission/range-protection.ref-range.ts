@@ -18,8 +18,6 @@ import { Inject } from '@wendellhu/redi';
 
 import type { ICommandInfo, IRange, Workbook } from '@univerjs/core';
 import { Disposable, DisposableCollection, ICommandService, IUniverInstanceService, LifecycleStages, OnLifecycle, Rectangle, Tools, UniverInstanceType } from '@univerjs/core';
-import type { EffectRefRangeParams, IInsertColCommandParams, IInsertColMutationParams, IInsertRowCommandParams, IMoveColsCommandParams, IMoveRowsCommandParams, IMoveRowsMutationParams, IRemoveRowColCommandParams, ISetWorksheetActivateCommandParams } from '@univerjs/sheets';
-import { InsertColCommand, InsertColMutation, InsertRowCommand, InsertRowMutation, MoveColsCommand, MoveColsMutation, MoveRowsCommand, MoveRowsMutation, RefRangeService, RemoveColCommand, RemoveColMutation, RemoveRowCommand, RemoveRowMutation, SetWorksheetActivateCommand } from '@univerjs/sheets';
 import { AddRangeProtectionCommand } from '../../../commands/commands/add-range-protection.command';
 import { SetRangeProtectionCommand } from '../../../commands/commands/set-range-protection.command';
 import type { IRangeProtectionRule } from '../../../model/range-protection-rule.model';
@@ -27,6 +25,31 @@ import { RangeProtectionRuleModel } from '../../../model/range-protection-rule.m
 import { RangeProtectionRenderModel } from '../../../model/range-protection-render.model';
 import type { ISetRangeProtectionMutationParams } from '../../../commands/mutations/set-range-protection.mutation';
 import { SetRangeProtectionMutation } from '../../../commands/mutations/set-range-protection.mutation';
+
+import { InsertColMutation, InsertRowMutation } from '../../../commands/mutations/insert-row-col.mutation';
+import { RemoveColMutation, RemoveRowMutation } from '../../../commands/mutations/remove-row-col.mutation';
+import { type IMoveRowsMutationParams, MoveColsMutation, MoveRowsMutation } from '../../../commands/mutations/move-rows-cols.mutation';
+import type {
+    IInsertColMutationParams,
+} from '../../../basics/interfaces/mutation-interface';
+import type { IInsertColCommandParams, IInsertRowCommandParams } from '../../../commands/commands/insert-row-col.command';
+import { InsertColCommand, InsertRowCommand } from '../../../commands/commands/insert-row-col.command';
+import type { IRemoveRowColCommandParams } from '../../../commands/commands/remove-row-col.command';
+import type { EffectRefRangeParams } from '../../../services/ref-range/type';
+
+import type {
+    IMoveColsCommandParams,
+    IMoveRowsCommandParams } from '../../../commands/commands/move-rows-cols.command';
+import {
+    MoveColsCommand,
+    MoveRowsCommand,
+} from '../../../commands/commands/move-rows-cols.command';
+import {
+    type ISetWorksheetActivateCommandParams,
+    SetWorksheetActivateCommand,
+} from '../../../commands/commands/set-worksheet-activate.command';
+import { RemoveColCommand, RemoveRowCommand } from '../../../commands/commands/remove-row-col.command';
+import { RefRangeService } from '../../../services/ref-range/ref-range.service';
 
 const mutationIdByRowCol = [InsertColMutation.id, InsertRowMutation.id, RemoveColMutation.id, RemoveRowMutation.id];
 const mutationIdArrByMove = [MoveRowsMutation.id, MoveColsMutation.id];

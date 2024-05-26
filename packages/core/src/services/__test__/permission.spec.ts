@@ -16,21 +16,21 @@
 
 import { beforeEach, describe, expect, it } from 'vitest';
 import { firstValueFrom } from 'rxjs';
+import { UnitAction, UnitObject } from '@univerjs/protocol';
 import { PermissionService } from '../permission/permission.service';
-import type { IPermissionPoint, IUnitPermissionId, PermissionStatus } from '../permission/type';
-import { PermissionType, UnitPermissionType } from '../permission/type';
+import type { IPermissionPoint, PermissionStatus } from '../permission/type';
 import type { Univer } from '../../univer';
 import { createTestBed } from './index';
 
 class TestPermissionPoint implements IPermissionPoint {
-    type: PermissionType.WORK_BOOK;
+    type: UnitObject.Workbook;
     id;
     status: PermissionStatus.INIT;
-    subType: UnitPermissionType.Copy;
+    subType: UnitAction.Copy;
     value: boolean = false;
 
     constructor(id: string) {
-        this.id = `${PermissionType.WORK_BOOK}.${UnitPermissionType.CreateSheet}.${id}` as IUnitPermissionId;
+        this.id = `${UnitObject.Workbook}.${UnitAction.CreateSheet}.${id}` as string;
     }
 }
 

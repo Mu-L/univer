@@ -16,14 +16,13 @@
 
 import type { Workbook } from '@univerjs/core';
 import { IUniverInstanceService, Rectangle, UniverInstanceType } from '@univerjs/core';
-import { SelectionManagerService } from '@univerjs/sheets';
-import { SelectionProtectionRuleModel } from '@univerjs/sheets-selection-protection';
+import { RangeProtectionRuleModel, SelectionManagerService } from '@univerjs/sheets';
 import type { IAccessor } from '@wendellhu/redi';
 import { combineLatest, map } from 'rxjs';
 
 export function getSheetSelectionsDisabled$(accessor: IAccessor) {
     const selectionManagerService = accessor.get(SelectionManagerService);
-    const selectionProtectionRuleModel = accessor.get(SelectionProtectionRuleModel);
+    const rangeProtectionRuleModel = accessor.get(RangeProtectionRuleModel);
     const univerInstanceService = accessor.get(IUniverInstanceService);
     const workbook = univerInstanceService.getCurrentUnitForType<Workbook>(UniverInstanceType.UNIVER_SHEET)!;
     const unitId = workbook.getUnitId();
@@ -36,7 +35,7 @@ export function getSheetSelectionsDisabled$(accessor: IAccessor) {
             if (!sheet) return false;
             if (!selection || selection.length === 0) return false;
             const subUnitId = sheet.getSheetId();
-            const subUnitRuleRange = selectionProtectionRuleModel.getSubunitRuleList(unitId, subUnitId)
+            const subUnitRuleRange = rangeProtectionRuleModel.getSubunitRuleList(unitId, subUnitId)
                 .map((rule) => rule.ranges).flat();
 
             if (selection.length < 2) {

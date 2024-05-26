@@ -20,26 +20,26 @@ import type { Spreadsheet } from '@univerjs/engine-render';
 import { throttleTime } from 'rxjs/operators';
 import type { Workbook } from '@univerjs/core';
 import { Disposable, IPermissionService, IUniverInstanceService, LifecycleStages, OnLifecycle, UniverInstanceType } from '@univerjs/core';
-import { selectionProtectionKey, SelectionProtectionRenderExtension, SelectionProtectionRuleModel } from '@univerjs/sheets-selection-protection';
+import { RANGE_PROTECTION_RENDER_EXTENSION_KEY, RangeProtectionRenderExtension, RangeProtectionRuleModel } from '@univerjs/sheets';
 import { SheetSkeletonManagerService } from '@univerjs/sheets-ui';
 import { merge } from 'rxjs';
 
 @OnLifecycle(LifecycleStages.Ready, PermissionRenderService)
 export class PermissionRenderService extends Disposable {
-    private _selectionProtectionRenderExtension = new SelectionProtectionRenderExtension();
+    private _rangeProtectionRenderExtension = new RangeProtectionRenderExtension();
     constructor(
         @Inject(IRenderManagerService) private _renderManagerService: IRenderManagerService,
         @Inject(IUniverInstanceService) private _univerInstanceService: IUniverInstanceService,
-        @Inject(SelectionProtectionRuleModel) private _selectionProtectionRuleModel: SelectionProtectionRuleModel,
+        @Inject(RangeProtectionRuleModel) private _rangeProtectionRuleModel: RangeProtectionRuleModel,
         @Inject(SheetSkeletonManagerService) private _sheetSkeletonManagerService: SheetSkeletonManagerService,
         @IPermissionService private _permissionService: IPermissionService
     ) {
         super();
         this._initRender();
         this._initSkeleton();
-        this._selectionProtectionRuleModel.ruleChange$.subscribe((info) => {
-            if ((info.oldRule?.id && this._selectionProtectionRenderExtension.renderCache.has(info.oldRule.id)) || this._selectionProtectionRenderExtension.renderCache.has(info.rule.id)) {
-                this._selectionProtectionRenderExtension.clearCache();
+        this._rangeProtectionRuleModel.ruleChange$.subscribe((info) => {
+            if ((info.oldRule?.id && this._rangeProtectionRenderExtension.renderCache.has(info.oldRule.id)) || this._rangeProtectionRenderExtension.renderCache.has(info.rule.id)) {
+                this._rangeProtectionRenderExtension.clearCache();
             }
         });
     }
@@ -49,8 +49,8 @@ export class PermissionRenderService extends Disposable {
             const render = renderId && this._renderManagerService.getRenderById(renderId);
             const spreadsheetRender = render && render.mainComponent as Spreadsheet;
             if (spreadsheetRender) {
-                if (!spreadsheetRender.getExtensionByKey(selectionProtectionKey)) {
-                    spreadsheetRender.register(this._selectionProtectionRenderExtension);
+                if (!spreadsheetRender.getExtensionByKey(RANGE_PROTECTION_RENDER_EXTENSION_KEY)) {
+                    spreadsheetRender.register(this._rangeProtectionRenderExtension);
                 }
             }
         };
@@ -69,6 +69,6 @@ export class PermissionRenderService extends Disposable {
             const unitId = this._univerInstanceService.getCurrentUnitForType<Workbook>(UniverInstanceType.UNIVER_SHEET)!.getUnitId();
             this._renderManagerService.getRenderById(unitId)?.mainComponent?.makeDirty();
         };
-        this.disposeWithMe(merge(this._permissionService.permissionPointUpdate$.pipe(throttleTime(300, undefined, { trailing: true })), this._selectionProtectionRuleModel.ruleChange$).pipe().subscribe(markDirtySkeleton));
+        this.disposeWithMe(merge(this._permissionService.permissionPointUpdate$.pipe(throttleTime(300, undefined, { trailing: true })), this._rangeProtectionRuleModel.ruleChange$).pipe().subscribe(markDirtySkeleton));
     }
 }

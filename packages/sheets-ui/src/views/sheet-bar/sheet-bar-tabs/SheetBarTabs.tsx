@@ -19,6 +19,7 @@ import { ICommandService, IPermissionService, IUniverInstanceService, LocaleServ
 import { Dropdown } from '@univerjs/design';
 import {
     InsertSheetMutation,
+    RangeProtectionRuleModel,
     RemoveSheetMutation,
     SetTabColorMutation,
     SetWorksheetActiveOperation,
@@ -36,7 +37,6 @@ import { useDependency } from '@wendellhu/redi/react-bindings';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import { LockSingle } from '@univerjs/icons';
-import { SelectionProtectionRuleModel } from '@univerjs/sheets-selection-protection';
 import { merge } from 'rxjs';
 import { SheetMenuPosition } from '../../../controllers/menu/menu';
 import { ISelectionRenderService } from '../../../services/selection/selection-render.service';
@@ -67,7 +67,7 @@ export function SheetBarTabs() {
     const selectionRenderService = useDependency(ISelectionRenderService);
     const editorBridgeService = useDependency(IEditorBridgeService);
     const worksheetProtectionRuleModel = useDependency(WorksheetProtectionRuleModel);
-    const selectionProtectionRuleModel = useDependency(SelectionProtectionRuleModel);
+    const rangeProtectionRuleModel = useDependency(RangeProtectionRuleModel);
     const resetOrder = useObservable(worksheetProtectionRuleModel.resetOrder$);
 
     const workbook = univerInstanceService.getCurrentUnitForType<Workbook>(UniverInstanceType.UNIVER_SHEET)!;
@@ -83,7 +83,7 @@ export function SheetBarTabs() {
             .filter((sheet) => !sheet.isSheetHidden())
             .map((sheet, index) => {
                 const worksheetRule = worksheetProtectionRuleModel.getRule(workbook.getUnitId(), sheet.getSheetId());
-                const hasSelectionRule = selectionProtectionRuleModel.getSubunitRuleList(workbook.getUnitId(), sheet.getSheetId()).length > 0;
+                const hasSelectionRule = rangeProtectionRuleModel.getSubunitRuleList(workbook.getUnitId(), sheet.getSheetId()).length > 0;
                 const hasProtect = worksheetRule?.permissionId || hasSelectionRule;
                 const name = hasProtect
                     ? (
@@ -131,7 +131,7 @@ export function SheetBarTabs() {
     useEffect(() => {
         const subscription = merge(
             worksheetProtectionRuleModel.ruleChange$,
-            selectionProtectionRuleModel.ruleChange$
+            rangeProtectionRuleModel.ruleChange$
         ).subscribe(() => {
             statusInit();
         });
@@ -184,7 +184,7 @@ export function SheetBarTabs() {
                 const worksheet = workbook?.getActiveSheet();
                 const subUnitId = worksheet.getSheetId();
                 const worksheetRule = worksheetProtectionRuleModel.getRule(unitId, subUnitId);
-                const selectionRule = selectionProtectionRuleModel.getSubunitRuleList(unitId, subUnitId).length > 0;
+                const selectionRule = rangeProtectionRuleModel.getSubunitRuleList(unitId, subUnitId).length > 0;
                 if (worksheetRule || selectionRule) {
                     return permissionService.getPermissionPoint(new WorkbookManageCollaboratorPermission(unitId).id)?.value ?? false;
                 } else {

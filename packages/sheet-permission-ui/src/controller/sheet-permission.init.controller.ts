@@ -17,11 +17,10 @@
 import type { Workbook } from '@univerjs/core';
 import { IAuthzIoService, IPermissionService, IUniverInstanceService, LifecycleStages, OnLifecycle, RxDisposable, UniverInstanceType, UserManagerService } from '@univerjs/core';
 
-import { defaultWorkbookPermissionPoints, defaultWorksheetPermissionPoint, getAllWorkbookPermissionPoint, getAllWorksheetPermissionPoint, getAllWorksheetPermissionPointByPointPanel, WorksheetProtectionPointModel, WorksheetProtectionRuleModel } from '@univerjs/sheets';
+import { defaultWorkbookPermissionPoints, defaultWorksheetPermissionPoint, getAllRangePermissionPoint, getAllWorkbookPermissionPoint, getAllWorksheetPermissionPoint, getAllWorksheetPermissionPointByPointPanel, RangeProtectionRuleModel, WorksheetProtectionPointModel, WorksheetProtectionRuleModel } from '@univerjs/sheets';
 import { Inject } from '@wendellhu/redi';
 import { IDialogService } from '@univerjs/ui';
 
-import { getAllRangePermissionPoint, SelectionProtectionRuleModel } from '@univerjs/sheets-selection-protection';
 import { UnitAction, UnitObject, UniverType } from '@univerjs/protocol';
 
 import type { IRenderContext } from '@univerjs/engine-render';
@@ -34,7 +33,7 @@ export class SheetPermissionInitController extends RxDisposable {
         @IDialogService private readonly _dialogService: IDialogService,
         @IPermissionService private _permissionService: IPermissionService,
         @IAuthzIoService private _authzIoService: IAuthzIoService,
-        @Inject(SelectionProtectionRuleModel) private _selectionProtectionRuleModel: SelectionProtectionRuleModel,
+        @Inject(RangeProtectionRuleModel) private _rangeProtectionRuleModel: RangeProtectionRuleModel,
         @Inject(WorksheetProtectionRuleModel) private _worksheetProtectionRuleModel: WorksheetProtectionRuleModel,
         @Inject(UserManagerService) private _userManagerService: UserManagerService,
         @Inject(WorksheetProtectionPointModel) private _worksheetProtectionPointRuleModel: WorksheetProtectionPointModel
@@ -62,7 +61,7 @@ export class SheetPermissionInitController extends RxDisposable {
         const permissionIdWithRuleInstanceMap = new Map();
         allSheets.forEach((sheet) => {
             const subunitId = sheet.getSheetId();
-            this._selectionProtectionRuleModel.getSubunitRuleList(unitId, subunitId).forEach((rule) => {
+            this._rangeProtectionRuleModel.getSubunitRuleList(unitId, subunitId).forEach((rule) => {
                 permissionIdWithRuleInstanceMap.set(rule.permissionId, rule);
                 allAllowedParams.push({
                     objectID: rule.permissionId,
@@ -96,7 +95,7 @@ export class SheetPermissionInitController extends RxDisposable {
 
     private _initRangePermissionChange() {
         this.disposeWithMe(
-            this._selectionProtectionRuleModel.ruleChange$.subscribe((info) => {
+            this._rangeProtectionRuleModel.ruleChange$.subscribe((info) => {
                 if (info.type !== 'delete') {
                     this._authzIoService.allowed({
                         objectID: info.rule.permissionId,
@@ -121,7 +120,7 @@ export class SheetPermissionInitController extends RxDisposable {
                         });
                     });
                 } else {
-                    const ruleList = this._selectionProtectionRuleModel.getSubunitRuleList(info.unitId, info.subUnitId);
+                    const ruleList = this._rangeProtectionRuleModel.getSubunitRuleList(info.unitId, info.subUnitId);
                     if (ruleList.length === 0) {
                         this._worksheetProtectionPointRuleModel.deleteRule(info.unitId, info.subUnitId);
                         [...getAllWorksheetPermissionPointByPointPanel()].forEach((F) => {
@@ -284,7 +283,7 @@ export class SheetPermissionInitController extends RxDisposable {
                         this._permissionService.addPermissionPoint(instance);
                     });
 
-                    const ruleList = this._selectionProtectionRuleModel.getSubunitRuleList(unitId, subUnitId);
+                    const ruleList = this._rangeProtectionRuleModel.getSubunitRuleList(unitId, subUnitId);
                     ruleList.forEach((rule) => {
                         getAllRangePermissionPoint().forEach((F) => {
                             const instance = new F(unitId, subUnitId, rule.permissionId);

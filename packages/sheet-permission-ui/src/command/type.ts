@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-import type { IWorksheetProtectionRule } from '@univerjs/sheets';
-import type { ISelectionProtectionRule } from '@univerjs/sheets-selection-protection';
+import type { IRangeProtectionRule, IWorksheetProtectionRule } from '@univerjs/sheets';
 import type { IPermissionPanelRule } from '../service/sheet-permission-panel.model';
 
 export interface IAddRangeProtectionParams {
     permissionId: string;
-    rule: ISelectionProtectionRule;
+    rule: IRangeProtectionRule;
 }
 
 export type ISetRangeProtectionParams = IAddRangeProtectionParams;
@@ -28,7 +27,7 @@ export type ISetRangeProtectionParams = IAddRangeProtectionParams;
 export interface IDeleteRangeProtectionParams {
     unitId: string;
     subUnitId: string;
-    rule: ISelectionProtectionRule;
+    rule: IRangeProtectionRule;
 }
 
 export interface IAddWorksheetProtectionParams {

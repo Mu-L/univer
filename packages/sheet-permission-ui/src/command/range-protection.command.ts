@@ -16,9 +16,8 @@
 
 import type { ICommand, Workbook } from '@univerjs/core';
 import { CommandType, ICommandService, IUndoRedoService, IUniverInstanceService, Rectangle, sequenceExecute, UniverInstanceType } from '@univerjs/core';
-import type { ISelectionProtectionRule } from '@univerjs/sheets-selection-protection';
-import { AddSelectionProtection, DeleteSelectionProtection, SelectionProtectionRuleModel, SetSelectionProtection } from '@univerjs/sheets-selection-protection';
-import { AddWorksheetProtectionMutation, DeleteWorksheetProtectionMutation, SelectionManagerService, SetWorksheetProtectionMutation, WorksheetProtectionRuleModel } from '@univerjs/sheets';
+import type { IRangeProtectionRule } from '@univerjs/sheets';
+import { AddRangeProtectionMutation, AddWorksheetProtectionMutation, DeleteRangeProtectionMutation, DeleteWorksheetProtectionMutation, RangeProtectionRuleModel, SelectionManagerService, SetRangeProtectionMutation, SetWorksheetProtectionMutation, WorksheetProtectionRuleModel } from '@univerjs/sheets';
 import { UnitObject } from '@univerjs/protocol';
 import { SheetPermissionOpenPanelOperation } from '../operation/sheet-permission-open-panel.operation';
 import { SheetPermissionPanelModel } from '../service/sheet-permission-panel.model';
@@ -90,7 +89,7 @@ export const AddRangeProtectionCommand: ICommand<IAddRangeProtectionParams> = {
         }
         const commandService = accessor.get(ICommandService);
         const undoRedoService = accessor.get(IUndoRedoService);
-        const selectionProtectionModel = accessor.get(SelectionProtectionRuleModel);
+        const selectionProtectionModel = accessor.get(RangeProtectionRuleModel);
         const { rule, permissionId } = params;
 
         const { unitId, subUnitId, ranges, name, description } = rule;
@@ -102,15 +101,15 @@ export const AddRangeProtectionCommand: ICommand<IAddRangeProtectionParams> = {
             description,
         }];
 
-        const result = await commandService.executeCommand(AddSelectionProtection.id, {
+        const result = await commandService.executeCommand(AddRangeProtectionMutation.id, {
             unitId,
             subUnitId,
             rules,
         });
 
         if (result) {
-            const redoMutations = [{ id: AddSelectionProtection.id, params: { unitId, subUnitId, rules } }];
-            const undoMutations = [{ id: DeleteSelectionProtection.id, params: { unitId, subUnitId, ruleIds: rules.map((rule) => rule.id) } }];
+            const redoMutations = [{ id: AddRangeProtectionMutation.id, params: { unitId, subUnitId, rules } }];
+            const undoMutations = [{ id: DeleteRangeProtectionMutation.id, params: { unitId, subUnitId, ruleIds: rules.map((rule) => rule.id) } }];
             undoRedoService.pushUndoRedo({
                 unitID: unitId,
                 redoMutations,
@@ -138,13 +137,13 @@ export const DeleteRangeSelectionCommand: ICommand<IDeleteRangeProtectionParams>
             subUnitId,
             ruleIds: [rule.id],
         };
-        const result = await commandService.executeCommand(DeleteSelectionProtection.id, redoMutationParam);
+        const result = await commandService.executeCommand(DeleteRangeProtectionMutation.id, redoMutationParam);
 
         if (result) {
             undoRedoService.pushUndoRedo({
                 unitID: unitId,
-                redoMutations: [{ id: DeleteSelectionProtection.id, params: redoMutationParam }],
-                undoMutations: [{ id: AddSelectionProtection.id, params: { unitId, subUnitId, rules: [rule] } }],
+                redoMutations: [{ id: DeleteRangeProtectionMutation.id, params: redoMutationParam }],
+                undoMutations: [{ id: AddRangeProtectionMutation.id, params: { unitId, subUnitId, rules: [rule] } }],
             });
         }
 
@@ -160,7 +159,7 @@ export const SetRangeProtectionCommand: ICommand<ISetRangeProtectionParams> = {
             return false;
         }
         const commandService = accessor.get(ICommandService);
-        const selectionProtectionModel = accessor.get(SelectionProtectionRuleModel);
+        const selectionProtectionModel = accessor.get(RangeProtectionRuleModel);
         const sheetPermissionPanelModel = accessor.get(SheetPermissionPanelModel);
         const undoRedoService = accessor.get(IUndoRedoService);
         const { rule, permissionId } = params;
@@ -180,14 +179,14 @@ export const SetRangeProtectionCommand: ICommand<ISetRangeProtectionParams> = {
                     description,
                 },
             };
-            const result = await commandService.executeCommand(SetSelectionProtection.id, redoMutationParam);
+            const result = await commandService.executeCommand(SetRangeProtectionMutation.id, redoMutationParam);
 
             if (result) {
                 const redoMutations = [{
-                    id: SetSelectionProtection.id, params: redoMutationParam,
+                    id: SetRangeProtectionMutation.id, params: redoMutationParam,
                 }];
                 const undoMutations = [{
-                    id: SetSelectionProtection.id, params: {
+                    id: SetRangeProtectionMutation.id, params: {
                         unitId,
                         subUnitId,
                         ruleId: rule.id,
@@ -228,7 +227,7 @@ export const DeleteRangeProtectionFromContextMenuCommand: ICommand = {
             if (!selectRange) {
                 return false;
             }
-            const sheetPermissionRuleModal = accessor.get(SelectionProtectionRuleModel);
+            const sheetPermissionRuleModal = accessor.get(RangeProtectionRuleModel);
 
             const subRuleList = sheetPermissionRuleModal.getSubunitRuleList(unitId, subUnitId);
             const rule = subRuleList.find((item) => {
@@ -241,12 +240,12 @@ export const DeleteRangeProtectionFromContextMenuCommand: ICommand = {
                     subUnitId,
                     ruleIds: [rule.id],
                 };
-                const result = await commandService.executeCommand(DeleteSelectionProtection.id, redoMutationParam);
+                const result = await commandService.executeCommand(DeleteRangeProtectionMutation.id, redoMutationParam);
                 if (result) {
                     undoRedoService.pushUndoRedo({
                         unitID: unitId,
-                        redoMutations: [{ id: DeleteSelectionProtection.id, params: redoMutationParam }],
-                        undoMutations: [{ id: AddSelectionProtection.id, params: { unitId, subUnitId, rules: [rule] } }],
+                        redoMutations: [{ id: DeleteRangeProtectionMutation.id, params: redoMutationParam }],
+                        undoMutations: [{ id: AddRangeProtectionMutation.id, params: { unitId, subUnitId, rules: [rule] } }],
                     });
                 }
                 return true;
@@ -288,7 +287,7 @@ export const SetRangeProtectionFromContextMenuCommand: ICommand = {
             if (!selectRange) {
                 return false;
             }
-            const sheetPermissionRuleModal = accessor.get(SelectionProtectionRuleModel);
+            const sheetPermissionRuleModal = accessor.get(RangeProtectionRuleModel);
             const subRuleList = sheetPermissionRuleModal.getSubunitRuleList(unitId, subUnitId);
             const rule = subRuleList.find((item) => {
                 return item?.ranges?.some((range) => Rectangle.intersects(range, selectRange));
@@ -321,7 +320,7 @@ export const SetProtectionCommand: ICommand<ISetProtectionParams> = {
         const commandService = accessor.get(ICommandService);
         const undoRedoService = accessor.get(IUndoRedoService);
         const sheetPermissionPanelModel = accessor.get(SheetPermissionPanelModel);
-        const selectionProtectionRuleModel = accessor.get(SelectionProtectionRuleModel);
+        const rangeProtectionRuleModel = accessor.get(RangeProtectionRuleModel);
         const { rule } = params;
         const { unitId, subUnitId } = rule;
 
@@ -335,8 +334,8 @@ export const SetProtectionCommand: ICommand<ISetProtectionParams> = {
                 redoMutations.push({ id: SetWorksheetProtectionMutation.id, params: { unitId, subUnitId, rule } });
                 undoMutations.push({ id: SetWorksheetProtectionMutation.id, params: { unitId, subUnitId, rule: oldRule } });
             } else {
-                redoMutations.push({ id: SetSelectionProtection.id, params: { unitId, subUnitId, rule, ruleId: (rule as ISelectionProtectionRule).id } });
-                undoMutations.push({ id: SetSelectionProtection.id, params: { unitId, subUnitId, ruleId: (oldRule as ISelectionProtectionRule).id, rule: oldRule } });
+                redoMutations.push({ id: SetRangeProtectionMutation.id, params: { unitId, subUnitId, rule, ruleId: (rule as IRangeProtectionRule).id } });
+                undoMutations.push({ id: SetRangeProtectionMutation.id, params: { unitId, subUnitId, ruleId: (oldRule as IRangeProtectionRule).id, rule: oldRule } });
             }
         } else {
             if (oldRule) {
@@ -344,8 +343,8 @@ export const SetProtectionCommand: ICommand<ISetProtectionParams> = {
                     redoMutations.push({ id: DeleteWorksheetProtectionMutation.id, params: { unitId, subUnitId } });
                     undoMutations.push({ id: AddWorksheetProtectionMutation.id, params: { unitId, rule: oldRule } });
                 } else if (oldRule.unitType === UnitObject.SelectRange) {
-                    redoMutations.push({ id: DeleteSelectionProtection.id, params: { unitId, subUnitId, ruleIds: [(oldRule as ISelectionProtectionRule).id] } });
-                    undoMutations.push({ id: AddSelectionProtection.id, params: { unitId, subUnitId, rules: [oldRule] } });
+                    redoMutations.push({ id: DeleteRangeProtectionMutation.id, params: { unitId, subUnitId, ruleIds: [(oldRule as IRangeProtectionRule).id] } });
+                    undoMutations.push({ id: AddRangeProtectionMutation.id, params: { unitId, subUnitId, rules: [oldRule] } });
                 }
             }
 
@@ -353,9 +352,9 @@ export const SetProtectionCommand: ICommand<ISetProtectionParams> = {
                 redoMutations.push({ id: AddWorksheetProtectionMutation.id, params: { unitId, rule } });
                 undoMutations.unshift({ id: DeleteWorksheetProtectionMutation.id, params: { unitId, subUnitId } });
             } else if (rule.unitType === UnitObject.SelectRange) {
-                (rule as ISelectionProtectionRule).id = selectionProtectionRuleModel.createRuleId(unitId, subUnitId);
-                redoMutations.push({ id: AddSelectionProtection.id, params: { unitId, subUnitId, rules: [rule] } });
-                undoMutations.unshift({ id: DeleteSelectionProtection.id, params: { unitId, subUnitId, ruleIds: [(rule as ISelectionProtectionRule).id] } });
+                (rule as IRangeProtectionRule).id = rangeProtectionRuleModel.createRuleId(unitId, subUnitId);
+                redoMutations.push({ id: AddRangeProtectionMutation.id, params: { unitId, subUnitId, rules: [rule] } });
+                undoMutations.unshift({ id: DeleteRangeProtectionMutation.id, params: { unitId, subUnitId, ruleIds: [(rule as IRangeProtectionRule).id] } });
             }
         }
 

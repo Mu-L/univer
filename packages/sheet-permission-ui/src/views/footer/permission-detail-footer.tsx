@@ -20,7 +20,7 @@ import React from 'react';
 import { ISidebarService, useObservable } from '@univerjs/ui';
 import { IAuthzIoService, ICommandService, LocaleService } from '@univerjs/core';
 import { UnitAction, UnitObject, UnitRole } from '@univerjs/protocol';
-import { AddRangeProtectionCommand } from '@univerjs/sheets-selection-protection';
+import { AddRangeProtectionCommand } from '@univerjs/sheets';
 import { SheetPermissionUserManagerService } from '../../service';
 import { UNIVER_SHEET_PERMISSION_PANEL, UNIVER_SHEET_PERMISSION_PANEL_FOOTER } from '../../const';
 import { AddWorksheetProtectionCommand } from '../../command/worksheet-protection.command';

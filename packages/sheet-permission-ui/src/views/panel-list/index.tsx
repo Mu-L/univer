@@ -18,12 +18,10 @@ import React, { useCallback, useEffect, useState } from 'react';
 import clsx from 'clsx';
 import { Avatar, Tooltip } from '@univerjs/design';
 import { useDependency } from '@wendellhu/redi/react-bindings';
-import type { ISelectionProtectionRule } from '@univerjs/sheets-selection-protection';
-import { DeleteRangeProtectionCommand, SelectionProtectionRuleModel } from '@univerjs/sheets-selection-protection';
 import type { IRange, Workbook } from '@univerjs/core';
 import { IAuthzIoService, ICommandService, IPermissionService, IUniverInstanceService, LocaleService, UniverInstanceType, UserManagerService } from '@univerjs/core';
-import type { IWorksheetProtectionRule } from '@univerjs/sheets';
-import { SetWorksheetActiveOperation, WorkbookManageCollaboratorPermission, WorksheetProtectionRuleModel } from '@univerjs/sheets';
+import type { IRangeProtectionRule, IWorksheetProtectionRule } from '@univerjs/sheets';
+import { DeleteRangeProtectionCommand, RangeProtectionRuleModel, SetWorksheetActiveOperation, WorkbookManageCollaboratorPermission, WorksheetProtectionRuleModel } from '@univerjs/sheets';
 import { ISidebarService, useObservable } from '@univerjs/ui';
 import { merge } from 'rxjs';
 import type { IPermissionPoint } from '@univerjs/protocol';
@@ -38,13 +36,13 @@ import { DeleteWorksheetProtectionCommand } from '../../command/worksheet-protec
 import styles from './index.module.less';
 import { panelListEmptyBase64 } from './constant';
 
-type IRuleItem = ISelectionProtectionRule | IWorksheetProtectionRule;
+type IRuleItem = IRangeProtectionRule | IWorksheetProtectionRule;
 export const SheetPermissionPanelList = () => {
     const [isCurrentSheet, setIsCurrentSheet] = useState(true);
     const [forceUpdateFlag, setForceUpdateFlag] = useState(false);
     const sheetPermissionPanelModel = useDependency(SheetPermissionPanelModel);
     const localeService = useDependency(LocaleService);
-    const selectionProtectionModel = useDependency(SelectionProtectionRuleModel);
+    const rangeProtectionRuleModel = useDependency(RangeProtectionRuleModel);
     const worksheetProtectionModel = useDependency(WorksheetProtectionRuleModel);
     const univerInstanceService = useDependency(IUniverInstanceService);
     const workbook = univerInstanceService.getCurrentUnitForType<Workbook>(UniverInstanceType.UNIVER_SHEET)!;
@@ -59,7 +57,7 @@ export const SheetPermissionPanelList = () => {
     const [currentRuleRanges, currentRuleRangesSet] = useState<IRange[]>([]);
 
     useObservable(worksheetProtectionModel.ruleRefresh$);
-    useObservable(selectionProtectionModel.ruleRefresh$);
+    useObservable(rangeProtectionRuleModel.ruleRefresh$);
 
     const getRuleList = useCallback(async (isCurrentSheet: boolean) => {
         const worksheet = workbook.getActiveSheet()!;
@@ -71,7 +69,7 @@ export const SheetPermissionPanelList = () => {
 
         workbook.getSheets().forEach((sheet) => {
             const sheetId = sheet.getSheetId();
-            const rules = selectionProtectionModel.getSubunitRuleList(unitId, sheetId);
+            const rules = rangeProtectionRuleModel.getSubunitRuleList(unitId, sheetId);
             rules.forEach((rule) => {
                 if (rule.permissionId && rule.name) {
                     allRangePermissionId.push(rule.permissionId);
@@ -91,7 +89,7 @@ export const SheetPermissionPanelList = () => {
             actions: [UnitAction.View, UnitAction.Edit],
         });
 
-        const subUnitPermissionIds = selectionProtectionModel.getSubunitRuleList(unitId, subUnitId).map((item) => item.permissionId);
+        const subUnitPermissionIds = rangeProtectionRuleModel.getSubunitRuleList(unitId, subUnitId).map((item) => item.permissionId);
         const sheetPermissionId = worksheetProtectionModel.getRule(unitId, subUnitId)?.permissionId;
         if (sheetPermissionId) {
             subUnitPermissionIds.push(sheetPermissionId);
@@ -101,13 +99,13 @@ export const SheetPermissionPanelList = () => {
         });
 
         return isCurrentSheet ? subUnitRuleList : allPermissionRule;
-    }, [authzIoService, selectionProtectionModel, workbook, worksheetProtectionModel]);
+    }, [authzIoService, rangeProtectionRuleModel, workbook, worksheetProtectionModel]);
 
     const [ruleList, setRuleList] = useState<IPermissionPoint[]>([]);
 
     useEffect(() => {
         const subscription = merge(
-            selectionProtectionModel.ruleChange$,
+            rangeProtectionRuleModel.ruleChange$,
             workbook.activeSheet$,
             worksheetProtectionModel.ruleChange$
         ).subscribe(async () => {
@@ -117,7 +115,7 @@ export const SheetPermissionPanelList = () => {
         return () => {
             subscription.unsubscribe();
         };
-    }, [getRuleList, isCurrentSheet, selectionProtectionModel, workbook]);
+    }, [getRuleList, isCurrentSheet, rangeProtectionRuleModel, workbook]);
 
     const handleDelete = (rule: IRuleItem) => {
         const { unitId, subUnitId, unitType } = rule;
@@ -130,7 +128,7 @@ export const SheetPermissionPanelList = () => {
 
         if (res) {
             setForceUpdateFlag(!forceUpdateFlag);
-            if ((rule as ISelectionProtectionRule).ranges === currentRuleRanges) {
+            if ((rule as IRangeProtectionRule).ranges === currentRuleRanges) {
                 currentRuleRangesSet([]);
             }
         }
@@ -138,10 +136,10 @@ export const SheetPermissionPanelList = () => {
 
     useHighlightRange(currentRuleRanges);
 
-    const allRuleMap = new Map<string, ISelectionProtectionRule | IWorksheetProtectionRule>();
+    const allRuleMap = new Map<string, IRangeProtectionRule | IWorksheetProtectionRule>();
     workbook.getSheets().forEach((sheet) => {
         const sheetId = sheet.getSheetId();
-        const rangeRules = selectionProtectionModel.getSubunitRuleList(unitId, sheetId);
+        const rangeRules = rangeProtectionRuleModel.getSubunitRuleList(unitId, sheetId);
         rangeRules.forEach((rule) => {
             allRuleMap.set(rule.permissionId, rule);
         });
@@ -221,7 +219,7 @@ export const SheetPermissionPanelList = () => {
                             let ruleName = '';
 
                             if (rule.unitType === UnitObject.SelectRange) {
-                                const ranges = (rule as ISelectionProtectionRule).ranges;
+                                const ranges = (rule as IRangeProtectionRule).ranges;
                                 const rangeStr = ranges?.length
                                     ? ranges.map((range) => {
                                         const v = serializeRange(range);
@@ -245,7 +243,7 @@ export const SheetPermissionPanelList = () => {
                                             return false;
                                         }
                                         if (unitType === UnitObject.SelectRange) {
-                                            const ranges = (rule as ISelectionProtectionRule).ranges || [];
+                                            const ranges = (rule as IRangeProtectionRule).ranges || [];
                                             ranges !== currentRuleRanges && currentRuleRangesSet(ranges);
                                         } else if (unitType === UnitObject.Worksheet) {
                                             const ranges = [{ startRow: 0, endRow: activeSheet.getRowCount() - 1, startColumn: 0, endColumn: activeSheet.getColumnCount() - 1 }];

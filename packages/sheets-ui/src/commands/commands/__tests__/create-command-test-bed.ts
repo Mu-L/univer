@@ -26,12 +26,15 @@ import {
     Univer,
     UniverInstanceType,
 } from '@univerjs/core';
-import { BorderStyleManagerService, SelectionManagerService, SheetInterceptorService, WorkbookPermissionService, WorksheetPermissionService, WorksheetProtectionPointModel, WorksheetProtectionRuleModel } from '@univerjs/sheets';
+import { BorderStyleManagerService,
+    RangeProtectionRuleModel,
+    SelectionManagerService,
+
+    SheetInterceptorService, WorkbookPermissionService, WorksheetPermissionService, WorksheetProtectionPointModel, WorksheetProtectionRuleModel } from '@univerjs/sheets';
 import type { Dependency } from '@wendellhu/redi';
 import { Inject, Injector } from '@wendellhu/redi';
 
 import { LexerTreeBuilder } from '@univerjs/engine-formula';
-import { SelectionProtectionRuleModel } from '@univerjs/sheets-selection-protection';
 import enUS from '../../../locale/en-US';
 
 const getTestWorkbookDataDemo = (): IWorkbookData => {
@@ -103,7 +106,7 @@ export function createCommandTestBed(workbookData?: IWorkbookData, dependencies?
             injector.add([WorksheetProtectionPointModel]);
             injector.add([WorkbookPermissionService]);
             injector.add([WorksheetProtectionRuleModel]);
-            injector.add([SelectionProtectionRuleModel]);
+            injector.add([RangeProtectionRuleModel]);
             dependencies?.forEach((d) => injector.add(d));
         }
     }
