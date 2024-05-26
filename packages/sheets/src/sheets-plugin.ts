@@ -34,6 +34,11 @@ import { SelectionManagerService } from './services/selection-manager.service';
 import { SheetInterceptorService } from './services/sheet-interceptor/sheet-interceptor.service';
 import { DefinedNameDataController } from './controllers/defined-name-data.controller';
 import { WorksheetPermissionService, WorksheetProtectionPointModel, WorksheetProtectionRuleModel } from './services/permission/worksheet-permission';
+import { RangeProtectionRenderModel } from './model/range-protection-render.model';
+import { RangeProtectionRuleModel } from './model/range-protection-rule.model';
+
+import { RangeProtectionRefRangeService } from './services/permission/range-permission/range-protection.ref-range';
+import { RangeProtectionService } from './services/permission/range-permission/range-protection.service';
 
 const PLUGIN_NAME = 'SHEET_PLUGIN';
 
@@ -85,6 +90,12 @@ export class UniverSheetsPlugin extends Plugin {
             [WorksheetPermissionService],
             [WorksheetProtectionRuleModel],
             [WorksheetProtectionPointModel],
+
+            // range protection
+            [RangeProtectionRenderModel],
+            [RangeProtectionRuleModel],
+            [RangeProtectionRefRangeService],
+            [RangeProtectionService],
         ];
 
         if (!this._config?.notExecuteFormula) {

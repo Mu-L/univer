@@ -120,6 +120,14 @@ import { SetWorksheetProtectionMutation } from '../commands/mutations/set-worksh
 import { DeleteWorksheetProtectionMutation } from '../commands/mutations/delete-worksheet-protection.mutation';
 import { SetWorksheetPermissionPointsMutation } from '../commands/mutations/set-worksheet-permission-points.mutation';
 import { SetWorksheetPermissionPointsCommand } from '../commands/commands/set-worksheet-permission-points.command';
+
+import { AddRangeProtectionCommand } from '../commands/commands/add-range-protection.command';
+import { DeleteRangeProtectionCommand } from '../commands/commands/delete-range-protection.command';
+import { SetRangeProtectionCommand } from '../commands/commands/set-range-protection.command';
+
+import { AddRangeProtectionMutation } from '../commands/mutations/add-range-protection.mutation';
+import { DeleteRangeProtectionMutation } from '../commands/mutations/delete-range-protection.mutation';
+import { SetRangeProtectionMutation } from '../commands/mutations/set-range-protection.mutation';
 import { MAX_CELL_PER_SHEET_DEFAULT, MAX_CELL_PER_SHEET_KEY } from './config/config';
 
 export interface IStyleTypeValue<T> {
@@ -238,6 +246,14 @@ export class BasicWorksheetController extends Disposable implements IDisposable 
             SetWorksheetProtectionMutation,
             DeleteWorksheetProtectionMutation,
             SetWorksheetPermissionPointsMutation,
+
+            // range protection
+            AddRangeProtectionCommand,
+            DeleteRangeProtectionCommand,
+            SetRangeProtectionCommand,
+            AddRangeProtectionMutation,
+            DeleteRangeProtectionMutation,
+            SetRangeProtectionMutation,
         ].forEach((command) => this.disposeWithMe(this._commandService.registerCommand(command)));
 
         this._configService.setConfig(MAX_CELL_PER_SHEET_KEY, MAX_CELL_PER_SHEET_DEFAULT);

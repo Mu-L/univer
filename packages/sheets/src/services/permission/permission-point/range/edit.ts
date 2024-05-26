@@ -18,7 +18,7 @@ import type { IPermissionPoint } from '@univerjs/core';
 import { PermissionStatus } from '@univerjs/core';
 import { UnitAction, UnitObject } from '@univerjs/protocol';
 
-export class SelectionProtectionPermissionEditPoint implements IPermissionPoint {
+export class RangeProtectionPermissionEditPoint implements IPermissionPoint {
     type = UnitObject.SelectRange;
     subType = UnitAction.Edit;
     status = PermissionStatus.INIT;

@@ -300,6 +300,8 @@ export { SetDefinedNameCommand, type ISetDefinedNameCommandParams } from './comm
 export { ScrollToCellOperation } from './commands/operations/scroll-to-cell.operation';
 export type { FormatType } from './services/numfmt/type';
 export { getMoveRangeUndoRedoMutations } from './commands/commands/move-range.command';
+
+// permission
 export type { GetWorkbookPermission, GetWorksheetPermission } from './services/permission';
 export { defaultWorksheetPermissionPoint, getAllWorksheetPermissionPoint, getAllWorksheetPermissionPointByPointPanel } from './services/permission';
 export type { IWorksheetProtectionRule } from './services/permission/type';
@@ -345,8 +347,29 @@ export {
     WorkbookSharePermission,
     WorkbookCopyPermission,
     WorkbookManageCollaboratorPermission,
-
-    SelectionProtectionPermissionEditPoint,
-    SelectionProtectionPermissionViewPoint,
 } from './services/permission/permission-point';
 
+// range-protection
+export { AddRangeProtectionCommand, type IAddRangeProtectionCommandParams } from './commands/commands/add-range-protection.command';
+export { DeleteRangeProtectionCommand, type IDeleteRangeProtectionCommandParams } from './commands/commands/delete-range-protection.command';
+export { SetRangeProtectionCommand, type ISetRangeProtectionCommandParams } from './commands/commands/set-range-protection.command';
+
+export { AddRangeProtectionMutation, FactoryAddRangeProtectionMutation, type IAddRangeProtectionMutationParams } from './commands/mutations/add-range-protection.mutation';
+export { DeleteRangeProtectionMutation, FactoryDeleteRangeProtectionMutation, type IDeleteSelectionProtectionMutationParams } from './commands/mutations/delete-range-protection.mutation';
+export { SetRangeProtectionMutation, FactorySetRangeProtectionMutation, type ISetRangeProtectionMutationParams } from './commands/mutations/set-range-protection.mutation';
+
+export { RangeProtectionRenderExtension, type IRangeProtectionRenderCellData, RANGE_PROTECTION_RENDER_EXTENSION_KEY } from './render/range-protection/range-protection.render';
+
+export { RangeProtectionRenderModel, type ICellPermission } from './model/range-protection-render.model';
+export { RangeProtectionRuleModel, type IObjectModel, type IRangeProtectionRule, type IModel } from './model/range-protection-rule.model';
+
+export { RangeProtectionRefRangeService } from './services/permission/range-permission/range-protection.ref-range';
+export { RangeProtectionService } from './services/permission/range-permission/range-protection.service';
+export {
+    type IRangePermissionPoint,
+    getAllRangePermissionPoint,
+    getDefaultRangePermission,
+} from './services/permission/range-permission/util';
+
+export { RangeProtectionPermissionEditPoint } from './services/permission/permission-point/range/edit';
+export { RangeProtectionPermissionViewPoint } from './services/permission/permission-point/range/view';
