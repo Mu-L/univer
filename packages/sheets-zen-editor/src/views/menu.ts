@@ -18,7 +18,7 @@ import { type IMenuButtonItem, MenuGroup, MenuItemType, MenuPosition } from '@un
 
 import { getCurrentRangeDisable$ } from '@univerjs/sheets-ui/controllers/menu/menu-util.js';
 import type { IAccessor } from '@wendellhu/redi';
-import { RangeUnitPermissionType, SubUnitPermissionType, UnitPermissionType } from '@univerjs/core';
+import { SelectionProtectionPermissionEditPoint, WorkbookEditablePermission, WorksheetEditPermission, WorksheetSetCellStylePermission, WorksheetSetCellValuePermission } from '@univerjs/sheets';
 import { OpenZenEditorOperation } from '../commands/operations/zen-editor.operation';
 
 export function ZenEditorMenuItemFactory(accessor: IAccessor): IMenuButtonItem {
@@ -29,6 +29,6 @@ export function ZenEditorMenuItemFactory(accessor: IAccessor): IMenuButtonItem {
         title: 'rightClick.zenEditor',
         icon: 'AmplifySingle',
         positions: [MenuPosition.CONTEXT_MENU],
-        disabled$: getCurrentRangeDisable$(accessor, { workbookTypes: [UnitPermissionType.Edit], worksheetTypes: [SubUnitPermissionType.Edit, SubUnitPermissionType.SetCellValue, SubUnitPermissionType.SetCellStyle], rangeTypes: [RangeUnitPermissionType.Edit] }),
+        disabled$: getCurrentRangeDisable$(accessor, { workbookTypes: [WorkbookEditablePermission], worksheetTypes: [WorksheetEditPermission, WorksheetSetCellValuePermission, WorksheetSetCellStylePermission], rangeTypes: [SelectionProtectionPermissionEditPoint] }),
     };
 }

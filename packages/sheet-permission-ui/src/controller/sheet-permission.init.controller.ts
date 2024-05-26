@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import type { SubUnitPermissionType, Workbook } from '@univerjs/core';
-import { IAuthzIoService, IPermissionService, IUniverInstanceService, LifecycleStages, mapPermissionPointToSubEnum, OnLifecycle, RxDisposable, UniverInstanceType, UserManagerService } from '@univerjs/core';
+import type { Workbook } from '@univerjs/core';
+import { IAuthzIoService, IPermissionService, IUniverInstanceService, LifecycleStages, OnLifecycle, RxDisposable, UniverInstanceType, UserManagerService } from '@univerjs/core';
 
 import { defaultWorkbookPermissionPoints, defaultWorksheetPermissionPoint, getAllWorkbookPermissionPoint, getAllWorksheetPermissionPoint, getAllWorksheetPermissionPointByPointPanel, WorksheetProtectionPointModel, WorksheetProtectionRuleModel } from '@univerjs/sheets';
 import { Inject } from '@wendellhu/redi';
@@ -83,7 +83,7 @@ export class SheetPermissionInitController extends RxDisposable {
                 if (rule) {
                     getAllRangePermissionPoint().forEach((F) => {
                         const instance = new F(unitId, rule.subUnitId, item.objectID);
-                        const unitActionName = mapPermissionPointToSubEnum(instance.subType as unknown as SubUnitPermissionType);
+                        const unitActionName = instance.subType;
                         const result = item.actions.find((action) => action.action === unitActionName);
                         if (result?.allowed !== undefined) {
                             this._permissionService.updatePermissionPoint(instance.id, result.allowed);
@@ -113,7 +113,7 @@ export class SheetPermissionInitController extends RxDisposable {
                             }
                             const rule = info.rule;
                             const instance = new F(rule.unitId, rule.subUnitId, rule.permissionId);
-                            const unitActionName = mapPermissionPointToSubEnum(instance.subType as unknown as SubUnitPermissionType);
+                            const unitActionName = instance.subType;
                             const action = actionList.find((item) => item.action === unitActionName);
                             if (action) {
                                 this._permissionService.updatePermissionPoint(instance.id, action.allowed);
@@ -145,7 +145,7 @@ export class SheetPermissionInitController extends RxDisposable {
         }).then((actionList) => {
             getAllWorkbookPermissionPoint().forEach((F) => {
                 const instance = new F(unitId);
-                const unitActionName = mapPermissionPointToSubEnum(instance.subType);
+                const unitActionName = instance.subType;
                 const action = actionList.find((item) => item.action === unitActionName);
                 if (action) {
                     this._permissionService.updatePermissionPoint(instance.id, action.allowed);
@@ -166,7 +166,7 @@ export class SheetPermissionInitController extends RxDisposable {
                     }).then((actionList) => {
                         getAllWorksheetPermissionPoint().forEach((F) => {
                             const instance = new F(info.unitId, info.subUnitId);
-                            const unitActionName = mapPermissionPointToSubEnum(instance.subType);
+                            const unitActionName = instance.subType;
                             const action = actionList.find((item) => item.action === unitActionName);
                             if (action) {
                                 this._permissionService.updatePermissionPoint(instance.id, action.allowed);
@@ -195,7 +195,7 @@ export class SheetPermissionInitController extends RxDisposable {
                 }).then((actionList) => {
                     getAllWorksheetPermissionPointByPointPanel().forEach((F) => {
                         const instance = new F(info.unitId, info.subUnitId);
-                        const unitActionName = mapPermissionPointToSubEnum(instance.subType);
+                        const unitActionName = instance.subType;
                         const action = actionList.find((item) => item.action === unitActionName);
                         if (action) {
                             this._permissionService.updatePermissionPoint(instance.id, action.allowed);
@@ -252,7 +252,7 @@ export class SheetPermissionInitController extends RxDisposable {
                 if (rule) {
                     [...getAllWorksheetPermissionPoint(), ...getAllWorksheetPermissionPointByPointPanel()].forEach((F) => {
                         const instance = new F(unitId, rule.subUnitId);
-                        const unitActionName = mapPermissionPointToSubEnum(instance.subType);
+                        const unitActionName = instance.subType;
                         const result = item.actions.find((action) => action.action === unitActionName);
                         if (result?.allowed !== undefined) {
                             this._permissionService.updatePermissionPoint(instance.id, result.allowed);

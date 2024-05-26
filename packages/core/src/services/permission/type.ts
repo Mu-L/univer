@@ -16,6 +16,7 @@
 
 import type { Observable } from 'rxjs';
 import { createIdentifier } from '@wendellhu/redi';
+import type { UnitAction, UnitObject } from '@univerjs/protocol';
 import type { Nullable } from '../../common/type-utils';
 import { LifecycleStages, runOnLifecycle } from '../lifecycle/lifecycle';
 import type { IRange } from '../../types/interfaces';
@@ -26,77 +27,27 @@ export enum PermissionStatus {
     DONE = 'done',
 }
 
-export enum PermissionType {
-    WORK_BOOK = 'WORK_BOOK',
-    WORK_SHEET = 'WORK_SHEET',
-    SHEET_RANGE = 'SHEET_RANGE',
-}
-
-export enum UnitPermissionType {
-    Edit = 'Edit',
-    View = 'View',
-    Share = 'Share',
-    Duplicate = 'Duplicate',
-    Export = 'Export',
-    Comment = 'Comment',
-    Print = 'Print',
-    Copy = 'Copy',
-    ManageCollaborator = 'ManageCollaborator',
-    MoveSheet = 'MoveSheet',
-    DeleteSheet = 'DeleteSheet',
-    HideSheet = 'HideSheet',
-    RenameSheet = 'RenameSheet',
-    CreateSheet = 'CreateSheet',
-    CopySheet = 'CopySheet',
-    History = 'History',
-}
-
-export enum SubUnitPermissionType {
-    Edit = 'Edit',
-    Copy = 'Copy',
-    SelectProtectedCells = 'SelectProtectedCells',
-    SelectUnProtectedCells = 'SelectUnProtectedCells',
-    SetCellStyle = 'SetCellStyle',
-    SetCellValue = 'SetCellValue',
-    View = 'View',
-    SetRowStyle = 'SetRowStyle',
-    SetColumnStyle = 'SetColumnStyle',
-    InsertRow = 'InsertRow',
-    InsertColumn = 'InsertColumn',
-    InsertHyperlink = 'InsertHyperlink',
-    DeleteRow = 'DeleteRow',
-    DeleteColumn = 'DeleteColumn',
-    Sort = 'Sort',
-    Filter = 'Filter',
-    PivotTable = 'PivotTable',
-    EditExtraObject = 'EditExtraObject',
-    UnRecognized = 'UnRecognized',
-    ManageCollaborator = 'ManageCollaborator',
-}
+type WorkbookPermissionPointConstructor = new (unitId: string) => IPermissionPoint;
+type WorkSheetPermissionPointConstructor = new (unitId: string, subUnitId: string) => IPermissionPoint;
+type RangePermissionPointConstructor = new (unitId: string, subUnitId: string, permissionId: string) => IPermissionPoint;
 
 export interface IPermissionTypes {
-    rangeTypes?: RangeUnitPermissionType[];
-    worksheetTypes?: SubUnitPermissionType[];
-    workbookTypes?: UnitPermissionType[];
+    rangeTypes?: RangePermissionPointConstructor[];
+    worksheetTypes?: WorkSheetPermissionPointConstructor[];
+    workbookTypes?: WorkbookPermissionPointConstructor[];
 }
 
-export enum RangeUnitPermissionType {
-    Edit = 'Edit',
-    View = 'View',
-    ManageCollaborator = 'ManageCollaborator',
+export interface IPermissionTypesInRunTime {
+    rangeTypes: UnitAction[];
+    worksheetTypes: UnitAction[];
+    workbookTypes: UnitAction[];
 }
-export type IUnitPermissionId = `${PermissionType}.${UnitPermissionType}`;
-export type ISubUnitPermissionId = `${PermissionType}.${SubUnitPermissionType}`;
-export type IRangePermissionId = `${PermissionType}.${RangeUnitPermissionType}`;
 
 export interface IPermissionPoint<V = boolean> {
-    type: PermissionType;
-    /**
-     * ${PermissionType}.${SubUnitPermissionType}_${id}
-     */
-    id: IUnitPermissionId | ISubUnitPermissionId | IRangePermissionId;
+    type: UnitObject;
+    id: string;
     status: PermissionStatus;
-    subType: UnitPermissionType | SubUnitPermissionType | RangeUnitPermissionType;
+    subType: UnitAction;
     value: V;
 }
 
@@ -118,8 +69,6 @@ export interface IPermissionService {
     composePermission$(permissionId: string[]): Observable<IPermissionPoint<unknown>[]>;
     composePermission(permissionId: string[]): IPermissionPoint<unknown>[];
 }
-// composePermission$(permissionIdList: string[]): Observable<IPermissionPoint[]>;
-// composePermission(permissionIdList: string[]): IPermissionPoint[];
 
 export const IPermissionService = createIdentifier<IPermissionService>('univer.permission-service');
 runOnLifecycle(LifecycleStages.Starting, IPermissionService);

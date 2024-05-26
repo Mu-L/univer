@@ -15,9 +15,10 @@
  */
 
 import type { ICellDataForSheetInterceptor, IPermissionTypes, IRange, Nullable, Workbook, Worksheet } from '@univerjs/core';
-import { IPermissionService, IUniverInstanceService, Rectangle, Tools, UnitPermissionType, UniverInstanceType, UserManagerService } from '@univerjs/core';
+import { IPermissionService, IUniverInstanceService, Rectangle, Tools, UniverInstanceType, UserManagerService } from '@univerjs/core';
+import { UnitAction } from '@univerjs/protocol';
 
-import { getRangePointId, getWorkbookPointId, getWorksheetPointId, SelectionManagerService, WorkbookPermissionService, WorksheetProtectionRuleModel } from '@univerjs/sheets';
+import { SelectionManagerService, WorkbookEditablePermission, WorkbookManageCollaboratorPermission, WorkbookPermissionService, WorksheetProtectionRuleModel } from '@univerjs/sheets';
 import type { ICellPermission } from '@univerjs/sheets-selection-protection';
 import { SelectionProtectionRuleModel } from '@univerjs/sheets-selection-protection';
 import type { IAccessor } from '@wendellhu/redi';
@@ -64,18 +65,16 @@ export function getCurrentRangeDisable$(accessor: IAccessor, permissionTypes: IP
 
             const permissionService = accessor.get(IPermissionService);
 
-            const { workbookTypes = [UnitPermissionType.Edit], worksheetTypes, rangeTypes } = permissionTypes;
+            const { workbookTypes = [WorkbookEditablePermission], worksheetTypes, rangeTypes } = permissionTypes;
 
             const permissionIds: string[] = [];
 
-            workbookTypes?.forEach((type) => {
-                const workbookPointId = getWorkbookPointId(unitId, type);
-                permissionIds.push(workbookPointId);
+            workbookTypes?.forEach((F) => {
+                permissionIds.push(new F(unitId).id);
             });
 
-            worksheetTypes?.forEach((type) => {
-                const worksheetPointId = getWorksheetPointId(unitId, subUnitId, type);
-                permissionIds.push(worksheetPointId);
+            worksheetTypes?.forEach((F) => {
+                permissionIds.push(new F(unitId, subUnitId).id);
             });
 
             const worksheetRule = worksheetRuleModel.getRule(unitId, subUnitId);
@@ -93,10 +92,9 @@ export function getCurrentRangeDisable$(accessor: IAccessor, permissionTypes: IP
                 });
             });
 
-            rangeTypes?.forEach((type) => {
+            rangeTypes?.forEach((F) => {
                 rules.forEach((rule) => {
-                    const rangePointId = getRangePointId(rule.permissionId, type);
-                    permissionIds.push(rangePointId);
+                    permissionIds.push(new F(unitId, subUnitId, rule.permissionId).id);
                 });
             });
 
@@ -125,18 +123,16 @@ export function getCommentDisable$(accessor: IAccessor, permissionTypes: IPermis
 
             const permissionService = accessor.get(IPermissionService);
 
-            const { workbookTypes = [UnitPermissionType.Edit], worksheetTypes, rangeTypes } = permissionTypes;
+            const { workbookTypes = [WorkbookEditablePermission], worksheetTypes, rangeTypes } = permissionTypes;
 
             const permissionIds: string[] = [];
 
-            workbookTypes?.forEach((type) => {
-                const workbookPointId = getWorkbookPointId(unitId, type);
-                permissionIds.push(workbookPointId);
+            workbookTypes?.forEach((F) => {
+                permissionIds.push(new F(unitId).id);
             });
 
-            worksheetTypes?.forEach((type) => {
-                const worksheetPointId = getWorksheetPointId(unitId, subUnitId, type);
-                permissionIds.push(worksheetPointId);
+            worksheetTypes?.forEach((F) => {
+                permissionIds.push(new F(unitId, subUnitId).id);
             });
 
             const worksheetRule = worksheetRuleModel.getRule(unitId, subUnitId);
@@ -154,10 +150,9 @@ export function getCommentDisable$(accessor: IAccessor, permissionTypes: IPermis
                 });
             });
 
-            rangeTypes?.forEach((type) => {
+            rangeTypes?.forEach((F) => {
                 rules.forEach((rule) => {
-                    const rangePointId = getRangePointId(rule.permissionId, type);
-                    permissionIds.push(rangePointId);
+                    permissionIds.push(new F(unitId, subUnitId, rule.permissionId).id);
                 });
             });
 
@@ -193,7 +188,7 @@ export function getBaseRangeMenuHidden$(accessor: IAccessor) {
                 for (let row = startRow; row <= endRow; row++) {
                     for (let col = startColumn; col <= endColumn; col++) {
                         const permission = (worksheet.getCell(row, col) as (ICellDataForSheetInterceptor & { selectionProtection: ICellPermission[] }))?.selectionProtection?.[0];
-                        if (permission?.Edit === false) {
+                        if (permission?.[UnitAction.Edit] === false) {
                             return true;
                         }
                     }
@@ -235,7 +230,7 @@ export function getInsertAfterMenuHidden$(accessor: IAccessor, type: 'row' | 'co
                 for (let row = startRow; row <= endRow; row++) {
                     for (let col = startColumn; col <= endColumn; col++) {
                         const permission = (worksheet.getCell(row, col) as (ICellDataForSheetInterceptor & { selectionProtection: ICellPermission[] }))?.selectionProtection?.[0];
-                        if (permission?.Edit === false) {
+                        if (permission?.[UnitAction.Edit] === false) {
                             return true;
                         }
                     }
@@ -277,7 +272,7 @@ export function getInsertBeforeMenuHidden$(accessor: IAccessor, type: 'row' | 'c
                 for (let row = startRow; row <= endRow; row++) {
                     for (let col = startColumn; col <= endColumn; col++) {
                         const permission = (worksheet.getCell(row, col) as (ICellDataForSheetInterceptor & { selectionProtection: ICellPermission[] }))?.selectionProtection?.[0];
-                        if (permission?.Edit === false) {
+                        if (permission?.[UnitAction.Edit] === false) {
                             return true;
                         }
                     }
@@ -322,7 +317,7 @@ export function getDeleteMenuHidden$(accessor: IAccessor, type: 'row' | 'col') {
                 for (let row = startRow; row <= endRow; row++) {
                     for (let col = startColumn; col <= endColumn; col++) {
                         const permission = (worksheet.getCell(row, col) as (ICellDataForSheetInterceptor & { selectionProtection: ICellPermission[] }))?.selectionProtection?.[0];
-                        if (permission?.Edit === false) {
+                        if (permission?.[UnitAction.Edit] === false) {
                             return true;
                         }
                     }
@@ -365,7 +360,7 @@ export function getCellMenuHidden$(accessor: IAccessor, type: 'row' | 'col') {
                 for (let row = startRow; row <= endRow; row++) {
                     for (let col = startColumn; col <= endColumn; col++) {
                         const permission = (worksheet.getCell(row, col) as (ICellDataForSheetInterceptor & { selectionProtection: ICellPermission[] }))?.selectionProtection?.[0];
-                        if (permission?.Edit === false) {
+                        if (permission?.[UnitAction.Edit] === false) {
                             return true;
                         }
                     }
@@ -382,6 +377,7 @@ export function getWorkbookPermissionDisable$(accessor: IAccessor) {
     const worksheetRuleModel = accessor.get(WorksheetProtectionRuleModel);
     const selectionRuleModel = accessor.get(SelectionProtectionRuleModel);
     const workbookPermissionService = accessor.get(WorkbookPermissionService);
+    const permissionService = accessor.get(IPermissionService);
     const unitId = workbook.getUnitId();
 
     const activeSheet$ = workbook.activeSheet$;
@@ -393,8 +389,8 @@ export function getWorkbookPermissionDisable$(accessor: IAccessor) {
             if (!activeSheet) {
                 return of(true);
             }
-            const workbookEditable$ = workbookPermissionService.getEditPermission$(unitId);
-            const workbookManageCollaboratorPermission$ = workbookPermissionService.getManageCollaboratorPermission$(unitId);
+            const workbookEditable$ = permissionService.getPermissionPoint$(new WorkbookEditablePermission(unitId).id)?.pipe(map((permission) => permission.value)) ?? of(false);
+            const workbookManageCollaboratorPermission$ = permissionService.getPermissionPoint$(new WorkbookManageCollaboratorPermission(unitId).id)?.pipe(map((permission) => permission.value)) ?? of(false);
 
             return combineLatest([workbookEditable$, workbookManageCollaboratorPermission$]).pipe(
                 map(([editable, manageable]) => {

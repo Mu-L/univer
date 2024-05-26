@@ -19,8 +19,8 @@ import { useDependency } from '@wendellhu/redi/react-bindings';
 import React from 'react';
 import { ISidebarService, useObservable } from '@univerjs/ui';
 import type { Workbook } from '@univerjs/core';
-import { IUniverInstanceService, LocaleService, UniverInstanceType } from '@univerjs/core';
-import { WorkbookPermissionService, WorksheetProtectionRuleModel } from '@univerjs/sheets';
+import { IPermissionService, IUniverInstanceService, LocaleService, UniverInstanceType } from '@univerjs/core';
+import { WorkbookEditablePermission, WorkbookManageCollaboratorPermission, WorksheetProtectionRuleModel } from '@univerjs/sheets';
 import { UNIVER_SHEET_PERMISSION_PANEL, UNIVER_SHEET_PERMISSION_PANEL_FOOTER } from '../../const';
 import { SheetPermissionPanelModel } from '../../service/sheet-permission-panel.model';
 import styles from './index.module.less';
@@ -30,13 +30,13 @@ export const SheetPermissionPanelAddFooter = () => {
     const localeService = useDependency(LocaleService);
 
     const univerInstanceService = useDependency(IUniverInstanceService);
-    const workbookPermissionService = useDependency(WorkbookPermissionService);
+    const permissionService = useDependency(IPermissionService);
     const workbook = univerInstanceService.getCurrentUnitForType<Workbook>(UniverInstanceType.UNIVER_SHEET)!;
     const unitId = workbook.getUnitId();
     const activeSheet$ = useObservable(workbook.activeSheet$);
 
-    const workbookEditPermission = workbookPermissionService.getEditPermission(unitId);
-    const workbookManagePermission = workbookPermissionService.getManageCollaboratorPermission(unitId);
+    const workbookEditPermission = permissionService.getPermissionPoint(new WorkbookEditablePermission(unitId).id)?.value ?? false;
+    const workbookManagePermission = permissionService.getPermissionPoint(new WorkbookManageCollaboratorPermission(unitId).id)?.value ?? false;
 
     const hasSetProtectPermission = workbookEditPermission && workbookManagePermission;
     const sheetPermissionPanelModel = useDependency(SheetPermissionPanelModel);

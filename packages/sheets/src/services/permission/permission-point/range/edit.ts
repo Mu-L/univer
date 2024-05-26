@@ -18,16 +18,19 @@ import type { IPermissionPoint } from '@univerjs/core';
 import { PermissionStatus } from '@univerjs/core';
 import { UnitAction, UnitObject } from '@univerjs/protocol';
 
-export class WorkbookCopyPermission implements IPermissionPoint {
-    id: string;
-    value = true;
-    type = UnitObject.Workbook;
+export class SelectionProtectionPermissionEditPoint implements IPermissionPoint {
+    type = UnitObject.SelectRange;
+    subType = UnitAction.Edit;
     status = PermissionStatus.INIT;
-    subType = UnitAction.Copy;
-
-    constructor(public unitId: string) {
+    value = true;
+    id: string;
+    unitId: string;
+    subUnitId: string;
+    permissionId: string;
+    constructor(unitId: string, subUnitId: string, permissionId: string) {
         this.unitId = unitId;
-        this.id = `${this.type}.${UnitAction.Copy}_${unitId}`;
+        this.subUnitId = subUnitId;
+        this.permissionId = permissionId;
+        this.id = `${UnitObject.SelectRange}.${UnitAction.Edit}.${permissionId}`;
     }
 }
-

@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import type { IRange, RangeUnitPermissionType } from '@univerjs/core';
-import type { UnitObject } from '@univerjs/protocol';
+import type { IRange } from '@univerjs/core';
+import type { UnitAction, UnitObject } from '@univerjs/protocol';
 
 export interface ISelectionProtectionRule {
     ranges: IRange[];
@@ -28,7 +28,7 @@ export interface ISelectionProtectionRule {
     subUnitId: string;
 }
 
-export type ICellPermission = Record<RangeUnitPermissionType, boolean> & { ruleId?: string;ranges?: IRange[] };
+export type ICellPermission = Record<UnitAction, boolean> & { ruleId?: string;ranges?: IRange[] };
 export type IObjectModel = Record<string, Record<string, ISelectionProtectionRule[]>>;
 
 export type IModel = Map<string, Map<string, Map<string, ISelectionProtectionRule>>>;

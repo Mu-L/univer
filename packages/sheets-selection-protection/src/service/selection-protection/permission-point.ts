@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-import type { IPermissionPoint, IRangePermissionId } from '@univerjs/core';
-import { PermissionStatus, PermissionType, RangeUnitPermissionType } from '@univerjs/core';
+import type { IPermissionPoint } from '@univerjs/core';
+import { PermissionStatus } from '@univerjs/core';
+import { UnitAction, UnitObject } from '@univerjs/protocol';
 
 export class SelectionProtectionPermissionEditPoint implements IPermissionPoint {
-    type = PermissionType.SHEET_RANGE;
-    subType = RangeUnitPermissionType.Edit;
+    type = UnitObject.SelectRange;
+    subType = UnitAction.Edit;
     status = PermissionStatus.INIT;
     value = true;
-    id: IRangePermissionId;
+    id: string;
     unitId: string;
     subUnitId: string;
     permissionId: string;
@@ -30,16 +31,16 @@ export class SelectionProtectionPermissionEditPoint implements IPermissionPoint 
         this.unitId = unitId;
         this.subUnitId = subUnitId;
         this.permissionId = permissionId;
-        this.id = `${PermissionType.SHEET_RANGE}.${RangeUnitPermissionType.Edit}.${permissionId}` as IRangePermissionId;
+        this.id = `${UnitObject.SelectRange}.${UnitAction.Edit}.${permissionId}`;
     }
 }
 
 export class SelectionProtectionPermissionViewPoint implements IPermissionPoint {
-    type = PermissionType.SHEET_RANGE;
-    subType = RangeUnitPermissionType.View;
+    type = UnitObject.SelectRange;
+    subType = UnitAction.View;
     status = PermissionStatus.INIT;
     value = true;
-    id: IRangePermissionId;
+    id: string;
     unitId: string;
     subUnitId: string;
     permissionId: string;
@@ -47,7 +48,7 @@ export class SelectionProtectionPermissionViewPoint implements IPermissionPoint 
         this.unitId = unitId;
         this.subUnitId = subUnitId;
         this.permissionId = permissionId;
-        this.id = `${PermissionType.SHEET_RANGE}.${RangeUnitPermissionType.View}.${permissionId}` as IRangePermissionId;
+        this.id = `${UnitObject.SelectRange}.${UnitAction.View}.${permissionId}`;
     }
 }
 
@@ -59,4 +60,4 @@ export const getDefaultPermission = (unitId = 'unitId', subUnitId = 'subUnitId',
     const i = new F(unitId, subUnitId, permissionId);
     r[i.subType] = i.value;
     return r;
-}, {} as Record<RangeUnitPermissionType, boolean>);
+}, {} as Record<UnitAction, boolean>);

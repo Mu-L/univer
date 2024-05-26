@@ -14,12 +14,16 @@
  * limitations under the License.
  */
 
-import { ICommandService, IUniverInstanceService, LocaleService, RangeUnitPermissionType, SubUnitPermissionType, UnitPermissionType, UniverInstanceType } from '@univerjs/core';
+import { ICommandService, IUniverInstanceService, LocaleService, UniverInstanceType } from '@univerjs/core';
 import {
     INumfmtService,
     RemoveNumfmtMutation,
     SelectionManagerService,
+    SelectionProtectionPermissionEditPoint,
     SetNumfmtMutation,
+    WorkbookEditablePermission,
+    WorksheetEditPermission,
+    WorksheetSetCellStylePermission,
 } from '@univerjs/sheets';
 import type { IMenuSelectorItem } from '@univerjs/ui';
 import { getMenuHiddenObservable, MenuGroup, MenuItemType, MenuPosition } from '@univerjs/ui';
@@ -47,7 +51,7 @@ export const CurrencyMenuItem = (accessor: IAccessor) => {
         group: MenuGroup.TOOLBAR_FORMULAS_INSERT,
         positions: [MenuPosition.TOOLBAR_START],
         hidden$: getMenuHiddenObservable(accessor, UniverInstanceType.UNIVER_SHEET),
-        disabled$: getCurrentRangeDisable$(accessor, { workbookTypes: [UnitPermissionType.Edit], worksheetTypes: [SubUnitPermissionType.Edit, SubUnitPermissionType.SetCellStyle], rangeTypes: [RangeUnitPermissionType.Edit] }),
+        disabled$: getCurrentRangeDisable$(accessor, { workbookTypes: [WorkbookEditablePermission], worksheetTypes: [WorksheetEditPermission, WorksheetSetCellStylePermission], rangeTypes: [SelectionProtectionPermissionEditPoint] }),
 
     };
 };
@@ -62,7 +66,7 @@ export const AddDecimalMenuItem = (accessor: IAccessor) => {
         positions: [MenuPosition.TOOLBAR_START],
         group: MenuGroup.TOOLBAR_FORMULAS_INSERT,
         hidden$: getMenuHiddenObservable(accessor, UniverInstanceType.UNIVER_SHEET),
-        disabled$: getCurrentRangeDisable$(accessor, { workbookTypes: [UnitPermissionType.Edit], worksheetTypes: [SubUnitPermissionType.Edit, SubUnitPermissionType.SetCellStyle], rangeTypes: [RangeUnitPermissionType.Edit] }),
+        disabled$: getCurrentRangeDisable$(accessor, { workbookTypes: [WorkbookEditablePermission], worksheetTypes: [WorksheetEditPermission, WorksheetSetCellStylePermission], rangeTypes: [SelectionProtectionPermissionEditPoint] }),
     };
 };
 
@@ -76,7 +80,7 @@ export const SubtractDecimalMenuItem = (accessor: IAccessor) => {
         group: MenuGroup.TOOLBAR_FORMULAS_INSERT,
         positions: [MenuPosition.TOOLBAR_START],
         hidden$: getMenuHiddenObservable(accessor, UniverInstanceType.UNIVER_SHEET),
-        disabled$: getCurrentRangeDisable$(accessor, { workbookTypes: [UnitPermissionType.Edit], worksheetTypes: [SubUnitPermissionType.Edit, SubUnitPermissionType.SetCellStyle], rangeTypes: [RangeUnitPermissionType.Edit] }),
+        disabled$: getCurrentRangeDisable$(accessor, { workbookTypes: [WorkbookEditablePermission], worksheetTypes: [WorksheetEditPermission, WorksheetSetCellStylePermission], rangeTypes: [SelectionProtectionPermissionEditPoint] }),
     };
 };
 
@@ -90,7 +94,7 @@ export const PercentMenuItem = (accessor: IAccessor) => {
         group: MenuGroup.TOOLBAR_FORMULAS_INSERT,
         positions: [MenuPosition.TOOLBAR_START],
         hidden$: getMenuHiddenObservable(accessor, UniverInstanceType.UNIVER_SHEET),
-        disabled$: getCurrentRangeDisable$(accessor, { workbookTypes: [UnitPermissionType.Edit], worksheetTypes: [SubUnitPermissionType.Edit, SubUnitPermissionType.SetCellStyle], rangeTypes: [RangeUnitPermissionType.Edit] }),
+        disabled$: getCurrentRangeDisable$(accessor, { workbookTypes: [WorkbookEditablePermission], worksheetTypes: [WorksheetEditPermission, WorksheetSetCellStylePermission], rangeTypes: [SelectionProtectionPermissionEditPoint] }),
 
     };
 };
@@ -159,6 +163,6 @@ export const FactoryOtherMenuItem = (accessor: IAccessor): IMenuSelectorItem => 
         ],
         value$,
         hidden$: getMenuHiddenObservable(accessor, UniverInstanceType.UNIVER_SHEET),
-        disabled$: getCurrentRangeDisable$(accessor, { workbookTypes: [UnitPermissionType.Edit], worksheetTypes: [SubUnitPermissionType.SetCellStyle, SubUnitPermissionType.Edit], rangeTypes: [RangeUnitPermissionType.Edit] }),
+        disabled$: getCurrentRangeDisable$(accessor, { workbookTypes: [WorkbookEditablePermission], worksheetTypes: [WorksheetSetCellStylePermission, WorksheetEditPermission], rangeTypes: [SelectionProtectionPermissionEditPoint] }),
     };
 };

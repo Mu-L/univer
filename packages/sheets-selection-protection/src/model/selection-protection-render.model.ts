@@ -16,7 +16,8 @@
 
 import { Inject } from '@wendellhu/redi';
 import { filter, map } from 'rxjs/operators';
-import { IPermissionService, LifecycleStages, LRUMap, OnLifecycle, PermissionType, Range } from '@univerjs/core';
+import { IPermissionService, LifecycleStages, LRUMap, OnLifecycle, Range } from '@univerjs/core';
+import { UnitObject } from '@univerjs/protocol';
 import { getAllRangePermissionPoint } from '../service/selection-protection/permission-point';
 import type { getDefaultPermission, ISelectionPermissionPoint } from '../service/selection-protection/permission-point';
 
@@ -35,7 +36,7 @@ export class SelectionProtectionRenderModel {
 
     init() {
         this._permissionService.permissionPointUpdate$.pipe(
-            filter((permission) => permission.type === PermissionType.SHEET_RANGE),
+            filter((permission) => permission.type === UnitObject.SelectRange),
             filter((permission) => getAllRangePermissionPoint().some((F) => permission instanceof F)),
             map((permission) => permission as ISelectionPermissionPoint)
         )

@@ -14,19 +14,20 @@
  * limitations under the License.
  */
 
-import type { IPermissionPoint, IUnitPermissionId } from '@univerjs/core';
-import { PermissionStatus, PermissionType, UnitPermissionType } from '@univerjs/core';
+import type { IPermissionPoint } from '@univerjs/core';
+import { PermissionStatus } from '@univerjs/core';
+import { UnitAction, UnitObject } from '@univerjs/protocol';
 
 export class WorkbookEditablePermission implements IPermissionPoint {
-    id: IUnitPermissionId;
+    id: string;
     value = true;
-    type = PermissionType.WORK_BOOK;
+    type = UnitObject.Workbook;
     status = PermissionStatus.INIT;
-    subType = UnitPermissionType.Edit;
+    subType = UnitAction.Edit;
 
     constructor(public unitId: string) {
         this.unitId = unitId;
-        this.id = `${this.type}.${UnitPermissionType.Edit}_${unitId}` as IUnitPermissionId;
+        this.id = `${this.type}.${UnitAction.Edit}_${unitId}`;
     }
 }
 

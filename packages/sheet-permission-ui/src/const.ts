@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import { SubUnitPermissionType } from '@univerjs/core';
 import { UnitAction } from '@univerjs/protocol';
 
 export const UNIVER_SHEET_PERMISSION_PLUGIN_NAME = 'UNIVER_SHEET_PERMISSION_PLUGIN';
@@ -31,21 +30,21 @@ export const UNIVER_SHEET_PERMISSION_DIALOG = 'UNIVER_SHEET_PERMISSION_DIALOG';
 export const UNIVER_SHEET_PERMISSION_USER_DIALOG_ID = 'UNIVER_SHEET_PERMISSION_USER_DIALOG_ID';
 export const UNIVER_SHEET_PERMISSION_DIALOG_ID = 'UNIVER_SHEET_PERMISSION_DIALOG_ID';
 
-export const subUnitPermissionTypeMap: Partial<Record<UnitAction, SubUnitPermissionType>> = {
-    [UnitAction.Copy]: SubUnitPermissionType.Copy,
-    [UnitAction.SetCellStyle]: SubUnitPermissionType.SetCellStyle,
-    [UnitAction.SetCellValue]: SubUnitPermissionType.SetCellValue,
-    [UnitAction.SetRowStyle]: SubUnitPermissionType.SetRowStyle,
-    [UnitAction.SetColumnStyle]: SubUnitPermissionType.SetColumnStyle,
-    [UnitAction.InsertRow]: SubUnitPermissionType.InsertRow,
-    [UnitAction.InsertColumn]: SubUnitPermissionType.InsertColumn,
-    [UnitAction.InsertHyperlink]: SubUnitPermissionType.InsertHyperlink,
-    [UnitAction.DeleteRow]: SubUnitPermissionType.DeleteRow,
-    [UnitAction.DeleteColumn]: SubUnitPermissionType.DeleteColumn,
-    [UnitAction.Sort]: SubUnitPermissionType.Sort,
-    [UnitAction.Filter]: SubUnitPermissionType.Filter,
-    [UnitAction.PivotTable]: SubUnitPermissionType.PivotTable,
-    [UnitAction.EditExtraObject]: SubUnitPermissionType.EditExtraObject,
+export const subUnitPermissionTypeMap: Partial<Record<UnitAction, string>> = {
+    [UnitAction.Copy]: 'Copy',
+    [UnitAction.SetCellStyle]: 'SetCellStyle',
+    [UnitAction.SetCellValue]: 'SetCellValue',
+    [UnitAction.SetRowStyle]: 'SetRowStyle',
+    [UnitAction.SetColumnStyle]: 'SetColumnStyle',
+    [UnitAction.InsertRow]: 'InsertRow',
+    [UnitAction.InsertColumn]: 'InsertColumn',
+    [UnitAction.InsertHyperlink]: 'InsertHyperlink',
+    [UnitAction.DeleteRow]: 'DeleteRow',
+    [UnitAction.DeleteColumn]: 'DeleteColumn',
+    [UnitAction.Sort]: 'Sort',
+    [UnitAction.Filter]: 'Filter',
+    [UnitAction.PivotTable]: 'PivotTable',
+    [UnitAction.EditExtraObject]: 'EditExtraObject',
 };
 
 export const defaultWorksheetUnitActionList: UnitAction[] = [

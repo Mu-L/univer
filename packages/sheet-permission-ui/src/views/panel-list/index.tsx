@@ -21,9 +21,9 @@ import { useDependency } from '@wendellhu/redi/react-bindings';
 import type { ISelectionProtectionRule } from '@univerjs/sheets-selection-protection';
 import { DeleteRangeProtectionCommand, SelectionProtectionRuleModel } from '@univerjs/sheets-selection-protection';
 import type { IRange, Workbook } from '@univerjs/core';
-import { IAuthzIoService, ICommandService, IUniverInstanceService, LocaleService, UniverInstanceType, UserManagerService } from '@univerjs/core';
+import { IAuthzIoService, ICommandService, IPermissionService, IUniverInstanceService, LocaleService, UniverInstanceType, UserManagerService } from '@univerjs/core';
 import type { IWorksheetProtectionRule } from '@univerjs/sheets';
-import { SetWorksheetActiveOperation, WorkbookPermissionService, WorksheetProtectionRuleModel } from '@univerjs/sheets';
+import { SetWorksheetActiveOperation, WorkbookManageCollaboratorPermission, WorksheetProtectionRuleModel } from '@univerjs/sheets';
 import { ISidebarService, useObservable } from '@univerjs/ui';
 import { merge } from 'rxjs';
 import type { IPermissionPoint } from '@univerjs/protocol';
@@ -53,7 +53,7 @@ export const SheetPermissionPanelList = () => {
     const commandService = useDependency(ICommandService);
     const sidebarService = useDependency(ISidebarService);
     const authzIoService = useDependency(IAuthzIoService);
-    const workbookPermissionService = useDependency(WorkbookPermissionService);
+    const permissionService = useDependency(IPermissionService);
     const usesManagerService = useDependency(UserManagerService);
     const currentUser = usesManagerService.currentUser;
     const [currentRuleRanges, currentRuleRangesSet] = useState<IRange[]>([]);
@@ -212,7 +212,7 @@ export const SheetPermissionPanelList = () => {
                             const viewAction = item.actions.find((action) => action.action === UnitAction.View);
                             const viewPermission = viewAction?.allowed;
 
-                            const manageCollaboratorAction = workbookPermissionService.getManageCollaboratorPermission(unitId);
+                            const manageCollaboratorAction = permissionService.getPermissionPoint(new WorkbookManageCollaboratorPermission(unitId).id)?.value ?? false;
 
                             const hasManagerPermission = manageCollaboratorAction || currentUser.userID === item.creator?.userID;
 

@@ -300,14 +300,53 @@ export { SetDefinedNameCommand, type ISetDefinedNameCommandParams } from './comm
 export { ScrollToCellOperation } from './commands/operations/scroll-to-cell.operation';
 export type { FormatType } from './services/numfmt/type';
 export { getMoveRangeUndoRedoMutations } from './commands/commands/move-range.command';
-export type { GetWorkbookPermissionFunc, GetWorksheetPermission } from './services/permission';
+export type { GetWorkbookPermission, GetWorksheetPermission } from './services/permission';
 export { defaultWorksheetPermissionPoint, getAllWorksheetPermissionPoint, getAllWorksheetPermissionPointByPointPanel } from './services/permission';
 export type { IWorksheetProtectionRule } from './services/permission/type';
 export { WorksheetProtectionRuleModel, WorksheetProtectionPointModel, WorksheetProtectionRenderService } from './services/permission/worksheet-permission';
-export { getWorkbookPointId, getWorksheetPointId, getRangePointId } from './services/permission';
 export { AddWorksheetProtectionMutation } from './commands/mutations/add-worksheet-protection.mutation';
 export { SetWorksheetProtectionMutation } from './commands/mutations/set-worksheet-protection.mutation';
 export { DeleteWorksheetProtectionMutation } from './commands/mutations/delete-worksheet-protection.mutation';
 export { SetWorksheetPermissionPointsCommand } from './commands/commands/set-worksheet-permission-points.command';
 export { getAllWorkbookPermissionPoint, defaultWorkbookPermissionPoints } from './services/permission/workbook-permission';
+export {
+    WorksheetCopyPermission,
+    WorksheetSelectProtectedCellsPermission,
+    WorksheetSelectUnProtectedCellsPermission,
+    WorksheetSetCellStylePermission,
+    WorksheetSetCellValuePermission,
+    WorksheetViewPermission,
+    WorksheetSetRowStylePermission,
+    WorksheetSetColumnStylePermission,
+    WorksheetInsertRowPermission,
+    WorksheetInsertColumnPermission,
+    WorksheetInsertHyperlinkPermission,
+    WorksheetDeleteRowPermission,
+    WorksheetDeleteColumnPermission,
+    WorksheetSortPermission,
+    WorksheetFilterPermission,
+    WorksheetPivotTablePermission,
+    WorksheetEditExtraObjectPermission,
+    WorksheetManageCollaboratorPermission,
+    WorksheetEditPermission,
+
+    WorkbookCommentPermission,
+    WorkbookEditablePermission,
+    WorkbookDuplicatePermission,
+    WorkbookPrintPermission,
+    WorkbookExportPermission,
+    WorkbookMoveSheetPermission,
+    WorkbookDeleteSheetPermission,
+    WorkbookHideSheetPermission,
+    WorkbookRenameSheetPermission,
+    WorkbookCreateSheetPermission,
+    WorkbookHistoryPermission,
+    WorkbookViewPermission,
+    WorkbookSharePermission,
+    WorkbookCopyPermission,
+    WorkbookManageCollaboratorPermission,
+
+    SelectionProtectionPermissionEditPoint,
+    SelectionProtectionPermissionViewPoint,
+} from './services/permission/permission-point';
 

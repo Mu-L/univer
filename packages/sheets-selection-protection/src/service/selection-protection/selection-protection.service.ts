@@ -58,7 +58,7 @@ export class SelectionProtectionService extends Disposable {
                     })
                     .filter((p) => !!p.ranges);
                 if (permissionList.length) {
-                    const isSkipFontRender = permissionList.some((p) => !p.View);
+                    const isSkipFontRender = permissionList.some((p) => !p?.[UnitAction.View]);
                     const _cellData: ISelectionProtectionRenderCellData & ISheetFontRenderExtension = { ...cell, selectionProtection: permissionList };
                     if (isSkipFontRender) {
                         if (!_cellData.fontRenderExtension) {

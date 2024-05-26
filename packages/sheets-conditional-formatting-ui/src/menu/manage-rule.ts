@@ -18,19 +18,20 @@ import { merge, Observable } from 'rxjs';
 import type { IMenuSelectorItem } from '@univerjs/ui';
 import type { IAccessor } from '@wendellhu/redi';
 import { getMenuHiddenObservable, MenuGroup, MenuItemType, MenuPosition } from '@univerjs/ui';
-import { SelectionManagerService, SetWorksheetActiveOperation } from '@univerjs/sheets';
+import { SelectionManagerService, SelectionProtectionPermissionEditPoint, SetWorksheetActiveOperation, WorkbookEditablePermission, WorksheetEditPermission, WorksheetSetCellStylePermission } from '@univerjs/sheets';
 
 import { debounceTime } from 'rxjs/operators';
 import type { ICellDataForSheetInterceptor, IRange, Workbook } from '@univerjs/core';
-import { ICommandService, IUniverInstanceService, RangeUnitPermissionType, Rectangle, SubUnitPermissionType, UnitPermissionType, UniverInstanceType } from '@univerjs/core';
+import { ICommandService, IUniverInstanceService, Rectangle, UniverInstanceType } from '@univerjs/core';
 import { AddConditionalRuleMutation, ConditionalFormattingRuleModel, DeleteConditionalRuleMutation, MoveConditionalRuleMutation, SetConditionalRuleMutation } from '@univerjs/sheets-conditional-formatting';
 
 import { getCurrentRangeDisable$ } from '@univerjs/sheets-ui/controllers/menu/menu-util.js';
+import { UnitAction } from '@univerjs/protocol';
 import { CF_MENU_OPERATION, OpenConditionalFormattingOperator } from '../commands/operations/open-conditional-formatting-panel';
 
 const commandList = [SetWorksheetActiveOperation.id, AddConditionalRuleMutation.id, SetConditionalRuleMutation.id, DeleteConditionalRuleMutation.id, MoveConditionalRuleMutation.id];
 
-type ICellPermission = Record<RangeUnitPermissionType, boolean> & { ruleId?: string; ranges?: IRange[] };
+type ICellPermission = Record<UnitAction, boolean> & { ruleId?: string; ranges?: IRange[] };
 
 export const FactoryManageConditionalFormattingRule = (accessor: IAccessor): IMenuSelectorItem => {
     const commonSelections = [
@@ -125,7 +126,7 @@ export const FactoryManageConditionalFormattingRule = (accessor: IAccessor): IMe
                     for (let row = startRow; row <= endRow; row++) {
                         for (let col = startColumn; col <= endColumn; col++) {
                             const permission = (worksheet.getCell(row, col) as (ICellDataForSheetInterceptor & { selectionProtection: ICellPermission[] }))?.selectionProtection?.[0];
-                            if (permission?.Edit === false || permission?.View === false) {
+                            if (permission?.[UnitAction.Edit] === false || permission?.[UnitAction.View] === false) {
                                 return true;
                             }
                         }
@@ -162,7 +163,7 @@ export const FactoryManageConditionalFormattingRule = (accessor: IAccessor): IMe
         tooltip: 'sheet.cf.title',
         selections: selections$,
         hidden$: getMenuHiddenObservable(accessor, UniverInstanceType.UNIVER_SHEET),
-        disabled$: getCurrentRangeDisable$(accessor, { workbookTypes: [UnitPermissionType.Edit], worksheetTypes: [SubUnitPermissionType.SetCellStyle, SubUnitPermissionType.Edit], rangeTypes: [RangeUnitPermissionType.Edit] }),
+        disabled$: getCurrentRangeDisable$(accessor, { workbookTypes: [WorkbookEditablePermission], worksheetTypes: [WorksheetSetCellStylePermission, WorksheetEditPermission], rangeTypes: [SelectionProtectionPermissionEditPoint] }),
     } as IMenuSelectorItem;
 };
 

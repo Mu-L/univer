@@ -18,7 +18,7 @@ import type { IMenuButtonItem, IMenuSelectorItem } from '@univerjs/ui';
 import { MenuGroup, MenuItemType, MenuPosition } from '@univerjs/ui';
 
 import type { IAccessor } from '@wendellhu/redi';
-import { RangeUnitPermissionType, SubUnitPermissionType, UnitPermissionType } from '@univerjs/core';
+import { SelectionProtectionPermissionEditPoint, WorkbookEditablePermission, WorksheetDeleteColumnPermission, WorksheetDeleteRowPermission, WorksheetEditPermission } from '@univerjs/sheets';
 import { DeleteRangeMoveLeftConfirmCommand } from '../../commands/commands/delete-range-move-left-confirm.command ';
 import { DeleteRangeMoveUpConfirmCommand } from '../../commands/commands/delete-range-move-up-confirm.command';
 import {
@@ -38,7 +38,7 @@ export function DeleteRangeMenuItemFactory(accessor: IAccessor): IMenuSelectorIt
         icon: 'Reduce',
         positions: [MenuPosition.CONTEXT_MENU],
         hidden$: getBaseRangeMenuHidden$(accessor),
-        disabled$: getCurrentRangeDisable$(accessor, { workbookTypes: [UnitPermissionType.Edit], worksheetTypes: [SubUnitPermissionType.Edit] }),
+        disabled$: getCurrentRangeDisable$(accessor, { workbookTypes: [WorkbookEditablePermission], worksheetTypes: [WorksheetEditPermission] }),
     };
 }
 
@@ -51,7 +51,7 @@ export function RemoveColMenuItemFactory(accessor: IAccessor): IMenuButtonItem {
         positions: [DELETE_RANGE_MENU_ID, SheetMenuPosition.COL_HEADER_CONTEXT_MENU],
         title: 'rightClick.deleteSelectedColumn',
         hidden$: getDeleteMenuHidden$(accessor, 'col'),
-        disabled$: getCurrentRangeDisable$(accessor, { workbookTypes: [UnitPermissionType.Edit], worksheetTypes: [SubUnitPermissionType.Edit, SubUnitPermissionType.DeleteColumn] }),
+        disabled$: getCurrentRangeDisable$(accessor, { workbookTypes: [WorkbookEditablePermission], worksheetTypes: [WorksheetEditPermission, WorksheetDeleteColumnPermission] }),
     };
 }
 
@@ -63,7 +63,7 @@ export function RemoveRowMenuItemFactory(accessor: IAccessor): IMenuButtonItem {
         icon: 'DeleteRow',
         positions: [DELETE_RANGE_MENU_ID, SheetMenuPosition.ROW_HEADER_CONTEXT_MENU],
         title: 'rightClick.deleteSelectedRow',
-        disabled$: getCurrentRangeDisable$(accessor, { workbookTypes: [UnitPermissionType.Edit], worksheetTypes: [SubUnitPermissionType.Edit, SubUnitPermissionType.DeleteRow] }),
+        disabled$: getCurrentRangeDisable$(accessor, { workbookTypes: [WorkbookEditablePermission], worksheetTypes: [WorksheetEditPermission, WorksheetDeleteRowPermission] }),
         hidden$: getDeleteMenuHidden$(accessor, 'row'),
     };
 }
@@ -76,7 +76,7 @@ export function DeleteRangeMoveLeftMenuItemFactory(accessor: IAccessor): IMenuBu
         title: 'rightClick.moveLeft',
         icon: 'DeleteCellShiftLeft',
         positions: [DELETE_RANGE_MENU_ID],
-        disabled$: getCurrentRangeDisable$(accessor, { workbookTypes: [UnitPermissionType.Edit], worksheetTypes: [SubUnitPermissionType.Edit], rangeTypes: [RangeUnitPermissionType.Edit] }),
+        disabled$: getCurrentRangeDisable$(accessor, { workbookTypes: [WorkbookEditablePermission], worksheetTypes: [WorksheetEditPermission], rangeTypes: [SelectionProtectionPermissionEditPoint] }),
         hidden$: getCellMenuHidden$(accessor, 'col'),
     };
 }
@@ -89,7 +89,7 @@ export function DeleteRangeMoveUpMenuItemFactory(accessor: IAccessor): IMenuButt
         title: 'rightClick.moveUp',
         icon: 'DeleteCellShiftUp',
         positions: [DELETE_RANGE_MENU_ID],
-        disabled$: getCurrentRangeDisable$(accessor, { workbookTypes: [UnitPermissionType.Edit], worksheetTypes: [SubUnitPermissionType.Edit], rangeTypes: [RangeUnitPermissionType.Edit] }),
+        disabled$: getCurrentRangeDisable$(accessor, { workbookTypes: [WorkbookEditablePermission], worksheetTypes: [WorksheetEditPermission], rangeTypes: [SelectionProtectionPermissionEditPoint] }),
         hidden$: getCellMenuHidden$(accessor, 'row'),
     };
 }

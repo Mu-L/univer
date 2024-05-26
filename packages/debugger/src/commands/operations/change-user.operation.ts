@@ -15,8 +15,8 @@
  */
 
 import type { ICommand, Workbook } from '@univerjs/core';
-import { CommandType, createDefaultUser, IUniverInstanceService, UniverInstanceType, UserManagerService } from '@univerjs/core';
-import { WorkbookPermissionService } from '@univerjs/sheets';
+import { CommandType, createDefaultUser, IPermissionService, IUniverInstanceService, UniverInstanceType, UserManagerService } from '@univerjs/core';
+import { WorkbookManageCollaboratorPermission } from '@univerjs/sheets';
 
 import type { IAccessor } from '@wendellhu/redi';
 
@@ -40,12 +40,12 @@ export const ChangeUserCommand: ICommand = {
         const univerInstanceService = accessor.get(IUniverInstanceService);
         userManagerService.currentUser = createDefaultUser(params.value);
         const workbook = univerInstanceService.getCurrentUnitForType<Workbook>(UniverInstanceType.UNIVER_SHEET)!;
-        const workbookPermissionService = accessor.get(WorkbookPermissionService);
+        const permissionService = accessor.get(IPermissionService);
         const unitId = workbook.getUnitId();
         if (params.value === UnitRole.Owner) {
-            workbookPermissionService.setManageCollaboratorPermission(unitId, true);
+            permissionService.updatePermissionPoint(new WorkbookManageCollaboratorPermission(unitId).id, true);
         } else {
-            workbookPermissionService.setManageCollaboratorPermission(unitId, false);
+            permissionService.updatePermissionPoint(new WorkbookManageCollaboratorPermission(unitId).id, false);
         }
         return true;
     },

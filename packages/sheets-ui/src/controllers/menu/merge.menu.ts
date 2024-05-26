@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { RangeUnitPermissionType, SubUnitPermissionType, UnitPermissionType, UniverInstanceType } from '@univerjs/core';
-import { RemoveWorksheetMergeCommand } from '@univerjs/sheets';
+import { UniverInstanceType } from '@univerjs/core';
+import { RemoveWorksheetMergeCommand, SelectionProtectionPermissionEditPoint, WorkbookEditablePermission, WorksheetEditPermission, WorksheetSetCellStylePermission, WorksheetSetCellValuePermission } from '@univerjs/sheets';
 import type { IMenuButtonItem, IMenuSelectorItem } from '@univerjs/ui';
 import { getMenuHiddenObservable, MenuGroup, MenuItemType, MenuPosition } from '@univerjs/ui';
 import type { IAccessor } from '@wendellhu/redi';
@@ -31,7 +31,7 @@ import { getSheetSelectionsDisabled$ } from '../utils/selections-tools';
 import { getCurrentRangeDisable$ } from './menu-util';
 
 export function CellMergeMenuItemFactory(accessor: IAccessor): IMenuSelectorItem<string> {
-    const editDisabled$ = getCurrentRangeDisable$(accessor, { workbookTypes: [UnitPermissionType.Edit], worksheetTypes: [SubUnitPermissionType.Edit, SubUnitPermissionType.SetCellStyle, SubUnitPermissionType.SetCellValue], rangeTypes: [RangeUnitPermissionType.Edit] });
+    const editDisabled$ = getCurrentRangeDisable$(accessor, { workbookTypes: [WorkbookEditablePermission], worksheetTypes: [WorksheetEditPermission, WorksheetSetCellValuePermission, WorksheetSetCellStylePermission], rangeTypes: [SelectionProtectionPermissionEditPoint] });
     const selectionsHasCross$ = getSheetSelectionsDisabled$(accessor);
 
     return {

@@ -14,18 +14,19 @@
  * limitations under the License.
  */
 
-import type { IPermissionPoint, IUnitPermissionId } from '@univerjs/core';
-import { PermissionStatus, PermissionType, SubUnitPermissionType, UnitPermissionType } from '@univerjs/core';
+import type { IPermissionPoint } from '@univerjs/core';
+import { PermissionStatus } from '@univerjs/core';
+import { UnitAction, UnitObject } from '@univerjs/protocol';
 
 export class WorkbookCopySheetPermission implements IPermissionPoint {
-    id: IUnitPermissionId;
+    id: string;
     value = true;
-    type = PermissionType.WORK_BOOK;
-    subType = SubUnitPermissionType.Copy;
+    type = UnitObject.Workbook;
+    subType = UnitAction.CopySheet;
     status = PermissionStatus.INIT;
 
     constructor(public unitId: string) {
         this.unitId = unitId;
-        this.id = `${this.type}.${UnitPermissionType.CopySheet}_${unitId}` as IUnitPermissionId;
+        this.id = `${this.type}.${UnitAction.CopySheet}_${unitId}`;
     }
 }

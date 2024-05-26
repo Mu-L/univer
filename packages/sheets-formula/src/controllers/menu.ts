@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-import { RangeUnitPermissionType, SubUnitPermissionType, UnitPermissionType, UniverInstanceType } from '@univerjs/core';
+import { UniverInstanceType } from '@univerjs/core';
 import { getCurrentRangeDisable$, PASTE_SPECIAL_MENU_ID } from '@univerjs/sheets-ui';
 import type { IMenuItem } from '@univerjs/ui';
 import { getMenuHiddenObservable, IClipboardInterfaceService, MenuGroup, MenuItemType, MenuPosition } from '@univerjs/ui';
 import type { IAccessor } from '@wendellhu/redi';
 import { combineLatestWith, map, Observable } from 'rxjs';
 
+import { SelectionProtectionPermissionEditPoint, WorkbookEditablePermission, WorksheetEditPermission, WorksheetSetCellValuePermission } from '@univerjs/sheets';
 import { SheetOnlyPasteFormulaCommand } from '../commands/commands/formula-clipboard.command';
 import { InsertFunctionOperation } from '../commands/operations/insert-function.operation';
 import { MoreFunctionsOperation } from '../commands/operations/more-functions.operation';
@@ -61,7 +62,7 @@ export function InsertFunctionMenuItemFactory(accessor: IAccessor): IMenuItem {
             },
         ],
         hidden$: getMenuHiddenObservable(accessor, UniverInstanceType.UNIVER_SHEET),
-        disabled$: getCurrentRangeDisable$(accessor, { workbookTypes: [UnitPermissionType.Edit], worksheetTypes: [SubUnitPermissionType.Edit, SubUnitPermissionType.SetCellValue], rangeTypes: [RangeUnitPermissionType.Edit] }),
+        disabled$: getCurrentRangeDisable$(accessor, { workbookTypes: [WorkbookEditablePermission], worksheetTypes: [WorksheetEditPermission, WorksheetSetCellValuePermission], rangeTypes: [SelectionProtectionPermissionEditPoint] }),
     };
 }
 
@@ -86,7 +87,7 @@ export function PasteFormulaMenuItemFactory(accessor: IAccessor): IMenuItem {
         title: 'formula.operation.pasteFormula',
         positions: [PASTE_SPECIAL_MENU_ID],
         disabled$: menuClipboardDisabledObservable(accessor).pipe(
-            combineLatestWith(getCurrentRangeDisable$(accessor, { workbookTypes: [UnitPermissionType.Edit], rangeTypes: [RangeUnitPermissionType.Edit], worksheetTypes: [SubUnitPermissionType.SetCellValue, SubUnitPermissionType.Edit] })),
+            combineLatestWith(getCurrentRangeDisable$(accessor, { workbookTypes: [WorkbookEditablePermission], rangeTypes: [SelectionProtectionPermissionEditPoint], worksheetTypes: [WorksheetSetCellValuePermission, WorksheetEditPermission] })),
             map(([d1, d2]) => d1 || d2)
         ),
     };

@@ -16,8 +16,9 @@
 
 import { Inject } from '@wendellhu/redi';
 import type { IPermissionPoint, Workbook } from '@univerjs/core';
-import { Disposable, IPermissionService, IUniverInstanceService, LifecycleStages, OnLifecycle, UnitPermissionType, UniverInstanceType } from '@univerjs/core';
+import { Disposable, IPermissionService, IUniverInstanceService, LifecycleStages, OnLifecycle, UniverInstanceType } from '@univerjs/core';
 import { map, of } from 'rxjs';
+import { UnitAction } from '@univerjs/protocol';
 import {
     WorkbookCommentPermission,
     WorkbookCopyPermission,
@@ -35,82 +36,12 @@ import {
     WorkbookSharePermission,
     WorkbookViewPermission,
 } from '../permission-point';
-import type { GetWorkbookPermissionFunc, GetWorkbookPermissionFunc$, SetWorkbookPermissionFunc } from '../type';
+import type { IWorkbookPermissionServiceMethods } from '../type';
 import { getAllWorkbookPermissionPoint } from './utils';
 
 @OnLifecycle(LifecycleStages.Starting, WorkbookPermissionService)
-export class WorkbookPermissionService extends Disposable {
-    getEditPermission$: GetWorkbookPermissionFunc$;
-    getEditPermission: GetWorkbookPermissionFunc;
-    setEditPermission: SetWorkbookPermissionFunc;
-
-    getPrintPermission$: GetWorkbookPermissionFunc$;
-    getPrintPermission: GetWorkbookPermissionFunc;
-    setPrintPermission: SetWorkbookPermissionFunc;
-
-    getDuplicatePermission$: GetWorkbookPermissionFunc$;
-    getDuplicatePermission: GetWorkbookPermissionFunc;
-    setDuplicatePermission: SetWorkbookPermissionFunc;
-
-    getExportPermission$: GetWorkbookPermissionFunc$;
-    getExportPermission: GetWorkbookPermissionFunc;
-    setExportPermission: SetWorkbookPermissionFunc;
-
-    getMoveSheetPermission$: GetWorkbookPermissionFunc$;
-    getMoveSheetPermission: GetWorkbookPermissionFunc;
-    setMoveSheetPermission: SetWorkbookPermissionFunc;
-
-    getDeleteSheetPermission$: GetWorkbookPermissionFunc$;
-    getDeleteSheetPermission: GetWorkbookPermissionFunc;
-    setDeleteSheetPermission: SetWorkbookPermissionFunc;
-
-    getHideSheetPermission$: GetWorkbookPermissionFunc$;
-    getHideSheetPermission: GetWorkbookPermissionFunc;
-    setHideSheetPermission: SetWorkbookPermissionFunc;
-
-    getRenameSheetPermission$: GetWorkbookPermissionFunc$;
-    getRenameSheetPermission: GetWorkbookPermissionFunc;
-    setRenameSheetPermission: SetWorkbookPermissionFunc;
-
-    getCreateSheetPermission$: GetWorkbookPermissionFunc$;
-    getCreateSheetPermission: GetWorkbookPermissionFunc;
-    setCreateSheetPermission: SetWorkbookPermissionFunc;
-
-    getHistoryPermission$: GetWorkbookPermissionFunc$;
-    getHistoryPermission: GetWorkbookPermissionFunc;
-    setHistoryPermission: SetWorkbookPermissionFunc;
-
-    getViewPermission$: GetWorkbookPermissionFunc$;
-    getViewPermission: GetWorkbookPermissionFunc;
-    setViewPermission: SetWorkbookPermissionFunc;
-
-    getSharePermission$: GetWorkbookPermissionFunc$;
-    getSharePermission: GetWorkbookPermissionFunc;
-    setSharePermission: SetWorkbookPermissionFunc;
-
-    getCommentPermission$: GetWorkbookPermissionFunc$;
-    getCommentPermission: GetWorkbookPermissionFunc;
-    setCommentPermission: SetWorkbookPermissionFunc;
-
-    getCopyPermission$: GetWorkbookPermissionFunc$;
-    getCopyPermission: GetWorkbookPermissionFunc;
-    setCopyPermission: SetWorkbookPermissionFunc;
-
-    getProtectSheetPermission$: GetWorkbookPermissionFunc$;
-    getProtectSheetPermission: GetWorkbookPermissionFunc;
-    setProtectSheetPermission: SetWorkbookPermissionFunc;
-
-    getCopySheetPermission$: GetWorkbookPermissionFunc$;
-    getCopySheetPermission: GetWorkbookPermissionFunc;
-    setCopySheetPermission: SetWorkbookPermissionFunc;
-
-    getCollaboratorPermission$: GetWorkbookPermissionFunc$;
-    getCollaboratorPermission: GetWorkbookPermissionFunc;
-    setCollaboratorPermission: SetWorkbookPermissionFunc;
-
-    getManageCollaboratorPermission$: GetWorkbookPermissionFunc$;
-    getManageCollaboratorPermission: GetWorkbookPermissionFunc;
-    setManageCollaboratorPermission: SetWorkbookPermissionFunc;
+export class WorkbookPermissionService extends Disposable implements IWorkbookPermissionServiceMethods {
+    [key: string]: any;
 
     constructor(
         @Inject(IPermissionService) private _permissionService: IPermissionService,
@@ -174,22 +105,22 @@ export class WorkbookPermissionService extends Disposable {
 
     private _initializePermissions() {
         const permissions = [
-            { type: UnitPermissionType.Edit, class: WorkbookEditablePermission },
-            { type: UnitPermissionType.Print, class: WorkbookPrintPermission },
-            { type: UnitPermissionType.Duplicate, class: WorkbookDuplicatePermission },
-            { type: UnitPermissionType.Export, class: WorkbookExportPermission },
-            { type: UnitPermissionType.MoveSheet, class: WorkbookMoveSheetPermission },
-            { type: UnitPermissionType.DeleteSheet, class: WorkbookDeleteSheetPermission },
-            { type: UnitPermissionType.HideSheet, class: WorkbookHideSheetPermission },
-            { type: UnitPermissionType.RenameSheet, class: WorkbookRenameSheetPermission },
-            { type: UnitPermissionType.CreateSheet, class: WorkbookCreateSheetPermission },
-            { type: UnitPermissionType.History, class: WorkbookHistoryPermission },
-            { type: UnitPermissionType.View, class: WorkbookViewPermission },
-            { type: UnitPermissionType.Share, class: WorkbookSharePermission },
-            { type: UnitPermissionType.Comment, class: WorkbookCommentPermission },
-            { type: UnitPermissionType.Copy, class: WorkbookCopyPermission },
-            { type: UnitPermissionType.CopySheet, class: WorkbookCopyPermission },
-            { type: UnitPermissionType.ManageCollaborator, class: WorkbookManageCollaboratorPermission },
+            { type: UnitAction.Edit, class: WorkbookEditablePermission },
+            { type: UnitAction.Print, class: WorkbookPrintPermission },
+            { type: UnitAction.Duplicate, class: WorkbookDuplicatePermission },
+            { type: UnitAction.Export, class: WorkbookExportPermission },
+            { type: UnitAction.MoveSheet, class: WorkbookMoveSheetPermission },
+            { type: UnitAction.DeleteSheet, class: WorkbookDeleteSheetPermission },
+            { type: UnitAction.HideSheet, class: WorkbookHideSheetPermission },
+            { type: UnitAction.RenameSheet, class: WorkbookRenameSheetPermission },
+            { type: UnitAction.CreateSheet, class: WorkbookCreateSheetPermission },
+            { type: UnitAction.History, class: WorkbookHistoryPermission },
+            { type: UnitAction.View, class: WorkbookViewPermission },
+            { type: UnitAction.Share, class: WorkbookSharePermission },
+            { type: UnitAction.Comment, class: WorkbookCommentPermission },
+            { type: UnitAction.Copy, class: WorkbookCopyPermission },
+            { type: UnitAction.CopySheet, class: WorkbookCopyPermission },
+            { type: UnitAction.ManageCollaborator, class: WorkbookManageCollaboratorPermission },
         ];
 
         permissions.forEach(({ type, class: PermissionClass }) => {

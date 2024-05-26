@@ -15,7 +15,7 @@
  */
 
 import type { ICellDataForSheetInterceptor, Nullable, Workbook } from '@univerjs/core';
-import { DEFAULT_EMPTY_DOCUMENT_VALUE, DOCS_FORMULA_BAR_EDITOR_UNIT_ID_KEY, HorizontalAlign, IUniverInstanceService, ThemeService, UniverInstanceType, VerticalAlign, WrapStrategy } from '@univerjs/core';
+import { DEFAULT_EMPTY_DOCUMENT_VALUE, DOCS_FORMULA_BAR_EDITOR_UNIT_ID_KEY, HorizontalAlign, IPermissionService, IUniverInstanceService, ThemeService, UniverInstanceType, VerticalAlign, WrapStrategy } from '@univerjs/core';
 import { DeviceInputEventType } from '@univerjs/engine-render';
 import { CheckMarkSingle, CloseSingle, DropdownSingle, FxSingle } from '@univerjs/icons';
 import { KeyCode, ProgressBar, TextEditor } from '@univerjs/ui';
@@ -23,10 +23,11 @@ import { useDependency } from '@wendellhu/redi/react-bindings';
 import clsx from 'clsx';
 import React, { useEffect, useState } from 'react';
 
-import { SelectionManagerService, WorksheetPermissionService, WorksheetProtectionRuleModel } from '@univerjs/sheets';
+import { SelectionManagerService, WorksheetProtectionRuleModel, WorksheetSetCellStylePermission, WorksheetSetCellValuePermission } from '@univerjs/sheets';
 import { merge } from 'rxjs';
 import type { ICellPermission } from '@univerjs/sheets-selection-protection';
 import { SelectionProtectionRuleModel } from '@univerjs/sheets-selection-protection';
+import { UnitAction } from '@univerjs/protocol';
 import { IFormulaEditorManagerService } from '../../services/editor/formula-editor-manager.service';
 import { IEditorBridgeService } from '../../services/editor-bridge.service';
 
@@ -51,7 +52,7 @@ export function FormulaBar() {
     const selectionManager = useDependency(SelectionManagerService);
     const worksheetProtectionRuleModel = useDependency(WorksheetProtectionRuleModel);
     const selectionProtectionRuleModel = useDependency(SelectionProtectionRuleModel);
-    const worksheetPermissionService = useDependency(WorksheetPermissionService);
+    const permissionService = useDependency(IPermissionService);
 
     useEffect(() => {
         const workbook = univerInstanceService.getCurrentUnitForType<Workbook>(UniverInstanceType.UNIVER_SHEET)!;
@@ -65,8 +66,8 @@ export function FormulaBar() {
             const subUnitId = worksheet.getSheetId();
             const range = selectionManager.getLast()?.range;
             if (!range) return;
-            const worksheetSetCellValuePermission = worksheetPermissionService.getSetCellStylePermission({ unitId, subUnitId });
-            const worksheetSetCellStylePermission = worksheetPermissionService.getSetCellStylePermission({ unitId, subUnitId });
+            const worksheetSetCellValuePermission = permissionService.getPermissionPoint(new WorksheetSetCellValuePermission(unitId, subUnitId).id);
+            const worksheetSetCellStylePermission = permissionService.getPermissionPoint(new WorksheetSetCellStylePermission(unitId, subUnitId).id);
 
             if (!worksheetSetCellValuePermission || !worksheetSetCellStylePermission) {
                 setDisable(true);
@@ -77,7 +78,7 @@ export function FormulaBar() {
             for (let row = startRow; row <= endRow; row++) {
                 for (let col = startColumn; col <= endColumn; col++) {
                     const permission = (worksheet.getCell(row, col) as (ICellDataForSheetInterceptor & { selectionProtection: ICellPermission[] }))?.selectionProtection?.[0];
-                    if (permission?.Edit === false) {
+                    if (permission?.[UnitAction.Edit] === false) {
                         setDisable(true);
                         return;
                     }
@@ -86,7 +87,7 @@ export function FormulaBar() {
             setDisable(false);
         }
         );
-    }, [selectionManager, selectionProtectionRuleModel, univerInstanceService, worksheetPermissionService, worksheetProtectionRuleModel]);
+    }, [selectionManager, selectionProtectionRuleModel, univerInstanceService, worksheetProtectionRuleModel]);
 
     const INITIAL_SNAPSHOT = {
         id: DOCS_FORMULA_BAR_EDITOR_UNIT_ID_KEY,

@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-import type { IPermissionPoint, ISubUnitPermissionId } from '@univerjs/core';
-import { PermissionStatus, PermissionType, SubUnitPermissionType } from '@univerjs/core';
+import type { IPermissionPoint } from '@univerjs/core';
+import { PermissionStatus } from '@univerjs/core';
+import { UnitAction, UnitObject } from '@univerjs/protocol';
 
 export class WorksheetSortPermission implements IPermissionPoint {
     value = true;
-    type = PermissionType.WORK_SHEET;
+    type = UnitObject.Worksheet;
     status = PermissionStatus.INIT;
-    id: ISubUnitPermissionId;
-    subType = SubUnitPermissionType.Sort;
+    id: string;
+    subType = UnitAction.Sort;
     constructor(public unitId: string, public subUnitId: string) {
-        this.id = `${this.type}.${SubUnitPermissionType.Sort}_${unitId}_${subUnitId}` as ISubUnitPermissionId;
+        this.id = `${this.type}.${UnitAction.Sort}_${unitId}_${subUnitId}`;
     }
 }

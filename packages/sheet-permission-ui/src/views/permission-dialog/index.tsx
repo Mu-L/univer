@@ -20,7 +20,7 @@ import { Button, Switch } from '@univerjs/design';
 import clsx from 'clsx';
 import { useDependency } from '@wendellhu/redi/react-bindings';
 import type { Workbook } from '@univerjs/core';
-import { IAuthzIoService, ICommandService, IPermissionService, IUniverInstanceService, LocaleService, mapPermissionPointToSubEnum, UniverInstanceType } from '@univerjs/core';
+import { IAuthzIoService, ICommandService, IPermissionService, IUniverInstanceService, LocaleService, UniverInstanceType } from '@univerjs/core';
 import { IDialogService } from '@univerjs/ui';
 import { getAllWorksheetPermissionPoint, SetWorksheetPermissionPointsCommand, WorksheetProtectionPointModel } from '@univerjs/sheets';
 import type { ICollaborator, UnitAction } from '@univerjs/protocol';
@@ -150,7 +150,7 @@ export const SheetPermissionDialog = () => {
             }).then(() => {
                 getAllWorksheetPermissionPoint().forEach((F) => {
                     const instance = new F(unitId, subUnitId);
-                    const unitActionName = mapPermissionPointToSubEnum(instance.subType);
+                    const unitActionName = instance.subType;
                     const action = actions.find((item) => item.action === unitActionName);
                     if (action) {
                         permissionService.updatePermissionPoint(instance.id, action.role === UnitRole.Editor);

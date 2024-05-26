@@ -76,6 +76,10 @@
         "react": "^16.9.0 || ^17.0.0 || ^18.0.0",
         "rxjs": ">=7.0.0"
     },
+    "dependencies": {
+        "@univerjs/protocol": "^0.1.32-alpha.1",
+        "@univerjs/sheets": "workspace:*"
+    },
     "devDependencies": {
         "@types/react": "^18.2.79",
         "@univerjs/core": "workspace:*",

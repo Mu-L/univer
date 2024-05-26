@@ -15,7 +15,7 @@
  */
 
 import type { ICommandInfo, Workbook } from '@univerjs/core';
-import { ICommandService, IUniverInstanceService, LocaleService, UniverInstanceType } from '@univerjs/core';
+import { ICommandService, IPermissionService, IUniverInstanceService, LocaleService, UniverInstanceType } from '@univerjs/core';
 import { Dropdown } from '@univerjs/design';
 import {
     InsertSheetMutation,
@@ -27,7 +27,8 @@ import {
     SetWorksheetNameMutation,
     SetWorksheetOrderCommand,
     SetWorksheetOrderMutation,
-    WorkbookPermissionService,
+    WorkbookEditablePermission,
+    WorkbookManageCollaboratorPermission,
     WorksheetProtectionRuleModel,
 } from '@univerjs/sheets';
 import { IConfirmService, Menu, useObservable } from '@univerjs/ui';
@@ -70,7 +71,7 @@ export function SheetBarTabs() {
     const resetOrder = useObservable(worksheetProtectionRuleModel.resetOrder$);
 
     const workbook = univerInstanceService.getCurrentUnitForType<Workbook>(UniverInstanceType.UNIVER_SHEET)!;
-    const workbookPermissionService = useDependency(WorkbookPermissionService);
+    const permissionService = useDependency(IPermissionService);
 
     const statusInit = useCallback(() => {
         const currentSubUnitId = workbook.getActiveSheet().getSheetId();
@@ -185,9 +186,9 @@ export function SheetBarTabs() {
                 const worksheetRule = worksheetProtectionRuleModel.getRule(unitId, subUnitId);
                 const selectionRule = selectionProtectionRuleModel.getSubunitRuleList(unitId, subUnitId).length > 0;
                 if (worksheetRule || selectionRule) {
-                    return workbookPermissionService.getManageCollaboratorPermission(unitId);
+                    return permissionService.getPermissionPoint(new WorkbookManageCollaboratorPermission(unitId).id)?.value ?? false;
                 } else {
-                    return workbookPermissionService.getEditPermission(unitId);
+                    return permissionService.getPermissionPoint(new WorkbookEditablePermission(unitId).id)?.value ?? false;
                 }
             },
         });

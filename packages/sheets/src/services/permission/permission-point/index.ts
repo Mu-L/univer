@@ -50,3 +50,5 @@ export { WorkbookSharePermission } from './workbook/share';
 export { WorkbookCopyPermission } from './workbook/copy';
 export { WorkbookManageCollaboratorPermission } from './workbook/manage-collaborator';
 
+export { SelectionProtectionPermissionEditPoint } from './range/edit';
+export { SelectionProtectionPermissionViewPoint } from './range/view';
