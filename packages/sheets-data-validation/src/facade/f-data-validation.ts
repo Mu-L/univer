@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-import type { DataValidationOperator, DataValidationType, IDataValidationRule, IDataValidationRuleOptions, IRange } from '@univerjs/core';
+import type { DataValidationOperator, DataValidationType, IDataValidationRule, IDataValidationRuleOptions, Injector, IRange, Workbook, Worksheet } from '@univerjs/core';
 import type { IRemoveSheetDataValidationCommandParams, IUpdateSheetDataValidationOptionsCommandParams, IUpdateSheetDataValidationRangeCommandParams, IUpdateSheetDataValidationSettingCommandParams } from '@univerjs/sheets-data-validation';
-import type { FWorksheet } from '@univerjs/sheets/facade';
-import { DataValidationErrorStyle, ICommandService } from '@univerjs/core';
+import { DataValidationErrorStyle, ICommandService, IUniverInstanceService } from '@univerjs/core';
 import { DataValidationModel, getRuleOptions } from '@univerjs/data-validation';
 import { RemoveSheetDataValidationCommand, UpdateSheetDataValidationOptionsCommand, UpdateSheetDataValidationRangeCommand, UpdateSheetDataValidationSettingCommand } from '@univerjs/sheets-data-validation';
 import { FRange } from '@univerjs/sheets/facade';
@@ -25,17 +24,18 @@ import { FDataValidationBuilder } from './f-data-validation-builder';
 
 export class FDataValidation {
     rule: IDataValidationRule;
-    private _worksheet: FWorksheet | undefined;
+    private _worksheet: Worksheet | undefined;
+    private _injector: Injector | undefined;
 
-    constructor(rule: IDataValidationRule, worksheet?: FWorksheet) {
+    constructor(rule: IDataValidationRule, worksheet?: Worksheet, _injector?: Injector) {
+        this._injector = _injector;
         this.rule = rule;
         this._worksheet = worksheet;
     }
 
     /**
      * Gets whether invalid data is allowed based on the error style value.
-     *
-     * @return true if invalid data is allowed, false otherwise.
+     * @returns true if invalid data is allowed, false otherwise.
      */
     getAllowInvalid(): boolean {
         return this.rule.errorStyle !== DataValidationErrorStyle.STOP;
@@ -43,7 +43,6 @@ export class FDataValidation {
 
     /**
      * Gets the data validation type of the rule
-     *
      * @returns The data validation type
      */
     getCriteriaType(): DataValidationType | string {
@@ -52,16 +51,14 @@ export class FDataValidation {
 
     /**
      * Gets the values used for criteria evaluation
-     *
      * @returns An array containing the operator, formula1, and formula2 values
      */
-    getCriteriaValues(): (string | undefined)[] {
+    getCriteriaValues(): [string | undefined, string | undefined, string | undefined] {
         return [this.rule.operator, this.rule.formula1, this.rule.formula2];
     }
 
     /**
      * Gets the help text information, which is used to provide users with guidance and support
-     *
      * @returns Returns the help text information. If there is no error message, it returns an undefined value.
      */
     getHelpText(): string | undefined {
@@ -71,8 +68,7 @@ export class FDataValidation {
     /**
      * Creates a new instance of FDataValidationBuilder using the current rule object.
      * This method is useful for copying an existing data validation rule configuration.
-     *
-     * @return A new FDataValidationBuilder instance with the same rule configuration.
+     * @returns A new FDataValidationBuilder instance with the same rule configuration.
      */
     copy(): FDataValidationBuilder {
         return new FDataValidationBuilder(this.rule);
@@ -80,7 +76,6 @@ export class FDataValidation {
 
     /**
      * Gets whether the data validation rule is applied to the worksheet.
-     *
      * @returns true if the rule is applied, false otherwise.
      */
     getApplied(): boolean {
@@ -88,8 +83,8 @@ export class FDataValidation {
             return false;
         }
 
-        const dataValidationModel = this._worksheet.getInject().get(DataValidationModel);
-        const currentRule = dataValidationModel.getRuleById(this._worksheet.getWorkbook().getUnitId(), this._worksheet.getSheetId(), this.rule.uid);
+        const dataValidationModel = this._injector!.get(DataValidationModel);
+        const currentRule = dataValidationModel.getRuleById(this._worksheet.getUnitId(), this._worksheet.getSheetId(), this.rule.uid);
 
         if (currentRule && currentRule.ranges.length) {
             return true;
@@ -99,39 +94,27 @@ export class FDataValidation {
 
     /**
      * Gets the ranges to which the data validation rule is applied.
-     *
      * @returns An array of IRange objects representing the ranges to which the data validation rule is applied.
      */
     getRanges(): FRange[] {
-        if (!this.getAllowInvalid()) {
+        if (!this.getApplied()) {
             return [];
         }
 
-        const workbook = this._worksheet?.getWorkbook();
-        const sheetId = this.getSheetId();
-        if (!sheetId) {
-            return [];
-        }
-        const worksheet = workbook?.getSheetBySheetId(sheetId);
-        if (!workbook || !worksheet) {
-            return [];
-        }
-
-        return this.rule.ranges.map((range: IRange) => this._worksheet?.getInject().createInstance(FRange, workbook, worksheet, range));
+        const workbook = this._injector!.get(IUniverInstanceService).getUnit<Workbook>(this._worksheet!.getUnitId())!;
+        return this.rule.ranges.map((range: IRange) => this._injector!.createInstance(FRange, workbook, this._worksheet!, range));
     }
 
     /**
      * Gets the title of the error message dialog box.
-     *
      * @returns The title of the error message dialog box.
      */
     getUnitId(): string | undefined {
-        return this._worksheet?.getWorkbook().getUnitId();
+        return this._worksheet?.getUnitId();
     }
 
     /**
      * Gets the sheetId of the worksheet.
-     *
      * @returns The sheetId of the worksheet.
      */
     getSheetId(): string | undefined {
@@ -142,11 +125,12 @@ export class FDataValidation {
      * Set Criteria for the data validation rule.
      * @param type The type of data validation criteria.
      * @param values An array containing the operator, formula1, and formula2 values.
+     * @param allowBlank
      * @returns true if the criteria is set successfully, false otherwise.
      */
-    setCriteria(type: DataValidationType, values: [DataValidationOperator, string, string]): boolean {
+    setCriteria(type: DataValidationType, values: [DataValidationOperator, string, string], allowBlank = true): FDataValidation {
         if (this.getApplied()) {
-            const commandService = this._worksheet!.getInject().get(ICommandService);
+            const commandService = this._injector!.get(ICommandService);
             const res = commandService.syncExecuteCommand(UpdateSheetDataValidationSettingCommand.id, {
                 unitId: this.getUnitId(),
                 subUnitId: this.getSheetId(),
@@ -156,11 +140,12 @@ export class FDataValidation {
                     formula1: values[1],
                     formula2: values[2],
                     type: this.rule.type,
+                    allowBlank,
                 },
             } as IUpdateSheetDataValidationSettingCommandParams);
 
             if (!res) {
-                return false;
+                throw new Error('setCriteria failed');
             }
         }
 
@@ -168,8 +153,9 @@ export class FDataValidation {
         this.rule.formula1 = values[1];
         this.rule.formula2 = values[2];
         this.rule.type = type;
+        this.rule.allowBlank = allowBlank;
 
-        return true;
+        return this;
     }
 
     /**
@@ -178,9 +164,9 @@ export class FDataValidation {
      * @param options An object containing the options to set. `IDataValidationRuleOptions`
      * @returns true if the options are set successfully, false otherwise.
      */
-    setOptions(options: Partial<IDataValidationRuleOptions>): boolean {
+    setOptions(options: Partial<IDataValidationRuleOptions>): FDataValidation {
         if (this.getApplied()) {
-            const commandService = this._worksheet!.getInject().get(ICommandService);
+            const commandService = this._injector!.get(ICommandService);
             const res = commandService.syncExecuteCommand(UpdateSheetDataValidationOptionsCommand.id, {
                 unitId: this.getUnitId(),
                 subUnitId: this.getSheetId(),
@@ -192,12 +178,12 @@ export class FDataValidation {
             } as IUpdateSheetDataValidationOptionsCommandParams);
 
             if (!res) {
-                return false;
+                throw new Error('setOptions failed');
             }
         }
 
         Object.assign(this.rule, options);
-        return true;
+        return this;
     }
 
     /**
@@ -205,9 +191,9 @@ export class FDataValidation {
      * @param ranges new ranges array.
      * @returns true if the ranges are set successfully, false otherwise.
      */
-    setRanges(ranges: FRange[]): boolean {
+    setRanges(ranges: FRange[]): FDataValidation {
         if (this.getApplied()) {
-            const commandService = this._worksheet!.getInject().get(ICommandService);
+            const commandService = this._injector!.get(ICommandService);
             const res = commandService.syncExecuteCommand(UpdateSheetDataValidationRangeCommand.id, {
                 unitId: this.getUnitId(),
                 subUnitId: this.getSheetId(),
@@ -216,12 +202,12 @@ export class FDataValidation {
             } as IUpdateSheetDataValidationRangeCommandParams);
 
             if (!res) {
-                return false;
+                throw new Error('setRanges failed');
             }
         }
 
-        this.rule.ranges = ranges;
-        return true;
+        this.rule.ranges = ranges.map((range) => range.getRange());
+        return this;
     }
 
     /**
@@ -233,7 +219,7 @@ export class FDataValidation {
             return false;
         }
 
-        const commandService = this._worksheet!.getInject().get(ICommandService);
+        const commandService = this._injector!.get(ICommandService);
         return commandService.syncExecuteCommand(RemoveSheetDataValidationCommand.id, {
             unitId: this.getUnitId(),
             subUnitId: this.getSheetId(),

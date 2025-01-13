@@ -197,6 +197,15 @@ and then run the following command to run E2E tests:
 pnpm test:e2e
 ```
 
+### Build Preview
+
+After building, the output may differ from the source code. To test for any differences, you can link to the built artifacts using:
+
+```shell
+pnpm build
+pnpm dev:libs
+```
+
 ### Update Snapshots
 
 Univer uses Playwright to perform visual comparison tests. If you have made changes to the UI, the CI may fail due to visual differences. You can update the snapshots by running this GitHub Action [📸 Manually Update Snapshots · Workflow runs · dream-num/univer (github.com)](https://github.com/dream-num/univer/actions/workflows/update-snapshots-manually.yml) on your branch.
@@ -226,6 +235,21 @@ pnpm create @univerjs/cli init <project-name>
 npm create @univerjs/cli init <project-name>
 
 ```
+
+### How to Contribute to Facade API
+#### Synchronous API Priority
+* For asynchronous APIs, consider the following: Can a synchronous sub-API be extracted, separating logic such as secondary confirmation.
+* For APIs that must be asynchronous, indicate this in the method name, such as `addCommentAsync`.
+
+#### Chaining Principle
+*. APIs must adhere to the chaining principle.
+*. APIs with `modify` semantics should return `this`.
+*. APIs with `create` semantics should return the created instance.
+*. APIs with `delete` semantics should return `true/false`.
+
+#### Easy to Get
+*. All APIs/constants/enums should be accessible from the `univerAPI` variable.
+
 
 ## Links
 

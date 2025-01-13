@@ -16,11 +16,10 @@
 
 import type { Dependency } from '@univerjs/core';
 import type { IUniverEngineFormulaConfig } from './controller/config.schema';
-import { IConfigService, Inject, Injector, Plugin, touchDependencies } from '@univerjs/core';
+import { IConfigService, Inject, Injector, merge, Plugin, touchDependencies } from '@univerjs/core';
 import { CalculateController } from './controller/calculate.controller';
 import { defaultPluginConfig, ENGINE_FORMULA_PLUGIN_CONFIG_KEY } from './controller/config.schema';
 import { FormulaController } from './controller/formula.controller';
-import { SetDefinedNameController } from './controller/set-defined-name.controller';
 import { SetDependencyController } from './controller/set-dependency.controller';
 import { SetFeatureCalculationController } from './controller/set-feature-calculation.controller';
 import { SetOtherFormulaController } from './controller/set-other-formula.controller';
@@ -68,7 +67,11 @@ export class UniverFormulaEnginePlugin extends Plugin {
         super();
 
         // Manage the plugin configuration.
-        const { ...rest } = this._config;
+        const { ...rest } = merge(
+            {},
+            defaultPluginConfig,
+            this._config
+        );
         this._configService.setConfig(ENGINE_FORMULA_PLUGIN_CONFIG_KEY, rest);
     }
 
@@ -80,7 +83,6 @@ export class UniverFormulaEnginePlugin extends Plugin {
     override onReady(): void {
         touchDependencies(this._injector, [
             [FormulaController],
-            [SetDefinedNameController],
             [SetSuperTableController],
         ]);
 
@@ -120,7 +122,6 @@ export class UniverFormulaEnginePlugin extends Plugin {
 
             //Controllers
             [FormulaController],
-            [SetDefinedNameController],
             [SetSuperTableController],
         ];
 

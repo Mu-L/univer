@@ -21,6 +21,7 @@ import { CreateEmptySheetCommand, DisposeCurrentUnitCommand, DisposeUniverComman
 import { ShowCellContentOperation } from '../commands/operations/cell.operation';
 import { ChangeUserCommand } from '../commands/operations/change-user.operation';
 import { ConfirmOperation } from '../commands/operations/confirm.operation';
+import { DarkModeOperation } from '../commands/operations/dark-mode.operation';
 import { DialogOperation } from '../commands/operations/dialog.operation';
 import { LocaleOperation } from '../commands/operations/locale.operation';
 import { MessageOperation } from '../commands/operations/message.operation';
@@ -29,14 +30,14 @@ import { OpenWatermarkPanelOperation } from '../commands/operations/open-waterma
 import { SaveSnapshotOptions } from '../commands/operations/save-snapshot.operations';
 import { SetEditable } from '../commands/operations/set.editable.operation';
 import { SidebarOperation } from '../commands/operations/sidebar.operation';
+
 import { ThemeOperation } from '../commands/operations/theme.operation';
 
 import { ImageDemo } from '../components/Image';
-
 // @ts-ignore
 import VueI18nIcon from '../components/VueI18nIcon.vue';
-import { TEST_EDITOR_CONTAINER_COMPONENT } from '../views/test-editor/component-name';
-import { TestEditorContainer } from '../views/test-editor/TestTextEditor';
+// import { TEST_EDITOR_CONTAINER_COMPONENT } from '../views/test-editor/component-name';
+// import { TestEditorContainer } from '../views/test-editor/TestTextEditor';
 import { RecordController } from './local-save/record.controller';
 import { menuSchema } from './menu.schema';
 
@@ -54,6 +55,7 @@ export class DebuggerController extends Disposable {
 
         [
             LocaleOperation,
+            DarkModeOperation,
             ThemeOperation,
             NotificationOperation,
             DialogOperation,
@@ -81,7 +83,7 @@ export class DebuggerController extends Disposable {
 
     private _initCustomComponents(): void {
         const componentManager = this._componentManager;
-        this.disposeWithMe(componentManager.register(TEST_EDITOR_CONTAINER_COMPONENT, TestEditorContainer));
+        // this.disposeWithMe(componentManager.register(TEST_EDITOR_CONTAINER_COMPONENT, TestEditorContainer));
         this.disposeWithMe(componentManager.register('VueI18nIcon', VueI18nIcon, {
             framework: 'vue3',
         }));

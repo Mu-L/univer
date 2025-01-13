@@ -18,6 +18,7 @@ import '@univerjs/sheets/facade';
 import '@univerjs/ui/facade';
 import '@univerjs/docs-ui/facade';
 import '@univerjs/sheets-ui/facade';
+import '@univerjs/sheets-zen-editor/facade';
 import '@univerjs/sheets-data-validation/facade';
 import '@univerjs/engine-formula/facade';
 import '@univerjs/sheets-filter/facade';
@@ -26,10 +27,12 @@ import '@univerjs/sheets-numfmt/facade';
 import '@univerjs/sheets-hyper-link/facade';
 import '@univerjs/sheets-hyper-link-ui/facade';
 import '@univerjs/sheets-thread-comment/facade';
+import '@univerjs/sheets-conditional-formatting/facade';
 
 export { FHooks, FUniver } from '@univerjs/core';
 
 export { FFormula } from '@univerjs/engine-formula/facade';
+export { FConditionalFormattingBuilder } from '@univerjs/sheets-conditional-formatting/facade';
 export { FDataValidation, FDataValidationBuilder } from '@univerjs/sheets-data-validation/facade';
 export { FFilter } from '@univerjs/sheets-filter/facade';
 export { FThreadComment } from '@univerjs/sheets-thread-comment/facade';

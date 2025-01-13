@@ -17,7 +17,7 @@
 import type { Dependency, Workbook } from '@univerjs/core';
 import type { IUniverUIConfig } from '@univerjs/ui';
 import type { IUniverSheetsUIConfig } from './controllers/config.schema';
-import { DependentOn, IConfigService, Inject, Injector, IUniverInstanceService, mergeOverrideWithDependencies, Plugin, registerDependencies, touchDependencies, UniverInstanceType } from '@univerjs/core';
+import { DependentOn, IConfigService, Inject, Injector, IUniverInstanceService, merge, mergeOverrideWithDependencies, Plugin, registerDependencies, touchDependencies, UniverInstanceType } from '@univerjs/core';
 import { IRenderManagerService } from '@univerjs/engine-render';
 import { IRefSelectionsService, RefSelectionsService, UniverSheetsPlugin } from '@univerjs/sheets';
 import { UI_PLUGIN_CONFIG_KEY } from '@univerjs/ui';
@@ -42,13 +42,11 @@ import { FormatPainterController } from './controllers/format-painter/format-pai
 import { HoverRenderController } from './controllers/hover-render.controller';
 import { MarkSelectionRenderController } from './controllers/mark-selection.controller';
 import { MoveRangeRenderController } from './controllers/move-range.controller';
-import { SheetPermissionInitController } from './controllers/permission/sheet-permission-init.controller';
-import { SheetPermissionInterceptorBaseController } from './controllers/permission/sheet-permission-interceptor-base.controller';
+import { SheetPermissionCheckUIController } from './controllers/permission/sheet-permission-check-ui.controller';
 import { SheetPermissionInterceptorCanvasRenderController } from './controllers/permission/sheet-permission-interceptor-canvas-render.controller';
 import { SheetPermissionInterceptorClipboardController } from './controllers/permission/sheet-permission-interceptor-clipboard.controller';
 import { SheetPermissionInterceptorFormulaRenderController } from './controllers/permission/sheet-permission-interceptor-formula-render.controller';
 import { SheetPermissionRenderController, SheetPermissionRenderManagerController, WorksheetProtectionRenderController } from './controllers/permission/sheet-permission-render.controller';
-import { SheetPermissionViewModelController } from './controllers/permission/sheet-permission-view-model.controller';
 import { SheetContextMenuRenderController } from './controllers/render-controllers/contextmenu.render-controller';
 import { EditorBridgeRenderController } from './controllers/render-controllers/editor-bridge.render-controller';
 import { FormatPainterRenderController } from './controllers/render-controllers/format-painter.render-controller';
@@ -106,7 +104,11 @@ export class UniverSheetsUIPlugin extends Plugin {
         super();
 
         // Manage the plugin configuration.
-        const { menu, ...rest } = this._config;
+        const { menu, ...rest } = merge(
+            {},
+            defaultPluginConfig,
+            this._config
+        );
 
         if (menu) {
             this._configService.setConfig('menu', menu, { merge: true });
@@ -152,14 +154,11 @@ export class UniverSheetsUIPlugin extends Plugin {
             [SheetPermissionPanelModel],
             [SheetPermissionUserManagerService],
             [SheetPermissionInterceptorClipboardController],
-            [SheetPermissionInterceptorBaseController],
-            [SheetPermissionInitController],
-            [SheetPermissionViewModelController],
+            [SheetPermissionCheckUIController],
             [SheetPermissionRenderManagerController],
         ] as Dependency[], this._config.override));
 
         touchDependencies(this._injector, [
-            [SheetPermissionViewModelController],
             [SheetPermissionPanelModel],
         ]);
     }
@@ -179,7 +178,7 @@ export class UniverSheetsUIPlugin extends Plugin {
             [SheetUIController],
             [SheetsRenderService],
             [ActiveWorksheetController],
-            [SheetPermissionInterceptorBaseController],
+            [SheetPermissionCheckUIController],
         ]);
     }
 
@@ -187,7 +186,6 @@ export class UniverSheetsUIPlugin extends Plugin {
         this._registerRenderModules();
 
         touchDependencies(this._injector, [
-            [SheetPermissionInitController],
             [SheetPermissionRenderManagerController],
             [SheetClipboardController],
             [FormulaEditorController],

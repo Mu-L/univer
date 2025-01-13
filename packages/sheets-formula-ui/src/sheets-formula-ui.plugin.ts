@@ -16,7 +16,7 @@
 
 import type { Dependency } from '@univerjs/core';
 import type { IUniverSheetsFormulaBaseConfig } from './controllers/config.schema';
-import { DependentOn, IConfigService, Inject, Injector, Plugin, touchDependencies, UniverInstanceType } from '@univerjs/core';
+import { DependentOn, IConfigService, Inject, Injector, merge, Plugin, touchDependencies, UniverInstanceType } from '@univerjs/core';
 import { UniverFormulaEnginePlugin } from '@univerjs/engine-formula';
 import { IRenderManagerService } from '@univerjs/engine-render';
 import { UniverSheetsFormulaPlugin } from '@univerjs/sheets-formula';
@@ -33,7 +33,6 @@ import { FormulaClipboardController } from './controllers/formula-clipboard.cont
 import { FormulaEditorShowController } from './controllers/formula-editor-show.controller';
 import { FormulaRenderManagerController } from './controllers/formula-render.controller';
 import { FormulaUIController } from './controllers/formula-ui.controller';
-import { PromptController } from './controllers/prompt.controller';
 import { FormulaPromptService, IFormulaPromptService } from './services/prompt.service';
 import { RefSelectionsRenderService } from './services/render-services/ref-selections.render-service';
 import { FormulaEditor } from './views/formula-editor/index';
@@ -56,7 +55,10 @@ export class UniverSheetsFormulaUIPlugin extends Plugin {
         super();
 
         // Manage the plugin configuration.
-        const { menu, ...rest } = this._config;
+        const { menu, ...rest } = merge(
+            defaultPluginBaseConfig,
+            this._config
+        );
         if (menu) {
             this._configService.setConfig('menu', menu, { merge: true });
         }
@@ -72,10 +74,13 @@ export class UniverSheetsFormulaUIPlugin extends Plugin {
             [FormulaClipboardController],
             [FormulaEditorShowController],
             [FormulaRenderManagerController],
-            [PromptController],
         ];
 
         dependencies.forEach((dependency) => j.add(dependency));
+
+        const componentManager = this._injector.get(ComponentManager);
+        componentManager.register(RANGE_SELECTOR_COMPONENT_KEY, RangeSelector);
+        componentManager.register(EMBEDDING_FORMULA_EDITOR_COMPONENT_KEY, FormulaEditor);
     }
 
     override onRendered(): void {
@@ -91,15 +96,9 @@ export class UniverSheetsFormulaUIPlugin extends Plugin {
             [FormulaClipboardController],
             [FormulaRenderManagerController],
         ]);
-
-        const componentManager = this._injector.get(ComponentManager);
-
-        componentManager.register(RANGE_SELECTOR_COMPONENT_KEY, RangeSelector);
-        componentManager.register(EMBEDDING_FORMULA_EDITOR_COMPONENT_KEY, FormulaEditor);
     }
 
     override onSteady(): void {
         this._injector.get(FormulaAutoFillController);
-        this._injector.get(PromptController);
     }
 }

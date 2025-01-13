@@ -128,8 +128,7 @@ export class SheetsSelectionsService extends RxDisposable {
     ): void {
         if (typeof unitIdOrSelections === 'string' && typeof worksheetIdOrType === 'string') {
             const unitId = unitIdOrSelections as string;
-            const selectionModel = this.getWorkbookSelections(unitId);
-            selectionModel.setSelections(
+            this._ensureWorkbookSelection(unitId).setSelections(
                 worksheetIdOrType,
                 selectionDatas || [],
                 type ?? SelectionMoveType.ONLY_SET
@@ -217,4 +216,12 @@ export class SheetsSelectionsService extends RxDisposable {
 }
 
 /** An context key to disable normal selections if its value is set to `true`. */
+// so Bad! why not enableXXX
 export const DISABLE_NORMAL_SELECTIONS = 'DISABLE_NORMAL_SELECTIONS';
+export const SELECTIONS_ENABLED = 'SELECTIONS_ENABLED';
+export const REF_SELECTIONS_ENABLED = 'REF_SELECTIONS_ENABLED';
+export const SELECTION_MODE = '__SELECTION_MODE__';
+export enum SelectionMode {
+    NORMAL,
+    REF,
+}

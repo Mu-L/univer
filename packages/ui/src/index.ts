@@ -20,11 +20,9 @@ export * from './common';
 export { getHeaderFooterMenuHiddenObservable, getMenuHiddenObservable } from './common/menu-hidden-observable';
 export { mergeMenuConfigs } from './common/menu-merge-configs';
 export * from './components';
-export { useEvent } from './components/hooks/event';
 export { t } from './components/hooks/locale';
-export { useObservable, useObservableRef } from './components/hooks/observable';
+export * from './components/hooks';
 export { RectPopup } from './views/components/popup/RectPopup';
-export { useVirtualList } from './components/hooks/virtual-list';
 export { Menu as UIMenu } from './components/menu/desktop/Menu';
 export { type INotificationOptions, type NotificationType } from './components/notification/Notification';
 export { ProgressBar } from './components/progress-bar/ProgressBar';
@@ -44,7 +42,8 @@ export { IUIController, type IWorkbenchOptions } from './controllers/ui/ui.contr
 export { DesktopUIController } from './controllers/ui/ui-desktop.controller';
 export { UniverMobileUIPlugin } from './mobile-ui-plugin';
 export { DesktopBeforeCloseService, IBeforeCloseService } from './services/before-close/before-close.service';
-export { CopyCommand, CutCommand, PasteCommand } from './services/clipboard/clipboard.command';
+export { CopyCommand, CutCommand, PasteCommand, SheetPasteShortKeyCommandName } from './services/clipboard/clipboard.command';
+export { supportClipboardAPI } from './services/clipboard/clipboard-utils';
 export {
     BrowserClipboardService,
     FILE__BMP_CLIPBOARD_MIME_TYPE,

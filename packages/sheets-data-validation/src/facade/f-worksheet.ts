@@ -16,27 +16,50 @@
 
 import type { DataValidationStatus, Nullable, ObjectMatrix } from '@univerjs/core';
 import { DataValidationModel } from '@univerjs/data-validation';
-import { FWorksheet } from '@univerjs/sheets/facade';
 import { SheetsDataValidationValidatorService } from '@univerjs/sheets-data-validation';
+import { FWorksheet } from '@univerjs/sheets/facade';
 import { FDataValidation } from './f-data-validation';
 
 export interface IFWorksheetDataValidationMixin {
     /**
-     * get all data validation rules in current sheet
+     * Get all data validation rules in current sheet.
      * @returns all data validation rules
+     * ```ts
+     * const workbook = univerAPI.getActiveWorkbook();
+     * const worksheet = workbook.getWorksheet('sheet1');
+     * const dataValidations = worksheet.getDataValidations();
+     * ```
      */
     getDataValidations(): FDataValidation[];
     /**
-     * get data validation validator status for current sheet
+     * Get data validation validator status for current sheet.
      * @returns matrix of validator status
+     * ```ts
+     * const workbook = univerAPI.getActiveWorkbook();
+     * const worksheet = workbook.getWorksheet('sheet1');
+     * const validatorStatus = worksheet.getValidatorStatus();
+     * ```
      */
     getValidatorStatus(): Promise<ObjectMatrix<Nullable<DataValidationStatus>>>;
+
+    /**
+     * get data validation rule by rule id
+     * @param ruleId - the rule id
+     * @returns data validation rule
+     * ```ts
+     * const workbook = univerAPI.getActiveWorkbook();
+     * const worksheet = workbook.getWorksheet('sheet1');
+     * const dataValidation = worksheet.getDataValidation('ruleId');
+     * ```
+     */
+    getDataValidation(ruleId: string): Nullable<FDataValidation>;
+
 }
 
 export class FWorksheetDataValidationMixin extends FWorksheet implements IFWorksheetDataValidationMixin {
     override getDataValidations(): FDataValidation[] {
         const dataValidationModel = this._injector.get(DataValidationModel);
-        return dataValidationModel.getRules(this._workbook.getUnitId(), this._worksheet.getSheetId()).map((rule) => new FDataValidation(rule));
+        return dataValidationModel.getRules(this._workbook.getUnitId(), this._worksheet.getSheetId()).map((rule) => new FDataValidation(rule, this._worksheet, this._injector));
     }
 
     override getValidatorStatus(): Promise<ObjectMatrix<Nullable<DataValidationStatus>>> {
@@ -45,6 +68,15 @@ export class FWorksheetDataValidationMixin extends FWorksheet implements IFWorks
             this._workbook.getUnitId(),
             this._worksheet.getSheetId()
         );
+    }
+
+    override getDataValidation(ruleId: string): Nullable<FDataValidation> {
+        const dataValidationModel = this._injector.get(DataValidationModel);
+        const rule = dataValidationModel.getRuleById(this._workbook.getUnitId(), this._worksheet.getSheetId(), ruleId);
+        if (rule) {
+            return new FDataValidation(rule, this._worksheet, this._injector);
+        }
+        return null;
     }
 }
 

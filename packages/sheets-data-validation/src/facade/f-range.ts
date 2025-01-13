@@ -16,25 +16,25 @@
 
 import type { DataValidationStatus, Nullable } from '@univerjs/core';
 import type { IAddSheetDataValidationCommandParams, IClearRangeDataValidationCommandParams } from '@univerjs/sheets-data-validation';
-import { FRange } from '@univerjs/sheets/facade';
 import { AddSheetDataValidationCommand, ClearRangeDataValidationCommand, SheetsDataValidationValidatorService } from '@univerjs/sheets-data-validation';
+import { FRange } from '@univerjs/sheets/facade';
 import { FDataValidation } from './f-data-validation';
 
 export interface IFRangeDataValidationMixin {
     /**
-     * set a data validation rule to current range
+     * Set a data validation rule to current range.
      * @param rule data validation rule, build by `FUniver.newDataValidation`
      * @returns current range
      */
-    setDataValidation(this: FRange, rule: Nullable<FDataValidation>): Promise<FRange>;
+    setDataValidation(this: FRange, rule: Nullable<FDataValidation>): FRange;
     /**
-     * get first data validation rule in current range
+     * Get first data validation rule in current range.
      * @returns data validation rule
      */
     getDataValidation(this: FRange): Nullable<FDataValidation>;
 
     /**
-     * get all data validation rules in current range
+     * Get all data validation rules in current range.
      * @returns all data validation rules
      */
     getDataValidations(this: FRange): FDataValidation[];
@@ -42,9 +42,9 @@ export interface IFRangeDataValidationMixin {
 }
 
 export class FRangeDataValidationMixin extends FRange implements IFRangeDataValidationMixin {
-    override async setDataValidation(rule: Nullable<FDataValidation>): Promise<FRange> {
+    override setDataValidation(rule: Nullable<FDataValidation>): FRange {
         if (!rule) {
-            this._commandService.executeCommand(ClearRangeDataValidationCommand.id, {
+            this._commandService.syncExecuteCommand(ClearRangeDataValidationCommand.id, {
                 unitId: this._workbook.getUnitId(),
                 subUnitId: this._worksheet.getSheetId(),
                 ranges: [this._range],
@@ -62,7 +62,7 @@ export class FRangeDataValidationMixin extends FRange implements IFRangeDataVali
             },
         };
 
-        await this._commandService.executeCommand(AddSheetDataValidationCommand.id, params);
+        this._commandService.syncExecuteCommand(AddSheetDataValidationCommand.id, params);
         return this;
     }
 
@@ -75,7 +75,7 @@ export class FRangeDataValidationMixin extends FRange implements IFRangeDataVali
         );
 
         if (rule) {
-            return new FDataValidation(rule);
+            return new FDataValidation(rule, this._worksheet, this._injector);
         }
 
         return rule;
@@ -87,7 +87,7 @@ export class FRangeDataValidationMixin extends FRange implements IFRangeDataVali
             this._workbook.getUnitId(),
             this._worksheet.getSheetId(),
             [this._range]
-        ).map((rule) => new FDataValidation(rule));
+        ).map((rule) => new FDataValidation(rule, this._worksheet, this._injector));
     }
 
     override async getValidatorStatus(): Promise<Promise<DataValidationStatus>[][]> {

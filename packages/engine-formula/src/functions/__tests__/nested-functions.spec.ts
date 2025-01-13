@@ -39,7 +39,9 @@ import { Choose } from '../lookup/choose';
 import { FUNCTION_NAMES_LOOKUP } from '../lookup/function-names';
 import { Xlookup } from '../lookup/xlookup';
 import { Xmatch } from '../lookup/xmatch';
+import { Fact } from '../math/fact';
 import { FUNCTION_NAMES_MATH } from '../math/function-names';
+import { Product } from '../math/product';
 import { Sum } from '../math/sum';
 import { Sumif } from '../math/sumif';
 import { Sumifs } from '../math/sumifs';
@@ -267,6 +269,52 @@ const getFunctionsTestWorkbookData = (): IWorkbookData => {
                             t: 4,
                         },
                     },
+                    12: {
+                        0: {
+                            v: '10',
+                            t: 1,
+                            p: {
+                                id: '__INTERNAL_EDITOR__DOCS_NORMAL',
+                                documentStyle: {
+                                    pageSize: {
+                                        width: 73,
+                                        height: undefined,
+                                    },
+                                    marginTop: 1,
+                                    marginBottom: 2,
+                                    marginRight: 2,
+                                    marginLeft: 2,
+                                    renderConfig: {
+                                        horizontalAlign: 0,
+                                        verticalAlign: 0,
+                                        centerAngle: 0,
+                                        vertexAngle: 0,
+                                        wrapStrategy: 0,
+                                    },
+                                },
+                                body: {
+                                    dataStream: '10\r\n',
+                                    textRuns: [
+                                        { ts: { ff: 'Arial', fs: 11 }, st: 0, ed: 1 },
+                                        { st: 1, ed: 2, ts: { ff: 'Arial', fs: 11, cl: { rgb: '#B20000' } } },
+                                    ],
+                                    paragraphs: [
+                                        { startIndex: 2, paragraphStyle: { horizontalAlign: 0 } },
+                                    ],
+                                    sectionBreaks: [
+                                        { startIndex: 3 },
+                                    ],
+                                    customRanges: [],
+                                    customDecorations: [],
+                                },
+                                drawings: {},
+                                drawingsOrder: [],
+                                settings: {
+                                    zoomRatio: 1,
+                                },
+                            },
+                        },
+                    },
                 },
             },
         },
@@ -343,8 +391,9 @@ describe('Test nested functions', () => {
             new Sum(FUNCTION_NAMES_MATH.SUM),
             new Choose(FUNCTION_NAMES_LOOKUP.CHOOSE),
             new Len(FUNCTION_NAMES_TEXT.LEN),
-            new Divided(FUNCTION_NAMES_META.DIVIDED)
-
+            new Divided(FUNCTION_NAMES_META.DIVIDED),
+            new Product(FUNCTION_NAMES_MATH.PRODUCT),
+            new Fact(FUNCTION_NAMES_MATH.FACT)
         );
 
         calculate = (formula: string) => {
@@ -448,6 +497,24 @@ describe('Test nested functions', () => {
 
             result = calculate('=SUMIF(A11:C11,A12,A11:C11)');
             expect(result).toBe(2);
+        });
+
+        it('Product test, cell number string ignore, param number string can be calculated', () => {
+            let result = calculate('=PRODUCT(A12)');
+            expect(result).toBe(0);
+
+            result = calculate('=PRODUCT("2")');
+            expect(result).toBe(2);
+        });
+
+        it('value is rich text', () => {
+            let result = calculate('=SUM(A13)');
+            expect(result).toStrictEqual(0);
+
+            result = calculate('=FACT(A13)');
+            expect(result).toStrictEqual([
+                [3628800],
+            ]);
         });
     });
 });

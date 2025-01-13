@@ -15,6 +15,8 @@
  */
 
 import { AddWorksheetMergeMutation } from '../../commands/mutations/add-worksheet-merge.mutation';
+import { SetWorksheetRangeThemeStyleMutation } from '../../commands/mutations/add-worksheet-range-theme.mutation';
+import { DeleteWorksheetRangeThemeStyleMutation } from '../../commands/mutations/delete-worksheet-range-theme.mutation';
 import { InsertColMutation, InsertRowMutation } from '../../commands/mutations/insert-row-col.mutation';
 import { MoveRangeMutation } from '../../commands/mutations/move-range.mutation';
 import { MoveColsMutation, MoveRowsMutation } from '../../commands/mutations/move-rows-cols.mutation';
@@ -23,6 +25,7 @@ import { RemoveWorksheetMergeMutation } from '../../commands/mutations/remove-wo
 import { ReorderRangeMutation } from '../../commands/mutations/reorder-range.mutation';
 import { SetColDataMutation } from '../../commands/mutations/set-col-data.mutation';
 import { SetColHiddenMutation, SetColVisibleMutation } from '../../commands/mutations/set-col-visible.mutation';
+import { SetGridlinesColorMutation } from '../../commands/mutations/set-gridlines-color.mutation';
 import { SetRangeValuesMutation } from '../../commands/mutations/set-range-values.mutation';
 import { SetRowDataMutation } from '../../commands/mutations/set-row-data.mutation';
 import { SetRowHiddenMutation, SetRowVisibleMutation } from '../../commands/mutations/set-row-visible.mutation';
@@ -56,6 +59,7 @@ export const COMMAND_LISTENER_SKELETON_CHANGE = [
     RemoveColMutation.id,
     RemoveRowMutation.id,
     ToggleGridlinesMutation.id,
+    SetGridlinesColorMutation.id,
 ];
 
 export const COMMAND_LISTENER_VALUE_CHANGE = [
@@ -67,4 +71,6 @@ export const COMMAND_LISTENER_VALUE_CHANGE = [
     SetWorksheetDefaultStyleMutation.id,
     SetRowDataMutation.id,
     SetColDataMutation.id,
+    SetWorksheetRangeThemeStyleMutation.id,
+    DeleteWorksheetRangeThemeStyleMutation.id,
 ];
