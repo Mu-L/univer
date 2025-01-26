@@ -22,27 +22,24 @@ export { debounce, get, merge, mergeWith, set } from 'lodash-es';
 export { textDiff } from './shared/text-diff';
 export { dedupe, groupBy, makeArray, remove, rotate } from './common/array';
 export { isBooleanString } from './common/boolean';
-export {
-    createInternalEditorID,
-    DEFAULT_EMPTY_DOCUMENT_VALUE,
-    DOCS_FORMULA_BAR_EDITOR_UNIT_ID_KEY,
-    DOCS_NORMAL_EDITOR_UNIT_ID_KEY,
-    DOCS_ZEN_EDITOR_UNIT_ID_KEY,
-    IS_ROW_STYLE_PRECEDE_COLUMN_STYLE,
-    isInternalEditorID,
-} from './common/const';
+export * from './common/const';
 export * from './common/di';
 export { shallowEqual } from './common/equal';
-export { CustomCommandExecutionError } from './common/error';
+export { ParagraphStyleBuilder, ParagraphStyleValue, RichTextBuilder, RichTextValue, TextDecorationBuilder, TextStyleBuilder, TextStyleValue } from './docs/data-model/rich-text-builder';
+export { CanceledError, CustomCommandExecutionError } from './common/error';
 export { throttle } from './common/function';
-export type { ICellInterceptor, IComposeInterceptors, IInterceptor, InterceptorHandler } from './common/interceptor';
+export type { IAsyncInterceptor, ICellInterceptor, IComposeInterceptors, IInterceptor, InterceptorHandler } from './common/interceptor';
 export { AsyncInterceptorManager, composeInterceptors, createAsyncInterceptorKey, createInterceptorKey, InterceptorEffectEnum, InterceptorManager } from './common/interceptor';
 export type { Serializable } from './common/json';
 export { MemoryCursor } from './common/memory-cursor';
 export { mixinClass } from './common/mixin';
-export { FBase } from './facade/f-base';
+export { FBase, FBaseInitialable } from './facade/f-base';
 export { FUniver } from './facade/f-univer';
 export { FHooks } from './facade/f-hooks';
+export { FBlob, type IFBlobSource } from './facade/f-blob';
+export { FEventName, type IEventBase, type IEventParamConfig } from './facade/f-event';
+export { FEnum } from './facade/f-enum';
+export { FUtil } from './facade/f-util';
 export { isNumeric, isSafeNumeric } from './common/number';
 export { Registry, RegistryAsMap } from './common/registry';
 export { requestImmediateMacroTask } from './common/request-immediate-macro-task';
@@ -67,8 +64,19 @@ export { updateAttributeByDelete } from './docs/data-model/text-x/apply-utils/de
 export { updateAttributeByInsert } from './docs/data-model/text-x/apply-utils/insert-apply';
 export { TextX } from './docs/data-model/text-x/text-x';
 export type { TPriority } from './docs/data-model/text-x/text-x';
-export { composeBody, getBodySlice, SliceBodyType } from './docs/data-model/text-x/utils';
-export { getCustomDecorationSlice, getCustomRangeSlice, normalizeBody } from './docs/data-model/text-x/utils';
+export {
+    composeBody,
+    getBodySlice,
+    getCustomBlockSlice,
+    getCustomDecorationSlice,
+    getCustomRangeSlice,
+    getParagraphsSlice,
+    getSectionBreakSlice,
+    getTableSlice,
+    getTextRunSlice,
+    normalizeBody,
+    SliceBodyType,
+} from './docs/data-model/text-x/utils';
 export { EventState, EventSubject, fromEventSubject, type IEventObserver } from './observer/observable';
 export { AuthzIoLocalService } from './services/authz-io/authz-io-local.service';
 export { IAuthzIoService } from './services/authz-io/type';
@@ -166,7 +174,7 @@ export {
 } from './sheets/sheet-snapshot-utils';
 export { Styles } from './sheets/styles';
 export * from './sheets/typedef';
-export { addLinkToDocumentModel, isRangesEqual, isUnitRangesEqual } from './sheets/util';
+export { addLinkToDocumentModel, isNotNullOrUndefined, isRangesEqual, isUnitRangesEqual } from './sheets/util';
 export { SheetViewModel } from './sheets/view-model';
 export { createDocumentModelWithStyle } from './sheets/util';
 export { ImageCacheMap } from './shared/cache/image-cache';

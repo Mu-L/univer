@@ -16,13 +16,13 @@
 
 import { EDITOR_ACTIVATED, IContextService, useDependency } from '@univerjs/core';
 import { IRenderManagerService } from '@univerjs/engine-render';
-import { DISABLE_NORMAL_SELECTIONS, IRefSelectionsService } from '@univerjs/sheets';
+import { IRefSelectionsService, REF_SELECTIONS_ENABLED } from '@univerjs/sheets';
 import { IContextMenuService } from '@univerjs/ui';
-import { useEffect, useLayoutEffect } from 'react';
 
+import { useEffect, useLayoutEffect } from 'react';
 import { RefSelectionsRenderService } from '../../../services/render-services/ref-selections.render-service';
 
-export const useRefactorEffect = (isNeed: boolean, unitId: string) => {
+export const useRefactorEffect = (isNeed: boolean, selecting: boolean, unitId: string, disableContextMenu = true) => {
     const renderManagerService = useDependency(IRenderManagerService);
     const contextService = useDependency(IContextService);
     const contextMenuService = useDependency(IContextMenuService);
@@ -30,42 +30,46 @@ export const useRefactorEffect = (isNeed: boolean, unitId: string) => {
 
     const render = renderManagerService.getRenderById(unitId);
     const refSelectionsRenderService = render?.with(RefSelectionsRenderService);
+
     useLayoutEffect(() => {
         if (isNeed) {
-            const d1 = refSelectionsRenderService?.enableSelectionChanging();
-            contextService.setContextValue(DISABLE_NORMAL_SELECTIONS, true);
             contextService.setContextValue(EDITOR_ACTIVATED, true);
 
             return () => {
                 contextService.setContextValue(EDITOR_ACTIVATED, false);
-                contextService.setContextValue(DISABLE_NORMAL_SELECTIONS, false);
-                d1?.dispose();
-            };
-        }
-    }, [isNeed]);
-
-    useLayoutEffect(() => {
-        if (isNeed) {
-            return () => {
                 refSelectionsService.clear();
             };
         }
-    }, [isNeed]);
+    }, [contextService, isNeed, refSelectionsService]);
 
-    //right context controller
-    useEffect(() => {
-        if (isNeed) {
-            contextMenuService.disable();
+    useLayoutEffect(() => {
+        if (isNeed && selecting) {
+            const d1 = refSelectionsRenderService?.enableSelectionChanging();
+            contextService.setContextValue(REF_SELECTIONS_ENABLED, true);
+
             return () => {
-                contextMenuService.enable();
+                contextService.setContextValue(REF_SELECTIONS_ENABLED, false);
+                d1?.dispose();
             };
         }
-    }, [isNeed]);
+    }, [contextService, isNeed, refSelectionsRenderService, selecting]);
+
+    // right context controller
+    useEffect(() => {
+        if (isNeed) {
+            contextService.setContextValue(EDITOR_ACTIVATED, true);
+            disableContextMenu && contextMenuService.disable();
+            return () => {
+                contextService.setContextValue(EDITOR_ACTIVATED, false);
+                disableContextMenu && contextMenuService.enable();
+            };
+        }
+    }, [contextMenuService, contextService, isNeed, disableContextMenu]);
 
     // reset setSkipLastEnabled
     useEffect(() => {
         if (isNeed) {
             refSelectionsRenderService?.setSkipLastEnabled(false);
         }
-    }, [isNeed]);
+    }, [isNeed, refSelectionsRenderService]);
 };

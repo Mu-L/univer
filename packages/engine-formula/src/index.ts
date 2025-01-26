@@ -59,7 +59,6 @@ export { type ISetFormulaDataMutationParams, SetFormulaDataMutation } from './co
 export { type IRemoveOtherFormulaMutationParams, type ISetOtherFormulaMutationParams, RemoveOtherFormulaMutation, SetOtherFormulaMutation } from './commands/mutations/set-other-formula.mutation';
 export { RemoveSuperTableMutation, SetSuperTableMutation, SetSuperTableOptionMutation } from './commands/mutations/set-super-table.mutation';
 export { CalculateController } from './controller/calculate.controller';
-export { SetDefinedNameController } from './controller/set-defined-name.controller';
 export { Lexer } from './engine/analysis/lexer';
 export { LexerNode } from './engine/analysis/lexer-node';
 export { LexerTreeBuilder } from './engine/analysis/lexer-tree-builder';
@@ -100,7 +99,7 @@ export { handleRefStringInfo } from './engine/utils/reference';
 export { generateStringWithSequence, type ISequenceNode, sequenceNodeType } from './engine/utils/sequence';
 export { ArrayValueObject, ValueObjectFactory } from './engine/value-object/array-value-object';
 export { BaseValueObject, ErrorValueObject } from './engine/value-object/base-value-object';
-export type { PrimitiveValueType } from './engine/value-object/primitive-object';
+export type { FormulaFunctionResultValueType, FormulaFunctionValueType, PrimitiveValueType } from './engine/value-object/primitive-object';
 export { BooleanValueObject, NullValueObject, NumberValueObject, StringValueObject } from './engine/value-object/primitive-object';
 export { functionArray } from './functions/array/function-map';
 export { FUNCTION_NAMES_ARRAY } from './functions/array/function-names';
@@ -109,7 +108,7 @@ export { functionCompatibility } from './functions/compatibility/function-map';
 export { FUNCTION_NAMES_COMPATIBILITY } from './functions/compatibility/function-names';
 export { functionCube } from './functions/cube/function-map';
 export { FUNCTION_NAMES_CUBE } from './functions/cube/function-names';
-export { CustomFunction } from './functions/custom-function';
+export { AsyncCustomFunction, CustomFunction } from './functions/custom-function';
 export { functionDatabase } from './functions/database/function-map';
 export { FUNCTION_NAMES_DATABASE } from './functions/database/function-names';
 export { functionDate } from './functions/date/function-map';
@@ -156,7 +155,6 @@ export { FormulaExecutedStateType, FormulaExecuteStageType, FormulaRuntimeServic
 export { ISuperTableService } from './services/super-table.service';
 export { SuperTableService } from './services/super-table.service';
 export { deserializeRangeWithSheetWithCache } from './engine/utils/reference-cache';
-export { FFormula } from './facade/f-formula';
 export { FormulaDependencyTree, type IFormulaDependencyTree } from './engine/dependency/dependency-tree';
 export { type IOtherFormulaData } from './basics/common';
 export { FormulaDependencyTreeType } from './engine/dependency/dependency-tree';
@@ -164,7 +162,8 @@ export { FormulaDependencyTreeVirtual } from './engine/dependency/dependency-tre
 export { generateAstNode } from './engine/utils/generate-ast-node';
 export { type IFeatureCalculationManagerParam } from './services/feature-calculation-manager.service';
 export { DEFAULT_INTERVAL_COUNT } from './services/calculate-formula.service';
-export { ENGINE_FORMULA_PLUGIN_CONFIG_KEY, type IUniverEngineFormulaConfig } from './controller/config.schema';
+export { ENGINE_FORMULA_CYCLE_REFERENCE_COUNT, ENGINE_FORMULA_PLUGIN_CONFIG_KEY, type IUniverEngineFormulaConfig } from './controller/config.schema';
 
 export { generateRandomDependencyTreeId } from './engine/dependency/formula-dependency';
 export { DependencyManagerBaseService } from './services/dependency-manager.service';
+export { LambdaValueObjectObject } from './engine/value-object/lambda-value-object';

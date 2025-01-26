@@ -163,7 +163,13 @@ export class Viewport {
     private _widthOrigin: Nullable<number>;
     private _heightOrigin: Nullable<number>;
 
+    /**
+     * this._topOrigin * scaleY;
+     */
     private _top: number = 0;
+    /**
+     * this._leftOrigin * scaleX;
+     */
     private _left: number = 0;
     private _bottom: number = 0;
     private _right: number = 0;
@@ -208,6 +214,10 @@ export class Viewport {
      *  In future, viewMain dirty would not affect other viewports.
      */
     private _isDirty = true;
+
+    /**
+     * Canvas for cache if allowCache is true.
+     */
     private _cacheCanvas: UniverCanvas | null = null;
 
     /**
@@ -228,7 +238,7 @@ export class Viewport {
         this._scene.addViewport(this);
         this._active = Tools.isDefine(props?.active) ? props?.active : true;
 
-        this._setViewportSize(props);
+        this.setViewportSize(props);
         this.initCacheCanvas(props);
 
         this._isWheelPreventDefaultX = props?.isWheelPreventDefaultX || false;
@@ -348,22 +358,22 @@ export class Viewport {
         return this._viewportScrollY;
     }
 
-    private set top(num: number) {
+    set top(num: number) {
         this._topOrigin = num;
         this._top = toPx(num, this._scene?.getParent()?.height);
     }
 
-    private set left(num: number) {
+    set left(num: number) {
         this._leftOrigin = num;
         this._left = toPx(num, this.scene.getParent()?.width);
     }
 
-    private set bottom(num: number) {
+    set bottom(num: number) {
         this._bottomOrigin = num;
         this._bottom = toPx(num, this.scene.getParent()?.height);
     }
 
-    private set right(num: number) {
+    set right(num: number) {
         this._rightOrigin = num;
         this._right = toPx(num, this.scene.getParent()?.width);
     }
@@ -454,7 +464,7 @@ export class Viewport {
         if (positionKeys.length === 0) {
             return;
         }
-        this._setViewportSize(position);
+        this.setViewportSize(position);
         this.resetCanvasSizeAndUpdateScroll();
     }
 
@@ -715,7 +725,7 @@ export class Viewport {
 
         // set scrolling state for mainCtx,
         mainCtx.transform(tm[0], tm[1], tm[2], tm[3], tm[4], tm[5]);
-        const viewPortInfo = this._calcViewportInfo();
+        const viewPortInfo = this.calcViewportInfo();
 
         for (let i = 0, length = objects.length; i < length; i++) {
             objects[i].render(mainCtx, viewPortInfo);
@@ -785,7 +795,7 @@ export class Viewport {
     }
 
     // eslint-disable-next-line max-lines-per-function
-    private _calcViewportInfo(): IViewportInfo {
+    calcViewportInfo(): IViewportInfo {
         if (this.isActive === false) {
             return this._makeDefaultViewport();
         }
@@ -891,8 +901,12 @@ export class Viewport {
         } satisfies IViewportInfo;
     }
 
+    /**
+     * Get viewport info
+     * @deprecated use `calcViewportInfo`
+     */
     getBounding() {
-        return this._calcViewportInfo();
+        return this.calcViewportInfo();
     }
 
     /**
@@ -1477,7 +1491,7 @@ export class Viewport {
         }
     }
 
-    private _setViewportSize(props?: IViewProps) {
+    setViewportSize(props?: IViewProps) {
         if (Tools.isDefine(props?.top)) {
             this.top = props.top;
         }
@@ -1498,16 +1512,16 @@ export class Viewport {
             this.width = props?.width;
             this._widthOrigin = props?.width;
         } else {
-            this.width = null;
-            this._widthOrigin = null;
+            // this.width = null;
+            // this._widthOrigin = null;
         }
 
         if (Tools.isDefine(props?.height)) {
             this.height = props?.height;
             this._heightOrigin = props?.height;
         } else {
-            this.height = null;
-            this._heightOrigin = null;
+            // this.height = null;
+            // this._heightOrigin = null;
         }
     }
 }
